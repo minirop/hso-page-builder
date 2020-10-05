@@ -10,23 +10,26 @@ PageSettings::PageSettings(QWidget *parent) :
     ui(new Ui::PageSettings)
 {
     ui->setupUi(this);
+    ui->stackedWidget->setCurrentIndex(0);
 
     connect(ui->elementsList, &QListWidget::currentItemChanged, this, &PageSettings::itemChanged);
     connect(ui->textEdit, &QTextEdit::textChanged, [&]() {
         auto item = ui->elementsList->currentItem();
+        assert(item);
         auto graphics = item->data(Qt::UserRole+1).value<Text*>();
         assert(graphics);
         graphics->setString(ui->textEdit->toPlainText());
     });
     connect(ui->colorBtn, &QPushButton::clicked, [&]() {
         auto item = ui->elementsList->currentItem();
+        assert(item);
         auto graphics = item->data(Qt::UserRole+1).value<Text*>();
         assert(graphics);
 
         auto c = QColorDialog::getColor(graphics->fontColor, this, "Font color");
         if (c.isValid())
         {
-            graphics->setColor(c);
+            graphics->setFontColor(c);
             setFontColorButton(c);
         }
     });

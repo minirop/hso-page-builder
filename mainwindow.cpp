@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "ui_pagesettings.h"
+#include "globals.h"
 #include "gif.h"
 #include "text.h"
 #include <QFileDialog>
@@ -10,8 +11,6 @@
 #include <QHBoxLayout>
 #include <QScrollArea>
 #include <algorithm>
-
-constexpr int PAGE_WIDTH = 300;
 
 QList<int> stringsToInts(QStringList strings)
 {

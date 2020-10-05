@@ -15,6 +15,7 @@ Page::Page(QWidget * parent)
 
     setCacheMode(QGraphicsView::CacheBackground);
     setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing);
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setResizeAnchor(QGraphicsView::NoAnchor);
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);

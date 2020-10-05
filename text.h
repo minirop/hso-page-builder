@@ -25,7 +25,7 @@ public:
 
     void setWidth(int w);
     void setAnimation(int anim, int spd);
-    void setAlign(int align);
+    void setAlign(int halign);
     void setString(QString str);
     void setFont(QString filename);
     void setFontColor(QColor color);
@@ -36,21 +36,23 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 protected:
-    void timerEvent(QTimerEvent *event) override;
+    void timerEvent(QTimerEvent * event) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 private:
     void renderText(QString string);
 
     friend class PageSettings;
 
-    QPixmap renderedText;
+    QVector<QPixmap> renderedTextes;
     QString string;
     int width = 0;
+    int xoffset = 0;
     int align = Qt::AlignLeft;
     int marquee = 0;
     float floating = 0;
-    int typewriterProgress = 0;
-    int typewriterDirection = -1;
+    float typewriterProgress = 0;
+    int typewriterDirection = 1;
     bool textIsDirty = true;
     QColor fontColor = Qt::black;
     Animation animation = Animation::None;

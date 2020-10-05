@@ -28,6 +28,7 @@ SOURCES += \
 HEADERS += \
     fontdatabase.h \
     gif.h \
+    globals.h \
     mainwindow.h \
     page.h \
     pageelement.h \

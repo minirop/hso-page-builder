@@ -1,5 +1,6 @@
 #include "text.h"
 #include "fontdatabase.h"
+#include "globals.h"
 #include <QPainter>
 #include <QFileInfo>
 #include <QBitmap>
@@ -37,7 +38,7 @@ Text::Text()
     colorizeEffect->setColor(Qt::black);
     setGraphicsEffect(colorizeEffect);
 
-    setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+    setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges);
 }
 
 void Text::setWidth(int w)
@@ -64,15 +65,15 @@ void Text::setAnimation(int anim, int spd)
     }
 }
 
-void Text::setAlign(int align)
+void Text::setAlign(int halign)
 {
-    switch (align)
+    switch (halign)
     {
     case 0:
         align = Qt::AlignLeft;
         break;
     case 1:
-        align = Qt::AlignVCenter;
+        align = Qt::AlignHCenter;
         break;
     case 2:
         align = Qt::AlignRight;
@@ -83,6 +84,7 @@ void Text::setAlign(int align)
 void Text::setString(QString str)
 {
     string = str;
+    textIsDirty = true;
 }
 
 void Text::setFont(QString filename)
@@ -150,7 +152,7 @@ QRectF Text::boundingRect() const
     qreal pw = 0;
     if (isSelected())
         pw = pad;
-    return QRectF { -width / 2.0, 0 + (std::cos(floating)) * 5, qreal(width), qreal(renderedText.height()) }.adjusted(-pw, -pw, pw, pw);
+    return QRectF { -width / 2.0, 0 + (std::cos(floating)) * 5, qreal(width), qreal(renderedTextes.size() * fontHeight) }.adjusted(-pw, -pw, pw, pw);
 }
 
 void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -158,19 +160,44 @@ void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    auto rect = option->rect.adjusted(pad, pad, -pad, -pad);
+    auto origRect = option->rect;
+    auto rect = origRect.adjusted(pad, pad, -pad, -pad);
+    qreal pw = 0;
+    if (isSelected())
+        pw = pad;
 
     switch (animation)
     {
     case Animation::None:
     case Animation::TypeWriter:
-        painter->drawPixmap(rect.left(), rect.top(), renderedText);
+    {
+        int y = 0;
+        for (auto & renderedText : renderedTextes)
+        {
+            int x = 0;
+            switch (align)
+            {
+            case Qt::AlignLeft:
+                x = rect.left() + pw;
+                break;
+            case Qt::AlignHCenter:
+                x = (rect.width() - renderedText.width()) / 2 + rect.left();
+                break;
+            case Qt::AlignRight:
+                x = rect.right() - pw - renderedText.width();
+                break;
+            }
+
+            painter->drawPixmap(x, rect.top() + pw + y, renderedText);
+            y += fontHeight;
+        }
         break;
+    }
     case Animation::Floating:
-        painter->drawPixmap(rect.left(), rect.top(), renderedText);
+        //painter->drawPixmap(rect.left(), rect.top(), renderedTextes);
         break;
     case Animation::Marquee:
-        painter->drawPixmap(marquee, rect.top(), renderedText);
+        painter->drawPixmap(marquee, rect.top() + pw, renderedTextes.first());
         break;
     }
 
@@ -187,16 +214,33 @@ void Text::timerEvent(QTimerEvent * event)
     case Animation::None:
         break;
     case Animation::TypeWriter:
+        typewriterProgress += typewriterDirection * 0.5f;
+
+        if (typewriterProgress >= string.length() && typewriterDirection > 0)
+        {
+            typewriterDirection = -1;
+        }
+        else if (typewriterProgress < 0 && typewriterDirection < 0)
+        {
+            typewriterDirection = 1;
+        }
+
+        typewriterProgress = std::clamp(typewriterProgress, 0.0f, float(string.length()));
+        textIsDirty = true;
         break;
     case Animation::Floating:
         floating += 0.1f;
         break;
     case Animation::Marquee:
     {
-        marquee -= animationSpeed / 2;
-        if (marquee + renderedText.width() < x() - width/2)
+        if (renderedTextes.size())
         {
-            marquee = x() + width/2;
+            marquee -= animationSpeed / 2;
+
+            if (marquee + renderedTextes[0].width() < x() - width/2)
+            {
+                marquee = x() + width/2;
+            }
         }
         break;
     }
@@ -207,59 +251,73 @@ void Text::timerEvent(QTimerEvent * event)
     update();
 }
 
+QVariant Text::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+    if (change == ItemPositionChange && scene())
+    {
+        QPointF newPos = value.toPointF();
+        newPos.setX((xoffset + 100) * (PAGE_WIDTH / 200.0));
+        return newPos;
+    }
+    return QGraphicsItem::itemChange(change, value);
+}
+
 void Text::renderText(QString string)
 {
     if (!textIsDirty) return;
 
-    auto newText = QPixmap(width, 1000);
-    newText.fill(Qt::transparent);
-
-    QPainter painter;
-    painter.begin(&newText);
-
     auto & font = FontDatabase::GetFont(fontName);
 
-    QVector<int> splits;
+    QStringList lines;
 
     if (animation != Animation::Marquee)
     {
-        QVector<int> cumulativeWidths;
-        int www = width;
-        for (int xx = 0, index = 0; auto c : string)
+        auto str = string;
+        if (animation == Animation::TypeWriter)
+        {
+            str = str.left(typewriterProgress);
+        }
+        for (int xx = 0, www = width, index = 0; auto c : str)
         {
             xx += font.getWidth(c.toLatin1(), fontWidth);
-            cumulativeWidths.push_back(xx);
             index++;
 
             if (xx >= www)
             {
-                auto space = string.lastIndexOf(' ', index);
-                if (space == -1)
+                auto space = str.lastIndexOf(' ', index);
+                if (space != -1)
                 {
-                    space = index;
+                    lines.push_back(str.left(space).trimmed());
+                    str = str.mid(space).trimmed();
+                    xx = 0;
+                    index = 0;
                 }
-
-                splits.push_back(space + 1);
-                www = cumulativeWidths[space - 1] + width;
             }
         }
+        lines.push_back(str);
     }
-
-    for (int xx = 0, yy = 0, index = 0; auto c : string)
+    else
     {
-        painter.drawPixmap(xx, yy, fontChars[c.toLatin1()]);
-        index++;
-        xx += font.getWidth(c.toLatin1(), fontWidth);
-        if (splits.contains(index))
-        {
-            yy += fontHeight;
-            xx = 0;
-        }
+        lines.push_back(string);
     }
 
-    painter.end();
+    renderedTextes.clear();
+    for (const auto & line : lines)
+    {
+        auto newText = QPixmap(width, fontHeight);
+        newText.fill(Qt::transparent);
 
-    renderedText = newText.copy(0, 0, newText.width(), (splits.size() + 1) * fontHeight);
+        QPainter painter;
+        painter.begin(&newText);
+        int xx = 0;
+        for (int yy = 0; auto c : line)
+        {
+            painter.drawPixmap(xx, yy, fontChars[c.toLatin1()]);
+            xx += font.getWidth(c.toLatin1(), fontWidth);
+        }
+        painter.end();
+        renderedTextes.push_back(newText.copy(0, 0, xx, fontHeight));
+    }
 
     textIsDirty = false;
 }
