@@ -49,8 +49,8 @@ private:
     int width = 0;
     int xoffset = 0;
     int align = Qt::AlignLeft;
-    int marquee = 0;
-    float floating = 0;
+    qreal marquee = 0;
+    qreal floating = 0;
     float typewriterProgress = 0;
     int typewriterDirection = 1;
     bool textIsDirty = true;

@@ -12,6 +12,11 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
 
+    ui->animationComboBox->addItem("None", static_cast<int>(Animation::None));
+    ui->animationComboBox->addItem("TypeWriter", static_cast<int>(Animation::TypeWriter));
+    ui->animationComboBox->addItem("Floating", static_cast<int>(Animation::Floating));
+    ui->animationComboBox->addItem("Marquee", static_cast<int>(Animation::Marquee));
+
     connect(ui->elementsList, &QListWidget::currentItemChanged, this, &PageSettings::itemChanged);
     connect(ui->textEdit, &QTextEdit::textChanged, [&]() {
         auto item = ui->elementsList->currentItem();
@@ -32,6 +37,22 @@ PageSettings::PageSettings(QWidget *parent) :
             graphics->setFontColor(c);
             setFontColorButton(c);
         }
+    });
+    connect(ui->animationComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int) {
+        auto item = ui->elementsList->currentItem();
+        assert(item);
+        auto graphics = item->data(Qt::UserRole+1).value<Text*>();
+        assert(graphics);
+
+        graphics->setAnimation(ui->animationComboBox->currentData().toInt(), ui->speedSpinBox->value());
+    });
+    connect(ui->speedSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int) {
+        auto item = ui->elementsList->currentItem();
+        assert(item);
+        auto graphics = item->data(Qt::UserRole+1).value<Text*>();
+        assert(graphics);
+
+        graphics->setAnimation(ui->animationComboBox->currentData().toInt(), ui->speedSpinBox->value());
     });
 }
 

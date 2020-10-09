@@ -15,7 +15,7 @@ public:
 
     void addFrame(QString filename);
     void setSpeed(int speed);
-    void setColor(QColor c);
+    void setHSL(float h, float s, float l);
 
 protected:
     void timerEvent(QTimerEvent *event) override;

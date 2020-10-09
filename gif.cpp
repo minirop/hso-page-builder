@@ -1,4 +1,5 @@
 #include "gif.h"
+#include "utils.h"
 #include <QPainter>
 #include <QBitmap>
 
@@ -23,31 +24,19 @@ void Gif::setSpeed(int speed)
     startTimer(speed);
 }
 
-void Gif::setColor(QColor c)
-{/*
+void Gif::setHSL(float h, float s, float l)
+{
     QVector<QPixmap> newFrames;
 
     for (auto pix : frames)
     {
-        QImage image = pix.toImage();
-
-        static int i = 0;
-        image.save(QString("zzz-%1-before.png").arg(i));
-
-        for(int i = 0; i < image.width(); i++)
-        {
-            for(int j = 0; j < image.height(); j++)
-            {
-                QColor color = image.pixelColor(i, j);
-                color.setHsl(c.hue(), c.saturation(), c.lightness(), color.alpha());
-                image.setPixelColor(i, j, color.convertTo(QColor::Rgb));
-            }
-        }
-
-        newFrames.push_back(QPixmap::fromImage(image));
+        newFrames.push_back(Utils::ChangeHSL(pix, h, s, l));
     }
 
-    frames = newFrames;*/
+    frames = newFrames;
+
+    if (frames.size() == 1)
+        timerEvent(nullptr);
 }
 
 void Gif::timerEvent(QTimerEvent *event)

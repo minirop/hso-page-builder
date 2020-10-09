@@ -74,6 +74,7 @@ void MainWindow::openPage()
 
 void MainWindow::clearEverything()
 {
+    area->findChild<Page*>()->deleteLater();
     webpage = new Page(area);
     connect(webpage, &Page::selected, [&](int id) {
         settings->select(id);
@@ -156,7 +157,6 @@ QGraphicsItem * MainWindow::addElement(QString name, QStringList arguments)
         auto fadeSpeed = arguments[15].toInt();
 
         auto text = new Text;
-        text->setString(string);
         text->setAlign(align);
         text->setPos(x, y);
         text->setWidth(width);
@@ -178,6 +178,8 @@ QGraphicsItem * MainWindow::addElement(QString name, QStringList arguments)
             int b = (fadeColor >> 16) & 0xFF;
             text->setFade(QColor(r, g, b), fadeSpeed);
         }
+
+        text->setString(string);
 
         returnedElement = text;
     }
@@ -226,10 +228,10 @@ QGraphicsItem * MainWindow::addElement(QString name, QStringList arguments)
 
             if (color.size() == 3)
             {
-                int h = color[0].toInt();
-                int s = color[1].toInt();
-                int l = color[2].toInt();
-                gif->setColor(QColor::fromHsl(h, s, l));
+                auto h = color[0].toInt() / 100.0f;
+                auto s = color[1].toInt() / 100.0f;
+                auto l = color[2].toInt() / 100.0f;
+                gif->setHSL(h, s, l);
             }
 
             returnedElement = gif;

@@ -56,13 +56,17 @@ void Text::setAnimation(int anim, int spd)
     case Animation::None:
         break;
     case Animation::TypeWriter:
+        typewriterProgress = 0;
+        typewriterDirection = 1;
         break;
     case Animation::Floating:
+        floating = 0;
         break;
     case Animation::Marquee:
-        marquee = x() - width / 2;
+        marquee = 0;
         break;
     }
+    textIsDirty = true;
 }
 
 void Text::setAlign(int halign)
@@ -79,12 +83,15 @@ void Text::setAlign(int halign)
         align = Qt::AlignRight;
         break;
     }
+    textIsDirty = true;
 }
 
 void Text::setString(QString str)
 {
     string = str;
     textIsDirty = true;
+
+    renderText(string);
 }
 
 void Text::setFont(QString filename)
@@ -152,7 +159,13 @@ QRectF Text::boundingRect() const
     qreal pw = 0;
     if (isSelected())
         pw = pad;
-    return QRectF { -width / 2.0, 0 + (std::cos(floating)) * 5, qreal(width), qreal(renderedTextes.size() * fontHeight) }.adjusted(-pw, -pw, pw, pw);
+    qreal floatingOffset = 0.0;
+    if (animation == Animation::Floating)
+    {
+        constexpr auto PI_180 = M_PI / 180;
+        floatingOffset = (std::sin(floating * PI_180) * renderedTextes.size() * fontHeight * 0.25);
+    }
+    return QRectF { -width / 2.0, floatingOffset, qreal(width), qreal(renderedTextes.size() * fontHeight) }.adjusted(-pw, -pw, pw, pw);
 }
 
 void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -170,6 +183,7 @@ void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     {
     case Animation::None:
     case Animation::TypeWriter:
+    case Animation::Floating:
     {
         int y = 0;
         for (auto & renderedText : renderedTextes)
@@ -193,9 +207,6 @@ void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         }
         break;
     }
-    case Animation::Floating:
-        //painter->drawPixmap(rect.left(), rect.top(), renderedTextes);
-        break;
     case Animation::Marquee:
         painter->drawPixmap(marquee, rect.top() + pw, renderedTextes.first());
         break;
@@ -229,18 +240,15 @@ void Text::timerEvent(QTimerEvent * event)
         textIsDirty = true;
         break;
     case Animation::Floating:
-        floating += 0.1f;
+        floating += animationSpeed * 0.4;
         break;
     case Animation::Marquee:
     {
-        if (renderedTextes.size())
-        {
-            marquee -= animationSpeed / 2;
+        marquee -= animationSpeed / 10.0;
 
-            if (marquee + renderedTextes[0].width() < x() - width/2)
-            {
-                marquee = x() + width/2;
-            }
+        if (marquee < -width/2 - renderedTextes[0].width())
+        {
+            marquee = x() + width / 2;
         }
         break;
     }
@@ -304,7 +312,7 @@ void Text::renderText(QString string)
     renderedTextes.clear();
     for (const auto & line : lines)
     {
-        auto newText = QPixmap(width, fontHeight);
+        auto newText = QPixmap(fontWidth * line.length(), fontHeight);
         newText.fill(Qt::transparent);
 
         QPainter painter;

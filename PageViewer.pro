@@ -23,7 +23,8 @@ SOURCES += \
     page.cpp \
     pageelement.cpp \
     pagesettings.cpp \
-    text.cpp
+    text.cpp \
+    utils.cpp
 
 HEADERS += \
     fontdatabase.h \
@@ -33,7 +34,8 @@ HEADERS += \
     page.h \
     pageelement.h \
     pagesettings.h \
-    text.h
+    text.h \
+    utils.h
 
 FORMS += \
     mainwindow.ui \
