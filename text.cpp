@@ -198,15 +198,26 @@ void Text::timerEvent(QTimerEvent * event)
     case Animation::None:
         break;
     case Animation::TypeWriter:
-        typewriterProgress += typewriterDirection * 0.5f;
+        typewriterTimer -= animationSpeed;
 
-        if (typewriterProgress >= string.length() && typewriterDirection > 0)
+        if (typewriterTimer < 0)
         {
-            typewriterDirection = -1;
-        }
-        else if (typewriterProgress < 0 && typewriterDirection < 0)
-        {
-            typewriterDirection = 1;
+            typewriterProgress += typewriterDirection;
+
+            if (typewriterProgress >= string.length() && typewriterDirection > 0)
+            {
+                typewriterTimer = 800;
+                typewriterDirection = -1;
+            }
+            else if (typewriterProgress < 0 && typewriterDirection < 0)
+            {
+                typewriterTimer = 800;
+                typewriterDirection = 1;
+            }
+            else
+            {
+                typewriterTimer = 100;
+            }
         }
 
         typewriterProgress = std::clamp(typewriterProgress, 0.0f, float(string.length()));

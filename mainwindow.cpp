@@ -36,8 +36,11 @@ MainWindow::MainWindow(QWidget *parent)
     settings = new PageSettings;
     connect(settings, &PageSettings::selectionChanged, [&](int newSel, int oldSel) {
         if (oldSel != -1) pageElements[oldSel]->setSelected(false);
-        pageElements[newSel]->setSelected(true);
-        settings->select(newSel);
+        if (newSel != -1)
+        {
+            pageElements[newSel]->setSelected(true);
+            settings->select(newSel);
+        }
     });
 
     auto widget = new QWidget;

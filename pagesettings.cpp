@@ -18,6 +18,13 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->animationComboBox->addItem("Marquee", static_cast<int>(Animation::Marquee));
 
     connect(ui->elementsList, &QListWidget::currentItemChanged, this, &PageSettings::itemChanged);
+    connect(ui->elementName, &QLineEdit::textChanged, [&](QString newName) {
+        auto item = ui->elementsList->currentItem();
+        assert(item);
+        item->setText(newName);
+
+        emit selectedNameChanged(newName);
+    });
     connect(ui->textEdit, &QTextEdit::textChanged, [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);

@@ -54,6 +54,7 @@ private:
     qreal floating = 0;
     float typewriterProgress = 0;
     int typewriterDirection = 1;
+    float typewriterTimer = 100;
     bool textIsDirty = true;
     QColor fontColor = Qt::black;
     Animation animation = Animation::None;
