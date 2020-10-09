@@ -82,6 +82,7 @@ void MainWindow::clearEverything()
     connect(webpage, &Page::clearSelection, [&]() {
         settings->clearSelection();
     });
+    connect(settings, &PageSettings::selectedNameChanged, webpage, &Page::setSelectedName);
     webpage->move(0, 0);
     webpage->show();
 
@@ -161,7 +162,8 @@ QGraphicsItem * MainWindow::addElement(QString name, QStringList arguments)
         text->setPos(x, y);
         text->setWidth(width);
         text->setFont(QString("%1images/fonts/%2%3.png").arg(HYPNO_PATH, font.toLower(), style));
-        text->setAnimation(animation, animationSpeed);
+        text->setAnimation(animation);
+        text->setAnimationSpeed(animationSpeed);
 
         if (color >= 0)
         {

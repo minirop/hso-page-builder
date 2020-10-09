@@ -1,6 +1,6 @@
 #include "utils.h"
-#include <QDebug>
 #include <cmath>
+
 using std::min, std::max;
 
 struct Vec3 {

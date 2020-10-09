@@ -29,9 +29,15 @@ Page::Page(QWidget * parent)
         if (items.size())
         {
             auto item = items.first();
+            selectedItem = item;
             auto id = item->data(Qt::UserRole).toInt();
 
             emit selected(id);
+        }
+        else
+        {
+            selectedItem = nullptr;
+            selectedName.clear();
         }
     });
     setScene(scene);
@@ -69,6 +75,43 @@ bool Page::eventFilter(QObject * watched, QEvent * event)
     }
 
     return QGraphicsView::eventFilter(watched, event);
+}
+
+void Page::setSelectedName(QString name)
+{
+    selectedName = name;
+}
+
+void Page::drawForeground(QPainter * painter, const QRectF & rect)
+{
+    Q_UNUSED(rect)
+
+    if (selectedItem)
+    {
+        auto f = font();
+        f.setPixelSize(8);
+
+        QFontMetrics fm(f);
+        int width = fm.horizontalAdvance(selectedName);
+
+        // draw background
+        painter->save();
+        QPen p(QColor(0x94, 0xc4, 0xf0));
+        p.setWidth(2);
+        painter->setPen(p);
+        auto b = selectedItem->boundingRect().adjusted(-2, -2, 2, 2);
+        b.translate(selectedItem->pos());
+        painter->drawRect(b);
+        painter->fillRect(b.left() - 1, b.top() - 10, width + 10, 10, Qt::cyan);
+        painter->restore();
+
+        // draw text
+        painter->save();
+        painter->setPen(Qt::black);
+        painter->setFont(f);
+        painter->drawText(b.left() + 5, b.top() - 3, selectedName);
+        painter->restore();
+    }
 }
 
 void Page::wheelEvent(QWheelEvent * event)

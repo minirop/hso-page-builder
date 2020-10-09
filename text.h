@@ -24,7 +24,8 @@ public:
     ElementType elementType() const override { return ElementType::Text; }
 
     void setWidth(int w);
-    void setAnimation(int anim, int spd);
+    void setAnimation(int anim);
+    void setAnimationSpeed(int spd);
     void setAlign(int halign);
     void setString(QString str);
     void setFont(QString filename);

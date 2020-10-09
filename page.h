@@ -24,7 +24,11 @@ signals:
     void selected(int id);
     void clearSelection();
 
+public slots:
+    void setSelectedName(QString name);
+
 protected:
+    void drawForeground(QPainter * painter, const QRectF & rect) override;
     void wheelEvent(QWheelEvent *event) override;
 
 private:
@@ -32,6 +36,8 @@ private:
     int topLine = 0;
     int linesCount = 0;
     QGraphicsScene * scene;
+    QGraphicsItem * selectedItem = nullptr;
+    QString selectedName;
 };
 
 #endif // PAGE_H

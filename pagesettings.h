@@ -23,6 +23,7 @@ public:
 
 signals:
     void selectionChanged(int newSelection, int oldSelection);
+    void selectedNameChanged(QString name);
 
 private slots:
     void itemChanged(QListWidgetItem * item, QListWidgetItem * previous);

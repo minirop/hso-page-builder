@@ -44,7 +44,7 @@ PageSettings::PageSettings(QWidget *parent) :
         auto graphics = item->data(Qt::UserRole+1).value<Text*>();
         assert(graphics);
 
-        graphics->setAnimation(ui->animationComboBox->currentData().toInt(), ui->speedSpinBox->value());
+        graphics->setAnimation(ui->animationComboBox->currentData().toInt());
     });
     connect(ui->speedSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int) {
         auto item = ui->elementsList->currentItem();
@@ -52,7 +52,7 @@ PageSettings::PageSettings(QWidget *parent) :
         auto graphics = item->data(Qt::UserRole+1).value<Text*>();
         assert(graphics);
 
-        graphics->setAnimation(ui->animationComboBox->currentData().toInt(), ui->speedSpinBox->value());
+        graphics->setAnimationSpeed(ui->speedSpinBox->value());
     });
 }
 
@@ -85,13 +85,23 @@ void PageSettings::clearSelection()
 
 void PageSettings::itemChanged(QListWidgetItem * item, QListWidgetItem * previous)
 {
-    ui->elementName->setText(item->text());
+    int newSel = -1;
+    QString newName;
 
-    updateProperties(item);
+    if (item)
+    {
+        newName = item->text();
+        ui->elementName->setText(item->text());
+
+        updateProperties(item);
+
+        newSel = item->data(Qt::UserRole).toInt();
+    }
 
     int oldSel = previous ? previous->data(Qt::UserRole).toInt() : -1;
 
-    emit selectionChanged(item->data(Qt::UserRole).toInt(), oldSel);
+    emit selectionChanged(newSel, oldSel);
+    emit selectedNameChanged(newName);
 }
 
 void PageSettings::updateProperties(QListWidgetItem * item)
@@ -113,6 +123,8 @@ void PageSettings::updateProperties(QListWidgetItem * item)
 
 void PageSettings::updateGifProperties(Gif * gif)
 {
+    Q_UNUSED(gif)
+
     ui->stackedWidget->setCurrentIndex(2);
 }
 
@@ -120,9 +132,18 @@ void PageSettings::updateTextProperties(Text * text)
 {
     ui->stackedWidget->setCurrentIndex(1);
 
+    blockSignals(true);
+
     ui->textEdit->setText(text->string);
 
     setFontColorButton(text->fontColor);
+
+    int animIndex = ui->animationComboBox->findData(static_cast<int>(text->animation));
+    assert(animIndex != -1);
+    ui->animationComboBox->setCurrentIndex(animIndex);
+    ui->speedSpinBox->setValue(text->animationSpeed);
+
+    blockSignals(false);
 }
 
 void PageSettings::setFontColorButton(QColor color)

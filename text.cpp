@@ -9,27 +9,6 @@
 #include <QSequentialAnimationGroup>
 #include <QVariantAnimation>
 
-static const int pad = 1.0f;
-
-void qt_graphicsItem_highlightSelected(QGraphicsItem *item, QPainter *painter, const QStyleOptionGraphicsItem *option)
-{
-    const qreal penWidth = 0; // cosmetic pen
-
-    const QColor fgcolor = option->palette.windowText().color();
-    const QColor bgcolor( // ensure good contrast against fgcolor
-        fgcolor.red()   > 127 ? 0 : 255,
-        fgcolor.green() > 127 ? 0 : 255,
-        fgcolor.blue()  > 127 ? 0 : 255);
-
-    painter->setPen(QPen(bgcolor, penWidth, Qt::SolidLine));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(item->boundingRect().adjusted(pad, pad, -pad, -pad));
-
-    painter->setPen(QPen(option->palette.windowText(), 0, Qt::DashLine));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(item->boundingRect().adjusted(pad, pad, -pad, -pad));
-}
-
 Text::Text()
 {
     startTimer(16);
@@ -46,10 +25,9 @@ void Text::setWidth(int w)
     width = w;
 }
 
-void Text::setAnimation(int anim, int spd)
+void Text::setAnimation(int anim)
 {
     animation = static_cast<Animation>(anim);
-    animationSpeed = spd;
 
     switch (animation)
     {
@@ -67,6 +45,11 @@ void Text::setAnimation(int anim, int spd)
         break;
     }
     textIsDirty = true;
+}
+
+void Text::setAnimationSpeed(int spd)
+{
+    animationSpeed = spd;
 }
 
 void Text::setAlign(int halign)
@@ -156,16 +139,13 @@ void Text::setFade(QColor color, int speed)
 
 QRectF Text::boundingRect() const
 {
-    qreal pw = 0;
-    if (isSelected())
-        pw = pad;
     qreal floatingOffset = 0.0;
     if (animation == Animation::Floating)
     {
         constexpr auto PI_180 = M_PI / 180;
         floatingOffset = (std::sin(floating * PI_180) * renderedTextes.size() * fontHeight * 0.25);
     }
-    return QRectF { -width / 2.0, floatingOffset, qreal(width), qreal(renderedTextes.size() * fontHeight) }.adjusted(-pw, -pw, pw, pw);
+    return QRectF { -width / 2.0, floatingOffset, qreal(width), qreal(renderedTextes.size() * fontHeight) };
 }
 
 void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -173,11 +153,7 @@ void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    auto origRect = option->rect;
-    auto rect = origRect.adjusted(pad, pad, -pad, -pad);
-    qreal pw = 0;
-    if (isSelected())
-        pw = pad;
+    auto rect = option->rect;
 
     switch (animation)
     {
@@ -192,28 +168,25 @@ void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
             switch (align)
             {
             case Qt::AlignLeft:
-                x = rect.left() + pw;
+                x = rect.left();
                 break;
             case Qt::AlignHCenter:
                 x = (rect.width() - renderedText.width()) / 2 + rect.left();
                 break;
             case Qt::AlignRight:
-                x = rect.right() - pw - renderedText.width();
+                x = rect.right() - renderedText.width();
                 break;
             }
 
-            painter->drawPixmap(x, rect.top() + pw + y, renderedText);
+            painter->drawPixmap(x, rect.top() + y, renderedText);
             y += fontHeight;
         }
         break;
     }
     case Animation::Marquee:
-        painter->drawPixmap(marquee, rect.top() + pw, renderedTextes.first());
+        painter->drawPixmap(marquee, rect.top(), renderedTextes.first());
         break;
     }
-
-    if (isSelected())
-        qt_graphicsItem_highlightSelected(this, painter, option);
 }
 
 void Text::timerEvent(QTimerEvent * event)
@@ -310,8 +283,13 @@ void Text::renderText(QString string)
     }
 
     renderedTextes.clear();
-    for (const auto & line : lines)
+    for (auto line : lines)
     {
+        if (line.length() == 0)
+        {
+            // so the selected marker doesn't collapse and stays at "1 line minimum".
+            line = " ";
+        }
         auto newText = QPixmap(fontWidth * line.length(), fontHeight);
         newText.fill(Qt::transparent);
 
