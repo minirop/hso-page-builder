@@ -20,6 +20,7 @@ public:
     };
 
     static FontData & GetFont(QString name);
+    static QList<QString> GetFonts();
 
 private:
     static inline FontDatabase * instance = nullptr;

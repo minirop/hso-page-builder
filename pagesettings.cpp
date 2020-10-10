@@ -3,7 +3,11 @@
 #include "pageelement.h"
 #include "gif.h"
 #include "text.h"
+#include "fontdatabase.h"
 #include <QColorDialog>
+
+//extern const QString HYPNO_PATH;
+const QString HYPNO_PATH = "/home/minirop/.local/share/Steam/steamapps/common/Hypnospace Outlaw/data/";
 
 PageSettings::PageSettings(QWidget *parent) :
     QWidget(parent),
@@ -60,6 +64,16 @@ PageSettings::PageSettings(QWidget *parent) :
         assert(graphics);
 
         graphics->setAnimationSpeed(ui->speedSpinBox->value());
+    });
+    connect(ui->fontsCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int index) {
+        auto item = ui->elementsList->currentItem();
+        assert(item);
+        auto graphics = item->data(Qt::UserRole+1).value<Text*>();
+        assert(graphics);
+
+        QString newFont = ui->fontsCombo->itemText(index);
+
+        graphics->setFont(QString("%1images/fonts/%2.png").arg(HYPNO_PATH, newFont.toLower()));
     });
 }
 
@@ -139,7 +153,19 @@ void PageSettings::updateTextProperties(Text * text)
 {
     ui->stackedWidget->setCurrentIndex(1);
 
-    blockSignals(true);
+    auto bb = blockSignals(true);
+
+    auto fontsNames = FontDatabase::GetFonts();
+
+    auto bf = ui->fontsCombo->blockSignals(true);
+    ui->fontsCombo->clear();
+    for (auto name : fontsNames)
+    {
+        ui->fontsCombo->addItem(name);
+    }
+    ui->fontsCombo->blockSignals(bf);
+    auto index = ui->fontsCombo->findText(text->fontName, Qt::MatchExactly);
+    ui->fontsCombo->setCurrentIndex(index);
 
     ui->textEdit->setText(text->string);
 
@@ -150,7 +176,7 @@ void PageSettings::updateTextProperties(Text * text)
     ui->animationComboBox->setCurrentIndex(animIndex);
     ui->speedSpinBox->setValue(text->animationSpeed);
 
-    blockSignals(false);
+    blockSignals(bb);
 }
 
 void PageSettings::setFontColorButton(QColor color)

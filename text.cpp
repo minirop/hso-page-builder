@@ -97,6 +97,8 @@ void Text::setFont(QString filename)
             xx = 0;
         }
     }
+
+    textIsDirty = true;
 }
 
 void Text::setFontColor(QColor color)

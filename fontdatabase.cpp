@@ -68,6 +68,11 @@ FontDatabase::FontData & FontDatabase::GetFont(QString name)
     return instance->fonts[name];
 }
 
+QList<QString> FontDatabase::GetFonts()
+{
+    return instance->fonts.keys();
+}
+
 int FontDatabase::FontData::getWidth(char c, int defaultWidth)
 {
     if (widths.contains(c))
