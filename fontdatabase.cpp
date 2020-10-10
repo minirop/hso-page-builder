@@ -1,6 +1,9 @@
 #include "fontdatabase.h"
 #include <QSettings>
 #include <QFile>
+#include <QSet>
+
+const QString HYPNO_PATH = "/home/minirop/.local/share/Steam/steamapps/common/Hypnospace Outlaw/data/";
 
 FontDatabase::FontDatabase()
 {
@@ -70,7 +73,19 @@ FontDatabase::FontData & FontDatabase::GetFont(QString name)
 
 QList<QString> FontDatabase::GetFonts()
 {
-    return instance->fonts.keys();
+    auto keys = instance->fonts.keys();
+    QSet<QString> uniqueKeys;
+    for (auto key : keys)
+    {
+        uniqueKeys.insert(key.left(key.size() - 2));
+    }
+
+    return uniqueKeys.values();
+}
+
+QPixmap FontDatabase::GetFontAtlas(QString name)
+{
+    return QPixmap(QString("%1images/fonts/%2.png").arg(HYPNO_PATH, name.toLower()));
 }
 
 int FontDatabase::FontData::getWidth(char c, int defaultWidth)

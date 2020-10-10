@@ -6,9 +6,6 @@
 #include "fontdatabase.h"
 #include <QColorDialog>
 
-//extern const QString HYPNO_PATH;
-const QString HYPNO_PATH = "/home/minirop/.local/share/Steam/steamapps/common/Hypnospace Outlaw/data/";
-
 PageSettings::PageSettings(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PageSettings)
@@ -49,7 +46,7 @@ PageSettings::PageSettings(QWidget *parent) :
             setFontColorButton(c);
         }
     });
-    connect(ui->animationComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int) {
+    connect(ui->animationComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
         auto graphics = item->data(Qt::UserRole+1).value<Text*>();
@@ -57,7 +54,7 @@ PageSettings::PageSettings(QWidget *parent) :
 
         graphics->setAnimation(ui->animationComboBox->currentData().toInt());
     });
-    connect(ui->speedSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int) {
+    connect(ui->speedSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
         auto graphics = item->data(Qt::UserRole+1).value<Text*>();
@@ -65,16 +62,26 @@ PageSettings::PageSettings(QWidget *parent) :
 
         graphics->setAnimationSpeed(ui->speedSpinBox->value());
     });
-    connect(ui->fontsCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int index) {
+
+    auto setFontCallback = [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
         auto graphics = item->data(Qt::UserRole+1).value<Text*>();
         assert(graphics);
 
-        QString newFont = ui->fontsCombo->itemText(index);
+        auto fontSize = ui->fontSizeGroup->checkedButton()->text();
+        graphics->setFontSize(fontSize.toInt());
 
-        graphics->setFont(QString("%1images/fonts/%2.png").arg(HYPNO_PATH, newFont.toLower()));
-    });
+        auto fontBold = ui->boldButton->isChecked();
+        graphics->setFontBold(fontBold);
+
+        auto newFont = ui->fontsCombo->currentText();
+        graphics->setFont(newFont.toLower());
+    };
+
+    connect(ui->fontsCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), setFontCallback);
+    connect(ui->fontSizeGroup, &QButtonGroup::idClicked, setFontCallback);
+    connect(ui->boldButton, &QPushButton::clicked, setFontCallback);
 }
 
 PageSettings::~PageSettings()
@@ -153,18 +160,19 @@ void PageSettings::updateTextProperties(Text * text)
 {
     ui->stackedWidget->setCurrentIndex(1);
 
-    auto bb = blockSignals(true);
+    QSignalBlocker a1(this);
+    QSignalBlocker a2(ui->fontsCombo);
+    QSignalBlocker a3(ui->fontSizeGroup);
 
     auto fontsNames = FontDatabase::GetFonts();
 
-    auto bf = ui->fontsCombo->blockSignals(true);
     ui->fontsCombo->clear();
     for (auto name : fontsNames)
     {
         ui->fontsCombo->addItem(name);
     }
-    ui->fontsCombo->blockSignals(bf);
-    auto index = ui->fontsCombo->findText(text->fontName, Qt::MatchExactly);
+
+    auto index = ui->fontsCombo->findText(text->fontName, Qt::MatchStartsWith);
     ui->fontsCombo->setCurrentIndex(index);
 
     ui->textEdit->setText(text->string);
@@ -176,7 +184,20 @@ void PageSettings::updateTextProperties(Text * text)
     ui->animationComboBox->setCurrentIndex(animIndex);
     ui->speedSpinBox->setValue(text->animationSpeed);
 
-    blockSignals(bb);
+    switch (text->fontSize)
+    {
+    case 0:
+        ui->size0Button->click();
+        break;
+    case 1:
+        ui->size1Button->click();
+        break;
+    case 2:
+        ui->size2Button->click();
+        break;
+    }
+
+    ui->boldButton->setChecked(text->fontBold);
 }
 
 void PageSettings::setFontColorButton(QColor color)

@@ -164,7 +164,9 @@ QGraphicsItem * MainWindow::addElement(QString name, QStringList arguments)
         text->setAlign(align);
         text->setPos(x, y);
         text->setWidth(width);
-        text->setFont(QString("%1images/fonts/%2%3.png").arg(HYPNO_PATH, font.toLower(), style));
+        text->setFontSize(QString(style[0]).toInt());
+        text->setFontBold(style[1] == 'b');
+        text->setFont(font.toLower());
         text->setAnimation(animation);
         text->setAnimationSpeed(animationSpeed);
 

@@ -102,7 +102,7 @@ void Page::drawForeground(QPainter * painter, const QRectF & rect)
         auto b = selectedItem->boundingRect().adjusted(-2, -2, 2, 2);
         b.translate(selectedItem->pos());
         painter->drawRect(b);
-        painter->fillRect(b.left() - 1, b.top() - 10, width + 10, 10, Qt::cyan);
+        painter->fillRect(b.left() - 1, b.top() - 10, width + 10, 10, p.color());
         painter->restore();
 
         // draw text

@@ -77,28 +77,22 @@ void Text::setString(QString str)
     renderText(string);
 }
 
-void Text::setFont(QString filename)
+void Text::setFontSize(int size)
 {
-    static const QString alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;:?!-_~#\"'&()[]|`\\/@°+=*€$$<> ";
-    QPixmap pix(filename);
-    assert(!pix.isNull());
-    fontWidth = pix.width() / 8;
-    fontHeight = pix.height() / 12;
-    fontName = QFileInfo(filename).baseName();
+    fontSize = size;
+    fontIsDirty = true;
+}
 
-    for (int xx = 0, yy = 0; auto c : alphabet)
-    {
-        fontChars[c] = pix.copy(xx * fontWidth, yy * fontHeight, fontWidth, fontHeight);
+void Text::setFontBold(bool bold)
+{
+    fontBold = bold;
+    fontIsDirty = true;
+}
 
-        xx++;
-        if (xx >= 8)
-        {
-            yy++;
-            xx = 0;
-        }
-    }
-
-    textIsDirty = true;
+void Text::setFont(QString name)
+{
+    fontName = name;
+    fontIsDirty = true;
 }
 
 void Text::setFontColor(QColor color)
@@ -258,9 +252,14 @@ QVariant Text::itemChange(QGraphicsItem::GraphicsItemChange change, const QVaria
 
 void Text::renderText(QString string)
 {
+    if (fontIsDirty)
+    {
+        regenerateFont();
+    }
+
     if (!textIsDirty) return;
 
-    auto & font = FontDatabase::GetFont(fontName);
+    auto & font = FontDatabase::GetFont(QString("%1%2%3").arg(fontName).arg(fontSize).arg(fontBold ? 'b' : 'n'));
 
     QStringList lines;
 
@@ -319,4 +318,28 @@ void Text::renderText(QString string)
     }
 
     textIsDirty = false;
+}
+
+void Text::regenerateFont()
+{
+    static const QString alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;:?!-_~#\"'&()[]|`\\/@°+=*€$$<> ";
+    QPixmap pix = FontDatabase::GetFontAtlas(QString("%1%2%3").arg(fontName).arg(fontSize).arg(fontBold ? 'b' : 'n'));
+    assert(!pix.isNull());
+    fontWidth = pix.width() / 8;
+    fontHeight = pix.height() / 12;
+
+    for (int xx = 0, yy = 0; auto c : alphabet)
+    {
+        fontChars[c] = pix.copy(xx * fontWidth, yy * fontHeight, fontWidth, fontHeight);
+
+        xx++;
+        if (xx >= 8)
+        {
+            yy++;
+            xx = 0;
+        }
+    }
+
+    textIsDirty = true;
+    fontIsDirty = false;
 }

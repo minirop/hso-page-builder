@@ -28,7 +28,9 @@ public:
     void setAnimationSpeed(int spd);
     void setAlign(int halign);
     void setString(QString str);
-    void setFont(QString filename);
+    void setFontSize(int size);
+    void setFontBold(bool bold);
+    void setFont(QString name);
     void setFontColor(QColor color);
     void setColor(QColor color);
     void setFade(QColor color, int speed);
@@ -42,6 +44,7 @@ protected:
 
 private:
     void renderText(QString string);
+    void regenerateFont();
 
     friend class PageSettings;
 
@@ -60,6 +63,9 @@ private:
     Animation animation = Animation::None;
     int animationSpeed = 0;
     QString fontName;
+    int fontSize;
+    bool fontBold;
+    bool fontIsDirty = true;
     QMap<QChar, QPixmap> fontChars;
     int fontWidth = 0;
     int fontHeight = 0;

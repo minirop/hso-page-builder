@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QMap>
+#include <QPixmap>
 
 class FontDatabase
 {
@@ -21,6 +22,7 @@ public:
 
     static FontData & GetFont(QString name);
     static QList<QString> GetFonts();
+    static QPixmap GetFontAtlas(QString name);
 
 private:
     static inline FontDatabase * instance = nullptr;
