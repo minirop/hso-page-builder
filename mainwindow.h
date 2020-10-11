@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QJsonArray>
 #include "page.h"
 #include "pagesettings.h"
 #include "fontdatabase.h"
@@ -20,12 +21,13 @@ public:
 
 private slots:
     void openPage();
+    void createElement(QString type, QJsonArray definition, QStringList eventData);
+    void updateZOrder();
 
 private:
     void clearEverything();
     void parseJSON(QByteArray data);
-    QGraphicsItem * addElement(QString name, QStringList arguments);
-    void updateZOrder();
+    QGraphicsItem * addElement(QString type, QStringList arguments);
 
     QHash<int, QGraphicsItem*> pageElements;
     Ui::MainWindow * ui;

@@ -8,6 +8,7 @@
 class Gif : public PageElement, public QGraphicsPixmapItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 
 public:
     Gif();

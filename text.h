@@ -18,6 +18,7 @@ class QAbstractAnimation;
 class Text : public PageElement, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 
 public:
     Text();

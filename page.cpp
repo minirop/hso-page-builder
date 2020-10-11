@@ -1,4 +1,5 @@
 #include "page.h"
+#include "globals.h"
 #include <QPainter>
 #include <QPushButton>
 #include <QWheelEvent>
@@ -30,7 +31,7 @@ Page::Page(QWidget * parent)
         {
             auto item = items.first();
             selectedItem = item;
-            auto id = item->data(Qt::UserRole).toInt();
+            auto id = item->data(ROLE_ID).toInt();
 
             emit selected(id);
         }

@@ -6,7 +6,6 @@
 #include "text.h"
 #include <QFileDialog>
 #include <QJsonDocument>
-#include <QJsonArray>
 #include <QJsonObject>
 #include <QHBoxLayout>
 #include <QScrollArea>
@@ -42,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
             settings->select(newSel);
         }
     });
+    connect(settings, &PageSettings::createElement, this, &MainWindow::createElement);
+    connect(settings, &PageSettings::updateZOrder, this, &MainWindow::updateZOrder);
 
     auto widget = new QWidget;
     setCentralWidget(widget);
@@ -72,6 +73,31 @@ void MainWindow::openPage()
 
             parseJSON(contents);
         }
+    }
+}
+
+void MainWindow::createElement(QString type, QJsonArray definition, QStringList eventData)
+{
+    auto element = addElement(type, eventData);
+
+    auto id = definition[1].toInt();
+    if (id == 0)
+    {
+        auto keys = pageElements.keys();
+        id = *std::max_element(keys.begin(), keys.end()) + 10;
+    }
+    auto name = definition[2].toString();
+    auto item = new QListWidgetItem(name);
+    item->setData(ROLE_ID, id);
+    settings->ui->elementsList->addItem(item);
+
+    if (element)
+    {
+        element->setData(ROLE_ID, id);
+        QVariant ptr;
+        ptr.setValue(dynamic_cast<PageElement*>(element));
+        item->setData(ITEM_ID, ptr);
+        pageElements[id] = element;
     }
 }
 
@@ -108,34 +134,25 @@ void MainWindow::parseJSON(QByteArray data)
         auto definition = eventList[0].toArray();
         auto type = definition.first().toString();
         auto eventData = eventList[1].toVariant().toStringList();
-        auto element = addElement(type, eventData);
 
-        auto id = definition[1].toInt();
-        auto name = definition[2].toString();
-        if (type == "Webpage") name = QString("[%1]").arg(type);
-        auto item = new QListWidgetItem(name);
-        if (type == "Webpage") item->setFlags(Qt::NoItemFlags);
-        item->setData(Qt::UserRole, id);
-        settings->ui->elementsList->addItem(item);
-
-        if (element && type != "Webpage")
+        if (type == "Webpage")
         {
-            element->setData(Qt::UserRole, id);
-            QVariant ptr;
-            ptr.setValue(dynamic_cast<PageElement*>(element));
-            item->setData(Qt::UserRole + 1, ptr);
-            pageElements[id] = element;
+            addElement(type, eventData);
+        }
+        else
+        {
+            createElement(type, definition, eventData);
         }
     }
 
     updateZOrder();
 }
 
-QGraphicsItem * MainWindow::addElement(QString name, QStringList arguments)
+QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
 {
     QGraphicsItem * returnedElement = nullptr;
 
-    if (name == "Webpage")
+    if (type == "Webpage")
     {
         auto background = arguments[5];
         webpage->setBackground(HYPNO_PATH + "images/bgs/" + background);
@@ -143,7 +160,7 @@ QGraphicsItem * MainWindow::addElement(QString name, QStringList arguments)
 
         setWindowTitle(arguments[1]);
     }
-    else if (name == "Text")
+    else if (type == "Text")
     {
         auto x = (PAGE_WIDTH / 2) + (arguments[1].toInt() / PAGE_WIDTH);
         auto y = arguments[2].toInt();
@@ -190,7 +207,7 @@ QGraphicsItem * MainWindow::addElement(QString name, QStringList arguments)
 
         returnedElement = text;
     }
-    else if (name == "Gif")
+    else if (type == "Gif")
     {
         auto gif = new Gif;
 
@@ -255,10 +272,10 @@ QGraphicsItem * MainWindow::addElement(QString name, QStringList arguments)
 
 void MainWindow::updateZOrder()
 {
-    for (int i = 1; i < settings->ui->elementsList->count(); i++)
+    for (int i = 0; i < settings->ui->elementsList->count(); i++)
     {
         auto item = settings->ui->elementsList->item(i);
-        auto id = item->data(Qt::UserRole).toInt();
+        auto id = item->data(ROLE_ID).toInt();
 
         pageElements[id]->setZValue(i * -1);
     }

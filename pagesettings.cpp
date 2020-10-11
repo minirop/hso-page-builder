@@ -4,7 +4,9 @@
 #include "gif.h"
 #include "text.h"
 #include "fontdatabase.h"
+#include "globals.h"
 #include <QColorDialog>
+#include <QGraphicsScene>
 
 PageSettings::PageSettings(QWidget *parent) :
     QWidget(parent),
@@ -21,22 +23,24 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->elementsList, &QListWidget::currentItemChanged, this, &PageSettings::itemChanged);
     connect(ui->elementName, &QLineEdit::textChanged, [&](QString newName) {
         auto item = ui->elementsList->currentItem();
-        assert(item);
-        item->setText(newName);
+        if (item)
+        {
+            item->setText(newName);
+        }
 
         emit selectedNameChanged(newName);
     });
     connect(ui->textEdit, &QTextEdit::textChanged, [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
-        auto graphics = item->data(Qt::UserRole+1).value<Text*>();
+        auto graphics = item->data(ITEM_ID).value<Text*>();
         assert(graphics);
         graphics->setString(ui->textEdit->toPlainText());
     });
     connect(ui->colorBtn, &QPushButton::clicked, [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
-        auto graphics = item->data(Qt::UserRole+1).value<Text*>();
+        auto graphics = item->data(ITEM_ID).value<Text*>();
         assert(graphics);
 
         auto c = QColorDialog::getColor(graphics->fontColor, this, "Font color");
@@ -49,7 +53,7 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->animationComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
-        auto graphics = item->data(Qt::UserRole+1).value<Text*>();
+        auto graphics = item->data(ITEM_ID).value<Text*>();
         assert(graphics);
 
         graphics->setAnimation(ui->animationComboBox->currentData().toInt());
@@ -57,7 +61,7 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->speedSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
-        auto graphics = item->data(Qt::UserRole+1).value<Text*>();
+        auto graphics = item->data(ITEM_ID).value<Text*>();
         assert(graphics);
 
         graphics->setAnimationSpeed(ui->speedSpinBox->value());
@@ -66,7 +70,7 @@ PageSettings::PageSettings(QWidget *parent) :
     auto setFontCallback = [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
-        auto graphics = item->data(Qt::UserRole+1).value<Text*>();
+        auto graphics = item->data(ITEM_ID).value<Text*>();
         assert(graphics);
 
         auto fontSize = ui->fontSizeGroup->checkedButton()->text();
@@ -82,6 +86,98 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->fontsCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), setFontCallback);
     connect(ui->fontSizeGroup, &QButtonGroup::idClicked, setFontCallback);
     connect(ui->boldButton, &QPushButton::clicked, setFontCallback);
+
+    connect(ui->deleteBtn, &QPushButton::clicked, [&]() {
+        auto item = ui->elementsList->currentItem();
+        assert(item);
+        auto txt = item->data(ITEM_ID).value<Text*>();
+        auto gif = item->data(ITEM_ID).value<Gif*>();
+        assert(txt || gif);
+
+        QGraphicsItem * graphics = nullptr;
+        if (txt)
+        {
+            graphics = txt;
+            txt->deleteLater();
+        }
+        else if (gif)
+        {
+            graphics = gif;
+            gif->deleteLater();
+        }
+        delete ui->elementsList->takeItem(ui->elementsList->row(item));
+        graphics->scene()->removeItem(graphics);
+    });
+
+    connect(ui->addTextButton, &QPushButton::clicked, [&]() {
+        QJsonArray definition;
+        definition.append(0);
+        definition.append(0);
+        definition.append(QString("Text"));
+
+        auto eventData = QStringList() << "DEFAULT" << "0" << "0" << "100" << "-1" << "Hypnospace" << "1741311" << "HypnoFont" << "0n" << "1" << "-1" << "-1" << "0" << "0" << "" << "0";
+
+        emit createElement("Text", definition, eventData);
+        emit updateZOrder();
+    });
+
+    auto moveItem = [](Ui::PageSettings * ui, QListWidgetItem * item, int from, int to) {
+        ui->elementsList->takeItem(from);
+        ui->elementsList->insertItem(to, item);
+
+        ui->elementsList->clearSelection();
+        ui->elementsList->setCurrentItem(item, QItemSelectionModel::SelectCurrent);
+    };
+
+    connect(ui->moveUp, &QPushButton::clicked, [&]() {
+        auto item = ui->elementsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->elementsList->row(item);
+            if (row < 1) return; // already at the top
+
+            moveItem(ui, item, row, row - 1);
+            emit updateZOrder();
+        }
+    });
+    connect(ui->moveDown, &QPushButton::clicked, [&]() {
+        auto item = ui->elementsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->elementsList->row(item);
+            if (row == ui->elementsList->count() - 1) return; // already at the bottom
+
+            moveItem(ui, item, row, row + 1);
+            emit updateZOrder();
+        }
+    });
+    connect(ui->moveToTop, &QPushButton::clicked, [&]() {
+        auto item = ui->elementsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->elementsList->row(item);
+            if (row < 1) return; // already at the top
+
+            moveItem(ui, item, row, 0);
+            emit updateZOrder();
+        }
+    });
+    connect(ui->moveToBottom, &QPushButton::clicked, [&]() {
+        auto item = ui->elementsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->elementsList->row(item);
+            auto count = ui->elementsList->count();
+            if (row == count - 1) return; // already at the bottom
+
+            moveItem(ui, item, row, count - 1);
+            emit updateZOrder();
+        }
+    });
 }
 
 PageSettings::~PageSettings()
@@ -91,10 +187,10 @@ PageSettings::~PageSettings()
 
 void PageSettings::select(int idSel)
 {
-    for (int i = 1; i < ui->elementsList->count(); i++)
+    for (int i = 0; i < ui->elementsList->count(); i++)
     {
         auto item = ui->elementsList->item(i);
-        auto id = item->data(Qt::UserRole).toInt();
+        auto id = item->data(ROLE_ID).toInt();
 
         if (id == idSel)
         {
@@ -123,10 +219,15 @@ void PageSettings::itemChanged(QListWidgetItem * item, QListWidgetItem * previou
 
         updateProperties(item);
 
-        newSel = item->data(Qt::UserRole).toInt();
+        newSel = item->data(ROLE_ID).toInt();
+    }
+    else
+    {
+        ui->elementName->clear();
+        ui->stackedWidget->setCurrentIndex(0);
     }
 
-    int oldSel = previous ? previous->data(Qt::UserRole).toInt() : -1;
+    int oldSel = previous ? previous->data(ROLE_ID).toInt() : -1;
 
     emit selectionChanged(newSel, oldSel);
     emit selectedNameChanged(newName);
@@ -134,7 +235,7 @@ void PageSettings::itemChanged(QListWidgetItem * item, QListWidgetItem * previou
 
 void PageSettings::updateProperties(QListWidgetItem * item)
 {
-    auto elem = item->data(Qt::UserRole + 1).value<PageElement*>();
+    auto elem = item->data(ITEM_ID).value<PageElement*>();
     if (elem)
     {
         switch (elem->elementType())

@@ -2,6 +2,7 @@
 #define PAGESETTINGS_H
 
 #include <QWidget>
+#include <QJsonArray>
 
 namespace Ui {
 class PageSettings;
@@ -24,6 +25,8 @@ public:
 signals:
     void selectionChanged(int newSelection, int oldSelection);
     void selectedNameChanged(QString name);
+    void createElement(QString type, QJsonArray definition, QStringList eventData);
+    void updateZOrder();
 
 private slots:
     void itemChanged(QListWidgetItem * item, QListWidgetItem * previous);

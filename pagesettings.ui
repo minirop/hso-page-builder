@@ -40,181 +40,203 @@
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QStackedWidget" name="stackedWidget">
-         <property name="currentIndex">
-          <number>1</number>
-         </property>
-         <widget class="QWidget" name="empty">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
-            <widget class="QLabel" name="label">
+            <widget class="QPushButton" name="addTextButton">
              <property name="text">
-              <string>NOTHING IS SELECTED</string>
+              <string>Add Text</string>
              </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="addGifButton">
+             <property name="text">
+              <string>Add Image</string>
              </property>
             </widget>
            </item>
           </layout>
-         </widget>
-         <widget class="QWidget" name="text">
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
+         </item>
+         <item>
+          <widget class="QStackedWidget" name="stackedWidget">
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="empty">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
-              <widget class="QLabel" name="label_4">
+              <widget class="QLabel" name="label">
                <property name="text">
-                <string>Font:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="fontsCombo">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_3">
-               <property name="text">
-                <string>Color:</string>
+                <string>NOTHING IS SELECTED</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="colorBtn">
-               <property name="styleSheet">
-                <string notr="true">background-color: black</string>
-               </property>
-               <property name="text">
-                <string/>
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
             </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
+           </widget>
+           <widget class="QWidget" name="text">
+            <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
-              <widget class="QPushButton" name="size0Button">
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">fontSizeGroup</string>
-               </attribute>
-              </widget>
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <item>
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Font:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="fontsCombo">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_3">
+                 <property name="text">
+                  <string>Color:</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="colorBtn">
+                 <property name="styleSheet">
+                  <string notr="true">background-color: black</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
-              <widget class="QPushButton" name="size1Button">
-               <property name="text">
-                <string>1</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">fontSizeGroup</string>
-               </attribute>
-              </widget>
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <item>
+                <widget class="QPushButton" name="size0Button">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">fontSizeGroup</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="size1Button">
+                 <property name="text">
+                  <string>1</string>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">fontSizeGroup</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="size2Button">
+                 <property name="text">
+                  <string>2</string>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">fontSizeGroup</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="boldButton">
+                 <property name="text">
+                  <string>Bold</string>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
-              <widget class="QPushButton" name="size2Button">
-               <property name="text">
-                <string>2</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">fontSizeGroup</string>
-               </attribute>
-              </widget>
+              <widget class="QTextEdit" name="textEdit"/>
              </item>
              <item>
-              <widget class="QPushButton" name="boldButton">
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>Animation:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="animationComboBox"/>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>Speed</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="speedSpinBox">
+                 <property name="maximum">
+                  <number>60</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="gif">
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <widget class="QLabel" name="label_2">
                <property name="text">
-                <string>Bold</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
+                <string>GIF GIF GIF</string>
                </property>
               </widget>
              </item>
             </layout>
-           </item>
-           <item>
-            <widget class="QTextEdit" name="textEdit"/>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <item>
-              <widget class="QLabel" name="label_5">
-               <property name="text">
-                <string>Animation:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="animationComboBox"/>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_6">
-               <property name="text">
-                <string>Speed</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="speedSpinBox">
-               <property name="maximum">
-                <number>60</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="gif">
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>GIF GIF GIF</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </widget>
+           </widget>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QToolBox" name="toolBox">
