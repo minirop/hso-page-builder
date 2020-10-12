@@ -37,6 +37,7 @@ private:
     void updateTextProperties(Text * text);
 
     void setFontColorButton(QColor color);
+    void setFadeColorButton(QColor color);
 
     friend class MainWindow;
     Ui::PageSettings *ui;

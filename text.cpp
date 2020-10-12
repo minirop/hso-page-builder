@@ -57,13 +57,13 @@ void Text::setAlign(int halign)
     switch (halign)
     {
     case 0:
-        align = Qt::AlignLeft;
+        align = ALIGN_LEFT;
         break;
     case 1:
-        align = Qt::AlignHCenter;
+        align = ALIGN_CENTRE;
         break;
     case 2:
-        align = Qt::AlignRight;
+        align = ALIGN_RIGHT;
         break;
     }
     textIsDirty = true;
@@ -109,7 +109,9 @@ void Text::setColor(QColor color)
 
 void Text::setFade(QColor color, int speed)
 {
-    auto group = new QSequentialAnimationGroup(this);
+    if (group) group->deleteLater();
+
+    group = new QSequentialAnimationGroup(this);
     auto fadeIn = new QVariantAnimation;
     fadeIn->setStartValue(fontColor);
     fadeIn->setEndValue(color);
@@ -131,6 +133,9 @@ void Text::setFade(QColor color, int speed)
     group->setLoopCount(-1);
 
     group->start();
+
+    fadeColor = color;
+    fadeSpeed = speed;
 }
 
 QRectF Text::boundingRect() const
@@ -163,13 +168,13 @@ void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
             int x = 0;
             switch (align)
             {
-            case Qt::AlignLeft:
+            case ALIGN_LEFT:
                 x = rect.left();
                 break;
-            case Qt::AlignHCenter:
+            case ALIGN_CENTRE:
                 x = (rect.width() - renderedText.width()) / 2 + rect.left();
                 break;
-            case Qt::AlignRight:
+            case ALIGN_RIGHT:
                 x = rect.right() - renderedText.width();
                 break;
             }

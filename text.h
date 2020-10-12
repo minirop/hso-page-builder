@@ -2,6 +2,7 @@
 #define TEXT_H
 
 #include "pageelement.h"
+#include "globals.h"
 #include <QMap>
 #include <QPixmap>
 #include <QGraphicsColorizeEffect>
@@ -14,7 +15,7 @@ enum class Animation {
     Marquee
 };
 
-class QAbstractAnimation;
+class QSequentialAnimationGroup;
 class Text : public PageElement, public QGraphicsItem
 {
     Q_OBJECT
@@ -47,13 +48,14 @@ private:
     void renderText(QString string);
     void regenerateFont();
 
+    friend class MainWindow;
     friend class PageSettings;
 
     QVector<QPixmap> renderedTextes;
     QString string;
     int width = 0;
     int xoffset = 0;
-    int align = Qt::AlignLeft;
+    int align = ALIGN_LEFT;
     qreal marquee = 0;
     qreal floating = 0;
     float typewriterProgress = 0;
@@ -70,7 +72,9 @@ private:
     QMap<QChar, QPixmap> fontChars;
     int fontWidth = 0;
     int fontHeight = 0;
-    QAbstractAnimation * fadeAnimation = nullptr;
+    QSequentialAnimationGroup * group = nullptr;
+    QColor fadeColor = Qt::black;
+    int fadeSpeed = 0;
     QGraphicsColorizeEffect * colorizeEffect = nullptr;
 };
 

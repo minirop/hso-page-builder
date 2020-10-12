@@ -28,7 +28,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="action_Open_Page"/>
-    <addaction name="separator"/>
+    <addaction name="action_Save_Page"/>
     <addaction name="action_Quit"/>
    </widget>
    <addaction name="menu_File"/>
@@ -48,6 +48,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="action_Save_Page">
+   <property name="text">
+    <string>&amp;Save Page</string>
    </property>
   </action>
  </widget>

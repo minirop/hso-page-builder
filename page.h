@@ -32,9 +32,15 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 private:
-    QPixmap background;
+    friend class MainWindow;
+
+    QString background;
     int topLine = 0;
     int linesCount = 0;
+    QString title;
+    QString username;
+    QString music;
+    QString descriptionAndTags;
     QGraphicsScene * scene;
     QGraphicsItem * selectedItem = nullptr;
     QString selectedName;

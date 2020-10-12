@@ -21,6 +21,11 @@ QList<int> stringsToInts(QStringList strings)
     return ints;
 }
 
+int colorToInt(QColor color)
+{
+    return color.red() | (color.green() << 8) | (color.blue() << 16);
+}
+
 const QString HYPNO_PATH = "/home/minirop/.local/share/Steam/steamapps/common/Hypnospace Outlaw/data/";
 
 MainWindow::MainWindow(QWidget *parent)
@@ -51,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(settings);
 
     connect(ui->action_Open_Page, &QAction::triggered, this, &MainWindow::openPage);
+    connect(ui->action_Save_Page, &QAction::triggered, this, &MainWindow::savePage);
 
     fontDatabase.load(HYPNO_PATH + "images/fonts/");
 }
@@ -76,6 +82,90 @@ void MainWindow::openPage()
     }
 }
 
+void MainWindow::savePage()
+{
+    QJsonObject object;
+    object["c2array"] = true;
+    QJsonArray size;
+    size.append(9);
+    size.append(21);
+    size.append(21);
+    object["size"] = size;
+
+    QJsonArray data;
+
+    for (auto i = -1; i < settings->ui->elementsList->count(); i++)
+    {
+        QJsonArray element;
+
+        if (i == -1)
+        {
+            auto definition = emptyArray();
+            definition[DefType] = TYPE_WEBPAGE;
+            element.append(definition);
+
+            auto metadata = emptyArray();
+            definition[WebEvent] = EVENT_DEFAULT;
+            definition[WebTitle] = webpage->title;
+            definition[WebUsername] = webpage->username;
+            definition[WebHeight] = QString::number(webpage->linesCount);
+            definition[WebMusic] = webpage->music;
+            definition[WebBGImage] = webpage->background;
+            definition[WebMouseFX] = "0";
+            definition[WebBGColor] = "0";
+            definition[WebDescriptionAndTags] = webpage->descriptionAndTags;
+            definition[WebPageStyle] = "";
+            definition[WebUserHOME] = "0";
+            definition[WebOnLoadScript] = "";
+        }
+        else
+        {
+            auto item = settings->ui->elementsList->item(i);
+            auto id = item->data(ROLE_ID).toInt();
+            auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+
+            QString typeName;
+            switch (pageElement->elementType())
+            {
+            case PageElement::ElementType::Gif:
+            {
+                typeName = TYPE_GIF;
+                element.append(gifToJson(dynamic_cast<Gif*>(pageElement)));
+                break;
+            }
+            case PageElement::ElementType::Text:
+            {
+                typeName = TYPE_TEXT;
+                element.append(textToJson(dynamic_cast<Text*>(pageElement)));
+                break;
+            }
+            }
+
+            auto definition = emptyArray();
+            definition[DefType] = typeName;
+            definition[DefId] = id;
+            definition[DefName] = item->text();
+            element.prepend(definition);
+        }
+
+        for (int i = 0; i < 19; i++)
+        {
+            element.push_back(emptyArray());
+        }
+
+        data.append(element);
+    }
+
+    object["data"] = data;
+
+    QFile f("debug.json");
+    if (f.open(QFile::WriteOnly))
+    {
+        f.write(QJsonDocument(object).toJson(QJsonDocument::Compact));
+        f.close();
+    }
+}
+
 void MainWindow::createElement(QString type, QJsonArray definition, QStringList eventData)
 {
     auto element = addElement(type, eventData);
@@ -96,7 +186,7 @@ void MainWindow::createElement(QString type, QJsonArray definition, QStringList 
         element->setData(ROLE_ID, id);
         QVariant ptr;
         ptr.setValue(dynamic_cast<PageElement*>(element));
-        item->setData(ITEM_ID, ptr);
+        item->setData(ROLE_ELEMENT, ptr);
         pageElements[id] = element;
     }
 }
@@ -135,7 +225,7 @@ void MainWindow::parseJSON(QByteArray data)
         auto type = definition.first().toString();
         auto eventData = eventList[1].toVariant().toStringList();
 
-        if (type == "Webpage")
+        if (type == TYPE_WEBPAGE)
         {
             addElement(type, eventData);
         }
@@ -152,30 +242,36 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
 {
     QGraphicsItem * returnedElement = nullptr;
 
-    if (type == "Webpage")
+    if (type == TYPE_WEBPAGE)
     {
-        auto background = arguments[5];
-        webpage->setBackground(HYPNO_PATH + "images/bgs/" + background);
-        webpage->setLineCount(arguments[3].toInt());
+        webpage->background = arguments[WebBGImage];
+        webpage->setBackground(HYPNO_PATH + "images/bgs/" + webpage->background);
+        webpage->setLineCount(arguments[WebHeight].toInt());
 
-        setWindowTitle(arguments[1]);
+        webpage->title = arguments[WebTitle];
+        setWindowTitle(webpage->title);
+
+        webpage->username = arguments[WebUsername];
+        webpage->music = arguments[WebMusic];
+        webpage->descriptionAndTags = arguments[WebDescriptionAndTags];
     }
-    else if (type == "Text")
+    else if (type == TYPE_TEXT)
     {
-        auto x = (PAGE_WIDTH / 2) + (arguments[1].toInt() / PAGE_WIDTH);
-        auto y = arguments[2].toInt();
-        auto width = arguments[3].toInt() * PAGE_WIDTH / 100;
-        auto caseTag = arguments[4];
-        auto string = arguments[5];
-        auto color = arguments[6].toInt();
-        auto font = arguments[7];
-        auto style = arguments[8];
-        auto align = arguments[9].toInt();
-        auto script = arguments[10];
-        auto animation = arguments[12].toInt();
-        auto animationSpeed = arguments[13].toInt();
-        auto fadeColor = arguments[14].toInt();
-        auto fadeSpeed = arguments[15].toInt();
+        auto x = ((arguments[TextX].toInt() + 100) * PAGE_WIDTH / 200);
+        auto y = arguments[TextY].toInt();
+        auto width = arguments[TextWidth].toInt() * PAGE_WIDTH / 100;
+        auto caseTag = arguments[TextCaseTag];
+        auto string = arguments[TextString];
+        auto color = arguments[TextColor].toInt();
+        auto font = arguments[TextFont];
+        auto style = arguments[TextStyle];
+        auto align = arguments[TextAlign].toInt();
+        auto script = arguments[TextLinkOrScript];
+        auto law = arguments[TextLawBroken].toInt();
+        auto animation = arguments[TextAnimation].toInt();
+        auto animationSpeed = arguments[TextAnimSpeed].toInt();
+        auto fadeColor = arguments[TextColorFadeTo].toInt();
+        auto fadeSpeed = arguments[TextColorFadeSpeed].toInt();
 
         auto text = new Text;
         text->setAlign(align);
@@ -186,6 +282,8 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         text->setFont(font.toLower());
         text->setAnimation(animation);
         text->setAnimationSpeed(animationSpeed);
+        text->setCaseTag(caseTag);
+        text->setBrokenLaw(law);
 
         if (color >= 0)
         {
@@ -207,11 +305,12 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
 
         returnedElement = text;
     }
-    else if (type == "Gif")
+    else if (type == TYPE_GIF)
     {
         auto gif = new Gif;
 
-        auto image = arguments[5];
+        auto image = arguments[GifNameOf];
+        gif->nameOf = image;
         if (QFileInfo fi(HYPNO_PATH + "images/gifs/" + image); fi.isDir())
         {
             QDir dir(fi.absoluteFilePath());
@@ -220,7 +319,7 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
                 if (entry.suffix() == "speed")
                 {
                     auto spd = entry.baseName().toInt();
-                    gif->setSpeed(1000 / spd);
+                    gif->setSpeed(spd);
                 }
                 else
                 {
@@ -244,17 +343,17 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
 
         if (gif)
         {
-            auto x = arguments[1].toInt();
-            auto y = arguments[2].toInt();
+            auto x = arguments[GifX].toInt();
+            auto y = arguments[GifY].toInt();
             gif->setPos(x, y);
 
-            auto color = arguments[3].split(',');
+            auto color = arguments[GifHSL].split(',');
 
             if (color.size() == 3)
             {
-                auto h = color[0].toInt() / 100.0f;
-                auto s = color[1].toInt() / 100.0f;
-                auto l = color[2].toInt() / 100.0f;
+                auto h = color[0].toInt();
+                auto s = color[1].toInt();
+                auto l = color[2].toInt();
                 gif->setHSL(h, s, l);
             }
 
@@ -268,6 +367,64 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
     }
 
     return returnedElement;
+}
+
+QJsonArray MainWindow::gifToJson(Gif * gif)
+{
+    QJsonArray array = emptyArray();
+
+    array[GifEvent] = "DEFAULT";
+    array[GifX] = QString::number((int)gif->pos().x());
+    array[GifY] = QString::number((int)gif->pos().y());
+    array[GifHSL] = QString("%1,%2,%3").arg(gif->H).arg(gif->S).arg(gif->L);
+    array[GifCaseTag] = gif->caseTag;
+    array[GifNameOf] = gif->nameOf;
+    array[GifScale] = "1";
+    array[GifRotation] = "0";
+    array[GifMirror] = "0";
+    array[GifFlip] = "0";
+    array[GifLinkOrScript] = "-1";
+    array[GifLawBroken] = "";
+    array[GifAnimFlipX] = "-1";
+    array[GifAnimFlipY] = "-1";
+    array[GifAnimFade] = "-1";
+    array[GifAnimTurn] = "0";
+    array[GifAnimTurnSpeed] = "0";
+    array[GifFPS] = QString::number(gif->fps);
+    array[GifOffset] = "0";
+    array[GifSync] = "0";
+    array[GifAnimMouseOver] = "0";
+
+    return array;
+}
+
+QJsonArray MainWindow::textToJson(Text * text)
+{
+    QJsonArray array = emptyArray();
+
+    array[TextEvent] = EVENT_DEFAULT;
+    array[TextX] = QString::number((((int)text->x() * 200) / PAGE_WIDTH) - 100);
+    array[TextY] = QString::number((int)text->y());
+    array[TextWidth] = QString::number(text->width * 100 / PAGE_WIDTH);
+    array[TextCaseTag] = text->caseTag;
+    array[TextString] = text->string;
+    array[TextColor] = QString::number(colorToInt(text->fontColor));
+    array[TextFont] = text->fontName;
+    array[TextStyle] = QString("%1%2").arg(text->fontSize).arg(text->fontBold ? 'b' : 'n');
+    array[TextAlign] = QString::number(text->align);
+    array[TextLinkOrScript] = "-1";
+    array[TextLawBroken] = QString::number(text->brokenLaw);
+    array[TextAnimation] = QString::number(static_cast<int>(text->animation));
+    array[TextAnimSpeed] = QString::number(text->animationSpeed);
+    array[TextColorFadeTo] = QString::number(colorToInt(text->fadeColor));
+    array[TextColorFadeSpeed] = QString::number(text->fadeSpeed);
+
+    return array;
+}
+
+QJsonArray MainWindow::emptyArray()
+{
+    return QJsonArray {QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString()};
 }
 
 void MainWindow::updateZOrder()

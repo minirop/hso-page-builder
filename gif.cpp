@@ -21,16 +21,21 @@ void Gif::addFrame(QString filename)
 
 void Gif::setSpeed(int speed)
 {
-    startTimer(speed);
+    fps = speed;
+    startTimer(1000 / speed);
 }
 
-void Gif::setHSL(float h, float s, float l)
+void Gif::setHSL(int h, int s, int l)
 {
+    H = h;
+    S = s;
+    L = l;
+
     QVector<QPixmap> newFrames;
 
     for (auto pix : frames)
     {
-        newFrames.push_back(Utils::ChangeHSL(pix, h, s, l));
+        newFrames.push_back(Utils::ChangeHSL(pix, h / 100.0f, s / 100.0f, l / 100.0f));
     }
 
     frames = newFrames;

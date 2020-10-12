@@ -20,6 +20,10 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->animationComboBox->addItem("Floating", static_cast<int>(Animation::Floating));
     ui->animationComboBox->addItem("Marquee", static_cast<int>(Animation::Marquee));
 
+    ui->alignmentComboBox->addItem("Left", 0);
+    ui->alignmentComboBox->addItem("Centre", 1);
+    ui->alignmentComboBox->addItem("Right", 2);
+
     connect(ui->elementsList, &QListWidget::currentItemChanged, this, &PageSettings::itemChanged);
     connect(ui->elementName, &QLineEdit::textChanged, [&](QString newName) {
         auto item = ui->elementsList->currentItem();
@@ -33,14 +37,14 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->textEdit, &QTextEdit::textChanged, [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
-        auto graphics = item->data(ITEM_ID).value<Text*>();
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
         graphics->setString(ui->textEdit->toPlainText());
     });
     connect(ui->colorBtn, &QPushButton::clicked, [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
-        auto graphics = item->data(ITEM_ID).value<Text*>();
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
         auto c = QColorDialog::getColor(graphics->fontColor, this, "Font color");
@@ -53,7 +57,7 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->animationComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
-        auto graphics = item->data(ITEM_ID).value<Text*>();
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
         graphics->setAnimation(ui->animationComboBox->currentData().toInt());
@@ -61,16 +65,46 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->speedSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
-        auto graphics = item->data(ITEM_ID).value<Text*>();
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
         graphics->setAnimationSpeed(ui->speedSpinBox->value());
+    });
+    connect(ui->alignmentComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
+        auto item = ui->elementsList->currentItem();
+        assert(item);
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
+        assert(graphics);
+
+        graphics->setAlign(ui->alignmentComboBox->currentData().toInt());
+    });
+
+    connect(ui->colorFadeBtn, &QPushButton::clicked, [&]() {
+        auto item = ui->elementsList->currentItem();
+        assert(item);
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
+        assert(graphics);
+
+        auto c = QColorDialog::getColor(graphics->fadeColor, this, "Fade color");
+        if (c.isValid())
+        {
+            graphics->setFade(c, ui->fadeSpeedSpinBox->value());
+            setFadeColorButton(c);
+        }
+    });
+    connect(ui->fadeSpeedSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&]() {
+        auto item = ui->elementsList->currentItem();
+        assert(item);
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
+        assert(graphics);
+
+        graphics->setFade(graphics->fadeColor, ui->fadeSpeedSpinBox->value());
     });
 
     auto setFontCallback = [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
-        auto graphics = item->data(ITEM_ID).value<Text*>();
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
         auto fontSize = ui->fontSizeGroup->checkedButton()->text();
@@ -90,8 +124,8 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->deleteBtn, &QPushButton::clicked, [&]() {
         auto item = ui->elementsList->currentItem();
         assert(item);
-        auto txt = item->data(ITEM_ID).value<Text*>();
-        auto gif = item->data(ITEM_ID).value<Gif*>();
+        auto txt = item->data(ROLE_ELEMENT).value<Text*>();
+        auto gif = item->data(ROLE_ELEMENT).value<Gif*>();
         assert(txt || gif);
 
         QGraphicsItem * graphics = nullptr;
@@ -113,11 +147,11 @@ PageSettings::PageSettings(QWidget *parent) :
         QJsonArray definition;
         definition.append(0);
         definition.append(0);
-        definition.append(QString("Text"));
+        definition.append(QString(TYPE_TEXT));
 
-        auto eventData = QStringList() << "DEFAULT" << "0" << "0" << "100" << "-1" << "Hypnospace" << "1741311" << "HypnoFont" << "0n" << "1" << "-1" << "-1" << "0" << "0" << "" << "0";
+        auto eventData = QStringList() << EVENT_DEFAULT << "0" << "0" << "100" << "-1" << "Hypnospace" << "1741311" << "HypnoFont" << "0n" << "1" << "-1" << "-1" << "0" << "0" << "" << "0";
 
-        emit createElement("Text", definition, eventData);
+        emit createElement(TYPE_TEXT, definition, eventData);
         emit updateZOrder();
     });
 
@@ -235,7 +269,7 @@ void PageSettings::itemChanged(QListWidgetItem * item, QListWidgetItem * previou
 
 void PageSettings::updateProperties(QListWidgetItem * item)
 {
-    auto elem = item->data(ITEM_ID).value<PageElement*>();
+    auto elem = item->data(ROLE_ELEMENT).value<PageElement*>();
     if (elem)
     {
         switch (elem->elementType())
@@ -264,6 +298,13 @@ void PageSettings::updateTextProperties(Text * text)
     QSignalBlocker a1(this);
     QSignalBlocker a2(ui->fontsCombo);
     QSignalBlocker a3(ui->fontSizeGroup);
+    QSignalBlocker a4(ui->animationComboBox);
+    QSignalBlocker a5(ui->fadeSpeedSpinBox);
+    QSignalBlocker a6(ui->textEdit);
+    QSignalBlocker a7(ui->boldButton);
+    QSignalBlocker a8(ui->colorBtn);
+    QSignalBlocker a9(ui->colorFadeBtn);
+    QSignalBlocker b0(ui->alignmentComboBox);
 
     auto fontsNames = FontDatabase::GetFonts();
 
@@ -285,6 +326,13 @@ void PageSettings::updateTextProperties(Text * text)
     ui->animationComboBox->setCurrentIndex(animIndex);
     ui->speedSpinBox->setValue(text->animationSpeed);
 
+    int alignIndex = ui->alignmentComboBox->findData(text->align);
+    assert(alignIndex != -1);
+    ui->alignmentComboBox->setCurrentIndex(alignIndex);
+
+    setFadeColorButton(text->fadeColor);
+    ui->fadeSpeedSpinBox->setValue(text->fadeSpeed);
+
     switch (text->fontSize)
     {
     case 0:
@@ -304,4 +352,9 @@ void PageSettings::updateTextProperties(Text * text)
 void PageSettings::setFontColorButton(QColor color)
 {
     ui->colorBtn->setStyleSheet(QString("background-color: rgb(%1, %2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
+}
+
+void PageSettings::setFadeColorButton(QColor color)
+{
+    ui->colorFadeBtn->setStyleSheet(QString("background-color: rgb(%1, %2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
 }

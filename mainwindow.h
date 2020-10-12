@@ -21,6 +21,7 @@ public:
 
 private slots:
     void openPage();
+    void savePage();
     void createElement(QString type, QJsonArray definition, QStringList eventData);
     void updateZOrder();
 
@@ -28,6 +29,9 @@ private:
     void clearEverything();
     void parseJSON(QByteArray data);
     QGraphicsItem * addElement(QString type, QStringList arguments);
+    QJsonArray gifToJson(Gif * gif);
+    QJsonArray textToJson(Text * text);
+    QJsonArray emptyArray();
 
     QHash<int, QGraphicsItem*> pageElements;
     Ui::MainWindow * ui;
