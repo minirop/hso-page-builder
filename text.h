@@ -24,6 +24,7 @@ class Text : public PageElement, public QGraphicsItem
 public:
     Text();
     ElementType elementType() const override { return ElementType::Text; }
+    void refresh() override;
 
     void setWidth(int w);
     void setAnimation(int anim);

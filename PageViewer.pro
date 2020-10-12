@@ -16,10 +16,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    appsettings.cpp \
     fontdatabase.cpp \
     gif.cpp \
     main.cpp \
     mainwindow.cpp \
+    modsmanager.cpp \
     page.cpp \
     pageelement.cpp \
     pagesettings.cpp \
@@ -27,10 +29,12 @@ SOURCES += \
     utils.cpp
 
 HEADERS += \
+    appsettings.h \
     fontdatabase.h \
     gif.h \
     globals.h \
     mainwindow.h \
+    modsmanager.h \
     page.h \
     pageelement.h \
     pagesettings.h \

@@ -1,5 +1,6 @@
 #include "page.h"
 #include "globals.h"
+#include "appsettings.h"
 #include <QPainter>
 #include <QPushButton>
 #include <QWheelEvent>
@@ -56,7 +57,38 @@ void Page::setLineCount(int lineCount)
 
 void Page::setBackground(QString image)
 {
-    setBackgroundBrush(QPixmap(image));
+    background.clear();
+
+    if (!image.isEmpty())
+    {
+        auto searchPaths = AppSettings::GetSearchPaths();
+        for (auto path : searchPaths)
+        {
+            if (QFile(path + "/images/bgs/" + background).exists())
+            {
+                background = image;
+                setBackgroundBrush(QPixmap(background));
+                break;
+            }
+        }
+    }
+
+    if (background.isEmpty())
+    {
+        setBackgroundColor(backgroundColor);
+    }
+
+    update();
+}
+
+void Page::setBackgroundColor(QColor color)
+{
+    backgroundColor = color;
+
+    if (background.isEmpty())
+    {
+        setBackgroundBrush(color);
+    }
 
     update();
 }
@@ -81,6 +113,21 @@ bool Page::eventFilter(QObject * watched, QEvent * event)
 void Page::setSelectedName(QString name)
 {
     selectedName = name;
+}
+
+void Page::setTitle(QString newTitle)
+{
+    title = newTitle;
+}
+
+void Page::setOwner(QString newOwner)
+{
+    username = newOwner;
+}
+
+void Page::setDescription(QString description)
+{
+    descriptionAndTags = description;
 }
 
 void Page::drawForeground(QPainter * painter, const QRectF & rect)

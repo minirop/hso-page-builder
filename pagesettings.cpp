@@ -1,5 +1,6 @@
 #include "pagesettings.h"
 #include "ui_pagesettings.h"
+#include "appsettings.h"
 #include "pageelement.h"
 #include "gif.h"
 #include "text.h"
@@ -23,6 +24,14 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->alignmentComboBox->addItem("Left", 0);
     ui->alignmentComboBox->addItem("Centre", 1);
     ui->alignmentComboBox->addItem("Right", 2);
+
+    ui->lawBrokenComboBox->addItem("None", -1);
+    ui->lawBrokenComboBox->addItem("C: Content Infringement", 1);
+    ui->lawBrokenComboBox->addItem("H: Harassment", 2);
+    ui->lawBrokenComboBox->addItem("I: Illegal or Profane Activity", 3);
+    ui->lawBrokenComboBox->addItem("M: Malicious Software", 4);
+    ui->lawBrokenComboBox->addItem("E: Extralegal Commerce", 5);
+    ui->lawBrokenComboBox->addItem("S: Submit Evidence", 6);
 
     connect(ui->elementsList, &QListWidget::currentItemChanged, this, &PageSettings::itemChanged);
     connect(ui->elementName, &QLineEdit::textChanged, [&](QString newName) {
@@ -139,8 +148,13 @@ PageSettings::PageSettings(QWidget *parent) :
             graphics = gif;
             gif->deleteLater();
         }
+
+        if (graphics)
+        {
+            graphics->scene()->removeItem(graphics);
+        }
+
         delete ui->elementsList->takeItem(ui->elementsList->row(item));
-        graphics->scene()->removeItem(graphics);
     });
 
     connect(ui->addTextButton, &QPushButton::clicked, [&]() {
@@ -211,6 +225,24 @@ PageSettings::PageSettings(QWidget *parent) :
             moveItem(ui, item, row, count - 1);
             emit updateZOrder();
         }
+    });
+
+    connect(ui->pageTitleLineEdit, &QLineEdit::textChanged, [&](QString title) {
+        emit pageTitleChanged(title);
+    });
+    connect(ui->pageOwnerLineEdit, &QLineEdit::textChanged, [&](QString owner) {
+        emit pageOwnerChanged(owner);
+    });
+    connect(ui->pageDescriptionAndTags, &QPlainTextEdit::textChanged, [&]() {
+        emit pageDescriptionChanged(ui->pageDescriptionAndTags->toPlainText());
+    });
+    connect(ui->lawBrokenComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
+        auto item = ui->elementsList->currentItem();
+        assert(item);
+        auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+        assert(pageElement);
+
+        pageElement->setBrokenLaw(ui->lawBrokenComboBox->currentData().toInt());
     });
 }
 
@@ -346,6 +378,10 @@ void PageSettings::updateTextProperties(Text * text)
         break;
     }
 
+    int lawIndex = ui->lawBrokenComboBox->findData(text->brokenLaw);
+    assert(lawIndex != -1);
+    ui->lawBrokenComboBox->setCurrentIndex(lawIndex);
+
     ui->boldButton->setChecked(text->fontBold);
 }
 
@@ -357,4 +393,26 @@ void PageSettings::setFontColorButton(QColor color)
 void PageSettings::setFadeColorButton(QColor color)
 {
     ui->colorFadeBtn->setStyleSheet(QString("background-color: rgb(%1, %2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
+}
+
+void PageSettings::refresh()
+{
+    // update elements
+    for (int i = 0; i < ui->elementsList->count(); i++)
+    {
+        auto item = ui->elementsList->item(i);
+        assert(item);
+        auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+        assert(pageElement);
+
+        pageElement->refresh();
+    }
+
+    // update form
+    auto items = ui->elementsList->selectedItems();
+    if (items.size() == 1)
+    {
+        auto item = items.first();
+        updateProperties(item);
+    }
 }

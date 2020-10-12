@@ -11,11 +11,13 @@ public:
     FontDatabase();
 
     void load(QString directory);
+    void clear();
 
     struct FontData {
         int spacing = 0;
         int lineheight = 0;
         QMap<char, int> widths;
+        QString path;
 
         int getWidth(char c, int defaultWidth);
     };

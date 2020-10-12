@@ -13,6 +13,7 @@ class Gif : public PageElement, public QGraphicsPixmapItem
 public:
     Gif();
     ElementType elementType() const override { return ElementType::Gif; }
+    void refresh() override;
 
     void addFrame(QString filename);
     void setSpeed(int speed);
@@ -26,9 +27,10 @@ private:
 
     QVector<QPixmap> frames;
     int currentFrame = 0;
-    int H = 0, S = 0, L = 0;
+    int H = 0, S = 100, L = 100;
     QString nameOf;
     int fps = 0;
+    int timerId = -1;
 };
 
 #endif // GIF_H

@@ -16,6 +16,7 @@ public:
 
     void setLineCount(int lineCount);
     void setBackground(QString image);
+    void setBackgroundColor(QColor color);
 
     void addElement(QGraphicsItem *element);
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -26,6 +27,9 @@ signals:
 
 public slots:
     void setSelectedName(QString name);
+    void setTitle(QString newTitle);
+    void setOwner(QString newOwner);
+    void setDescription(QString description);
 
 protected:
     void drawForeground(QPainter * painter, const QRectF & rect) override;
@@ -35,6 +39,7 @@ private:
     friend class MainWindow;
 
     QString background;
+    QColor backgroundColor;
     int topLine = 0;
     int linesCount = 0;
     QString title;

@@ -8,8 +8,7 @@ class PageElement : public QObject
     Q_OBJECT
 
 public:
-    enum class ElementType
-    {
+    enum class ElementType {
         Gif,
         Text
     };
@@ -18,6 +17,7 @@ public:
     virtual ~PageElement() = default;
 
     virtual ElementType elementType() const = 0;
+    virtual void refresh() = 0;
 
     void setCaseTag(QString tag);
     void setBrokenLaw(int law);

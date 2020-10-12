@@ -20,6 +20,10 @@ Text::Text()
     setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges);
 }
 
+void Text::refresh()
+{
+}
+
 void Text::setWidth(int w)
 {
     width = w;

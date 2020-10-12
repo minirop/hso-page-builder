@@ -1,7 +1,10 @@
 #include "gif.h"
 #include "utils.h"
+#include "appsettings.h"
 #include <QPainter>
 #include <QBitmap>
+#include <QFileInfo>
+#include <QDir>
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
@@ -21,8 +24,10 @@ void Gif::addFrame(QString filename)
 
 void Gif::setSpeed(int speed)
 {
+    if (timerId != -1)
+        killTimer(timerId);
     fps = speed;
-    startTimer(1000 / speed);
+    timerId = startTimer(1000 / speed);
 }
 
 void Gif::setHSL(int h, int s, int l)
@@ -53,4 +58,43 @@ void Gif::timerEvent(QTimerEvent *event)
     setPixmap(frame);
     setOffset(-frame.width() / 2, -frame.height() / 2);
     update();
+}
+
+void Gif::refresh()
+{
+    frames.clear();
+
+    auto searchPaths = AppSettings::GetSearchPaths();
+    for (auto path : searchPaths)
+    {
+        if (QFileInfo fi(path + "/images/gifs/" + nameOf); fi.isDir())
+        {
+            QDir dir(fi.absoluteFilePath());
+            for (auto entry : dir.entryInfoList(QDir::Files, QDir::Name))
+            {
+                if (entry.suffix() == "speed")
+                {
+                    auto spd = entry.baseName().toInt();
+                    setSpeed(spd);
+                }
+                else
+                {
+                    addFrame(entry.absoluteFilePath());
+                }
+            }
+            break;
+        }
+        else if (QFile(path + "/images/static/" + nameOf + ".png").exists())
+        {
+            addFrame(path + "/images/static/" + nameOf + ".png");
+            break;
+        }
+        else if (QFile(path + "/images/shapes/" + nameOf + ".png").exists())
+        {
+            addFrame(path + "/images/shapes/" + nameOf + ".png");
+            break;
+        }
+    }
+
+    setHSL(H, S, L);
 }

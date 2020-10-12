@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "ui_pagesettings.h"
+#include "modsmanager.h"
+#include "appsettings.h"
 #include "globals.h"
 #include "gif.h"
 #include "text.h"
@@ -26,8 +28,6 @@ int colorToInt(QColor color)
     return color.red() | (color.green() << 8) | (color.blue() << 16);
 }
 
-const QString HYPNO_PATH = "/home/minirop/.local/share/Steam/steamapps/common/Hypnospace Outlaw/data/";
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -48,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(settings, &PageSettings::createElement, this, &MainWindow::createElement);
     connect(settings, &PageSettings::updateZOrder, this, &MainWindow::updateZOrder);
+    connect(settings, &PageSettings::pageTitleChanged, [&](QString title) {
+        setWindowTitle(title);
+    });
 
     auto widget = new QWidget;
     setCentralWidget(widget);
@@ -55,15 +58,24 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(area);
     layout->addWidget(settings);
 
+    connect(ui->action_New_page, &QAction::triggered, this, &MainWindow::newPage);
     connect(ui->action_Open_Page, &QAction::triggered, this, &MainWindow::openPage);
     connect(ui->action_Save_Page, &QAction::triggered, this, &MainWindow::savePage);
+    connect(ui->action_Quit, &QAction::triggered, this, &MainWindow::close);
+    connect(ui->action_Mods, &QAction::triggered, this, &MainWindow::openModsWindow);
+    connect(ui->action_Refresh, &QAction::triggered, this, &MainWindow::refresh);
 
-    fontDatabase.load(HYPNO_PATH + "images/fonts/");
+    refresh();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::newPage()
+{
+
 }
 
 void MainWindow::openPage()
@@ -105,18 +117,19 @@ void MainWindow::savePage()
             element.append(definition);
 
             auto metadata = emptyArray();
-            definition[WebEvent] = EVENT_DEFAULT;
-            definition[WebTitle] = webpage->title;
-            definition[WebUsername] = webpage->username;
-            definition[WebHeight] = QString::number(webpage->linesCount);
-            definition[WebMusic] = webpage->music;
-            definition[WebBGImage] = webpage->background;
-            definition[WebMouseFX] = "0";
-            definition[WebBGColor] = "0";
-            definition[WebDescriptionAndTags] = webpage->descriptionAndTags;
-            definition[WebPageStyle] = "";
-            definition[WebUserHOME] = "0";
-            definition[WebOnLoadScript] = "";
+            metadata[WebEvent] = EVENT_DEFAULT;
+            metadata[WebTitle] = webpage->title;
+            metadata[WebUsername] = webpage->username;
+            metadata[WebHeight] = QString::number(webpage->linesCount);
+            metadata[WebMusic] = webpage->music;
+            metadata[WebBGImage] = webpage->background;
+            metadata[WebMouseFX] = "0";
+            metadata[WebBGColor] = "0";
+            metadata[WebDescriptionAndTags] = webpage->descriptionAndTags;
+            metadata[WebPageStyle] = "";
+            metadata[WebUserHOME] = "0";
+            metadata[WebOnLoadScript] = "";
+            element.append(metadata);
         }
         else
         {
@@ -166,6 +179,28 @@ void MainWindow::savePage()
     }
 }
 
+void MainWindow::openModsWindow()
+{
+    ModsManager manager;
+    if (manager.exec() == QDialog::Accepted)
+    {
+        refresh();
+    }
+}
+
+void MainWindow::refresh()
+{
+    auto paths = AppSettings::GetSearchPaths();
+
+    fontDatabase.clear();
+    for (auto path : paths)
+    {
+        fontDatabase.load(path + "/images/fonts");
+    }
+
+    settings->refresh();
+}
+
 void MainWindow::createElement(QString type, QJsonArray definition, QStringList eventData)
 {
     auto element = addElement(type, eventData);
@@ -202,6 +237,10 @@ void MainWindow::clearEverything()
         settings->clearSelection();
     });
     connect(settings, &PageSettings::selectedNameChanged, webpage, &Page::setSelectedName);
+    connect(settings, &PageSettings::pageTitleChanged, webpage, &Page::setTitle);
+    connect(settings, &PageSettings::pageOwnerChanged, webpage, &Page::setOwner);
+    connect(settings, &PageSettings::pageDescriptionChanged, webpage, &Page::setDescription);
+
     webpage->move(0, 0);
     webpage->show();
 
@@ -244,8 +283,7 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
 
     if (type == TYPE_WEBPAGE)
     {
-        webpage->background = arguments[WebBGImage];
-        webpage->setBackground(HYPNO_PATH + "images/bgs/" + webpage->background);
+        webpage->setBackground(webpage->background);
         webpage->setLineCount(arguments[WebHeight].toInt());
 
         webpage->title = arguments[WebTitle];
@@ -254,6 +292,10 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         webpage->username = arguments[WebUsername];
         webpage->music = arguments[WebMusic];
         webpage->descriptionAndTags = arguments[WebDescriptionAndTags];
+
+        settings->ui->pageTitleLineEdit->setText(webpage->title);
+        settings->ui->pageOwnerLineEdit->setText(webpage->username);
+        settings->ui->pageDescriptionAndTags->setPlainText(webpage->descriptionAndTags);
     }
     else if (type == TYPE_TEXT)
     {
@@ -311,54 +353,23 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
 
         auto image = arguments[GifNameOf];
         gif->nameOf = image;
-        if (QFileInfo fi(HYPNO_PATH + "images/gifs/" + image); fi.isDir())
+        gif->refresh();
+
+        auto x = arguments[GifX].toInt();
+        auto y = arguments[GifY].toInt();
+        gif->setPos(x, y);
+
+        auto color = arguments[GifHSL].split(',');
+
+        if (color.size() == 3)
         {
-            QDir dir(fi.absoluteFilePath());
-            for (auto entry : dir.entryInfoList(QDir::Files, QDir::Name))
-            {
-                if (entry.suffix() == "speed")
-                {
-                    auto spd = entry.baseName().toInt();
-                    gif->setSpeed(spd);
-                }
-                else
-                {
-                    gif->addFrame(entry.absoluteFilePath());
-                }
-            }
-        }
-        else if (QFile(HYPNO_PATH + "images/static/" + image + ".png").exists())
-        {
-            gif->addFrame(HYPNO_PATH + "images/static/" + image + ".png");
-        }
-        else if (QFile(HYPNO_PATH + "images/shapes/" + image + ".png").exists())
-        {
-            gif->addFrame(HYPNO_PATH + "images/shapes/" + image + ".png");
-        }
-        else
-        {
-            delete gif;
-            gif = nullptr;
+            auto h = color[0].toInt();
+            auto s = color[1].toInt();
+            auto l = color[2].toInt();
+            gif->setHSL(h, s, l);
         }
 
-        if (gif)
-        {
-            auto x = arguments[GifX].toInt();
-            auto y = arguments[GifY].toInt();
-            gif->setPos(x, y);
-
-            auto color = arguments[GifHSL].split(',');
-
-            if (color.size() == 3)
-            {
-                auto h = color[0].toInt();
-                auto s = color[1].toInt();
-                auto l = color[2].toInt();
-                gif->setHSL(h, s, l);
-            }
-
-            returnedElement = gif;
-        }
+        returnedElement = gif;
     }
 
     if (returnedElement)

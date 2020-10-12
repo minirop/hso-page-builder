@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>738</width>
+    <width>799</width>
     <height>543</height>
    </rect>
   </property>
@@ -247,7 +247,7 @@
                <item>
                 <widget class="QLabel" name="label_8">
                  <property name="text">
-                  <string>Fade colour:</string>
+                  <string>Fade color:</string>
                  </property>
                 </widget>
                </item>
@@ -283,6 +283,30 @@
                </item>
                <item>
                 <widget class="QSpinBox" name="fadeSpeedSpinBox"/>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <item>
+                <widget class="QLabel" name="label_14">
+                 <property name="text">
+                  <string>Law broken:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="lawBrokenComboBox"/>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_15">
+                 <property name="text">
+                  <string>Case tag:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="caseTagLineEdit"/>
                </item>
               </layout>
              </item>
@@ -416,6 +440,38 @@
       <attribute name="title">
        <string>Metadata</string>
       </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="pageTitleLineEdit"/>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLineEdit" name="pageOwnerLineEdit"/>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>Page owner:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="4">
+        <widget class="QPlainTextEdit" name="pageDescriptionAndTags"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Page title:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="4">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>Description and tags:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>

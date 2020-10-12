@@ -27,6 +27,9 @@ signals:
     void selectedNameChanged(QString name);
     void createElement(QString type, QJsonArray definition, QStringList eventData);
     void updateZOrder();
+    void pageTitleChanged(QString title);
+    void pageOwnerChanged(QString owner);
+    void pageDescriptionChanged(QString description);
 
 private slots:
     void itemChanged(QListWidgetItem * item, QListWidgetItem * previous);
@@ -38,6 +41,8 @@ private:
 
     void setFontColorButton(QColor color);
     void setFadeColorButton(QColor color);
+
+    void refresh();
 
     friend class MainWindow;
     Ui::PageSettings *ui;

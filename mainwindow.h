@@ -20,8 +20,11 @@ public:
     ~MainWindow();
 
 private slots:
+    void newPage();
     void openPage();
     void savePage();
+    void openModsWindow();
+    void refresh();
     void createElement(QString type, QJsonArray definition, QStringList eventData);
     void updateZOrder();
 
