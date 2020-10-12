@@ -45,14 +45,14 @@ PageSettings::PageSettings(QWidget *parent) :
     });
     connect(ui->textEdit, &QTextEdit::textChanged, [&]() {
         auto item = ui->elementsList->currentItem();
-        assert(item);
+        if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
         graphics->setString(ui->textEdit->toPlainText());
     });
     connect(ui->colorBtn, &QPushButton::clicked, [&]() {
         auto item = ui->elementsList->currentItem();
-        assert(item);
+        if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
@@ -65,7 +65,7 @@ PageSettings::PageSettings(QWidget *parent) :
     });
     connect(ui->animationComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
         auto item = ui->elementsList->currentItem();
-        assert(item);
+        if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
@@ -73,7 +73,7 @@ PageSettings::PageSettings(QWidget *parent) :
     });
     connect(ui->speedSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&]() {
         auto item = ui->elementsList->currentItem();
-        assert(item);
+        if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
@@ -81,7 +81,7 @@ PageSettings::PageSettings(QWidget *parent) :
     });
     connect(ui->alignmentComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
         auto item = ui->elementsList->currentItem();
-        assert(item);
+        if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
@@ -90,7 +90,7 @@ PageSettings::PageSettings(QWidget *parent) :
 
     connect(ui->colorFadeBtn, &QPushButton::clicked, [&]() {
         auto item = ui->elementsList->currentItem();
-        assert(item);
+        if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
@@ -103,7 +103,7 @@ PageSettings::PageSettings(QWidget *parent) :
     });
     connect(ui->fadeSpeedSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&]() {
         auto item = ui->elementsList->currentItem();
-        assert(item);
+        if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
@@ -112,7 +112,7 @@ PageSettings::PageSettings(QWidget *parent) :
 
     auto setFontCallback = [&]() {
         auto item = ui->elementsList->currentItem();
-        assert(item);
+        if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
@@ -132,7 +132,7 @@ PageSettings::PageSettings(QWidget *parent) :
 
     connect(ui->deleteBtn, &QPushButton::clicked, [&]() {
         auto item = ui->elementsList->currentItem();
-        assert(item);
+        if (!item) return;
         auto txt = item->data(ROLE_ELEMENT).value<Text*>();
         auto gif = item->data(ROLE_ELEMENT).value<Gif*>();
         assert(txt || gif);
@@ -238,7 +238,7 @@ PageSettings::PageSettings(QWidget *parent) :
     });
     connect(ui->lawBrokenComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
         auto item = ui->elementsList->currentItem();
-        assert(item);
+        if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
         assert(pageElement);
 
@@ -401,7 +401,7 @@ void PageSettings::refresh()
     for (int i = 0; i < ui->elementsList->count(); i++)
     {
         auto item = ui->elementsList->item(i);
-        assert(item);
+        if (!item) continue;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
         assert(pageElement);
 

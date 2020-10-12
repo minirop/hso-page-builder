@@ -28,6 +28,14 @@ int colorToInt(QColor color)
     return color.red() | (color.green() << 8) | (color.blue() << 16);
 }
 
+QColor intToColor(int color)
+{
+    int r = (color >> 0) & 0xFF;
+    int g = (color >> 8) & 0xFF;
+    int b = (color >> 16) & 0xFF;
+    return QColor(r, g, b);
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -66,6 +74,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->action_Refresh, &QAction::triggered, this, &MainWindow::refresh);
 
     refresh();
+
+    newPage();
 }
 
 MainWindow::~MainWindow()
@@ -75,7 +85,33 @@ MainWindow::~MainWindow()
 
 void MainWindow::newPage()
 {
+    QJsonObject emptyPage;
 
+    QJsonArray element;
+    auto definition = emptyArray();
+    definition[DefType] = TYPE_WEBPAGE;
+    element.append(definition);
+
+    auto metadata = emptyArray();
+    metadata[WebEvent] = EVENT_DEFAULT;
+    metadata[WebTitle] = "Empty page";
+    metadata[WebUsername] = "";
+    metadata[WebHeight] = "10";
+    metadata[WebMusic] = "";
+    metadata[WebBGImage] = "";
+    metadata[WebMouseFX] = "0";
+    metadata[WebBGColor] = "0";
+    metadata[WebDescriptionAndTags] = "";
+    metadata[WebPageStyle] = "";
+    metadata[WebUserHOME] = "0";
+    metadata[WebOnLoadScript] = "";
+    element.append(metadata);
+
+    QJsonArray dataArray;
+    dataArray.push_back(element);
+    emptyPage["data"] = dataArray;
+
+    parseJSON(QJsonDocument(emptyPage).toJson(QJsonDocument::Compact));
 }
 
 void MainWindow::openPage()
@@ -99,7 +135,7 @@ void MainWindow::savePage()
     QJsonObject object;
     object["c2array"] = true;
     QJsonArray size;
-    size.append(9);
+    size.append(settings->ui->elementsList->count() + 1);
     size.append(21);
     size.append(21);
     object["size"] = size;
@@ -228,7 +264,12 @@ void MainWindow::createElement(QString type, QJsonArray definition, QStringList 
 
 void MainWindow::clearEverything()
 {
-    area->findChild<Page*>()->deleteLater();
+    auto oldPage = area->findChild<Page*>();
+    if (oldPage)
+    {
+        oldPage->deleteLater();
+    }
+
     webpage = new Page(area);
     connect(webpage, &Page::selected, [&](int id) {
         settings->select(id);
@@ -283,8 +324,10 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
 
     if (type == TYPE_WEBPAGE)
     {
-        webpage->setBackground(webpage->background);
+        webpage->setBackground(arguments[WebBGImage]);
         webpage->setLineCount(arguments[WebHeight].toInt());
+
+        webpage->setBackgroundColor(intToColor(arguments[WebBGColor].toInt()));
 
         webpage->title = arguments[WebTitle];
         setWindowTitle(webpage->title);
@@ -329,18 +372,12 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
 
         if (color >= 0)
         {
-            int r = (color >> 0) & 0xFF;
-            int g = (color >> 8) & 0xFF;
-            int b = (color >> 16) & 0xFF;
-            text->setFontColor(QColor(r, g, b));
+            text->setFontColor(intToColor(color));
         }
 
         if (fadeColor >= 0)
         {
-            int r = (fadeColor >> 0) & 0xFF;
-            int g = (fadeColor >> 8) & 0xFF;
-            int b = (fadeColor >> 16) & 0xFF;
-            text->setFade(QColor(r, g, b), fadeSpeed);
+            text->setFade(intToColor(fadeColor), fadeSpeed);
         }
 
         text->setString(string);

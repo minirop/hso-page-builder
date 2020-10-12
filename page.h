@@ -13,6 +13,7 @@ class Page : public QGraphicsView
 
 public:
     Page(QWidget * parent);
+    virtual ~Page();
 
     void setLineCount(int lineCount);
     void setBackground(QString image);

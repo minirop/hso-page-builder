@@ -25,7 +25,7 @@ Page::Page(QWidget * parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    scene = new QGraphicsScene;
+    scene = new QGraphicsScene(this);
     connect(scene, &QGraphicsScene::selectionChanged, [&]() {
         auto items = scene->selectedItems();
         if (items.size())
@@ -45,6 +45,12 @@ Page::Page(QWidget * parent)
     setScene(scene);
 
     parent->installEventFilter(this);
+}
+
+Page::~Page()
+{
+    // crash without
+    scene->disconnect();
 }
 
 void Page::setLineCount(int lineCount)
@@ -67,7 +73,7 @@ void Page::setBackground(QString image)
             if (QFile(path + "/images/bgs/" + background).exists())
             {
                 background = image;
-                setBackgroundBrush(QPixmap(background));
+                setBackgroundBrush(QPixmap(path + "/images/bgs/" + background));
                 break;
             }
         }

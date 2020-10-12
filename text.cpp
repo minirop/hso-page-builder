@@ -279,8 +279,9 @@ void Text::renderText(QString string)
         {
             str = str.left(typewriterProgress);
         }
-        for (int xx = 0, www = width, index = 0; auto c : str)
+        for (int xx = 0, www = width, index = 0; index < str.size(); )
         {
+            auto c = str[index];
             xx += font.getWidth(c.toLatin1(), fontWidth);
             index++;
 
