@@ -24,9 +24,16 @@ void Text::refresh()
 {
 }
 
+void Text::setHSPosition(int x, int y)
+{
+    xoffset = x;
+    setPos((x + 50) * (PAGE_WIDTH / 100), y);
+}
+
 void Text::setWidth(int w)
 {
     width = w;
+    pageWidth = w * PAGE_WIDTH / 100;
 }
 
 void Text::setAnimation(int anim)
@@ -103,6 +110,10 @@ void Text::setFontColor(QColor color)
 {
     fontColor = color;
     setColor(color);
+    if (fadeSpeed > 0)
+    {
+        setFade(fadeColor, fadeSpeed);
+    }
 }
 
 void Text::setColor(QColor color)
@@ -114,6 +125,12 @@ void Text::setColor(QColor color)
 void Text::setFade(QColor color, int speed)
 {
     if (group) group->deleteLater();
+
+    if (speed == 0)
+    {
+        setColor(fontColor);
+        return;
+    }
 
     group = new QSequentialAnimationGroup(this);
     auto fadeIn = new QVariantAnimation;
@@ -150,7 +167,7 @@ QRectF Text::boundingRect() const
         constexpr auto PI_180 = M_PI / 180;
         floatingOffset = (std::sin(floating * PI_180) * renderedTextes.size() * fontHeight * 0.25);
     }
-    return QRectF { -width / 2.0, floatingOffset, qreal(width), qreal(renderedTextes.size() * fontHeight) };
+    return QRectF { -pageWidth / 2.0, floatingOffset, qreal(pageWidth), qreal(renderedTextes.size() * fontHeight) };
 }
 
 void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -235,9 +252,9 @@ void Text::timerEvent(QTimerEvent * event)
     {
         marquee -= animationSpeed / 10.0;
 
-        if (marquee < -width/2 - renderedTextes[0].width())
+        if (marquee < -pageWidth/2 - renderedTextes[0].width())
         {
-            marquee = x() + width / 2;
+            marquee = x() + pageWidth / 2;
         }
         break;
     }
@@ -253,7 +270,7 @@ QVariant Text::itemChange(QGraphicsItem::GraphicsItemChange change, const QVaria
     if (change == ItemPositionChange && scene())
     {
         QPointF newPos = value.toPointF();
-        newPos.setX((xoffset + 100) * (PAGE_WIDTH / 200.0));
+        newPos.setX((xoffset + 50) * (PAGE_WIDTH / 100));
         return newPos;
     }
     return QGraphicsItem::itemChange(change, value);
@@ -279,7 +296,7 @@ void Text::renderText(QString string)
         {
             str = str.left(typewriterProgress);
         }
-        for (int xx = 0, www = width, index = 0; index < str.size(); )
+        for (int xx = 0, www = pageWidth, index = 0; index < str.size(); )
         {
             auto c = str[index];
             xx += font.getWidth(c.toLatin1(), fontWidth);

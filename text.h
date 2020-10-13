@@ -26,6 +26,7 @@ public:
     ElementType elementType() const override { return ElementType::Text; }
     void refresh() override;
 
+    void setHSPosition(int x, int y);
     void setWidth(int w);
     void setAnimation(int anim);
     void setAnimationSpeed(int spd);
@@ -55,6 +56,7 @@ private:
     QVector<QPixmap> renderedTextes;
     QString string;
     int width = 0;
+    int pageWidth = 0;
     int xoffset = 0;
     int align = ALIGN_LEFT;
     qreal marquee = 0;

@@ -342,9 +342,9 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
     }
     else if (type == TYPE_TEXT)
     {
-        auto x = ((arguments[TextX].toInt() + 100) * PAGE_WIDTH / 200);
+        auto x = arguments[TextX].toInt();
         auto y = arguments[TextY].toInt();
-        auto width = arguments[TextWidth].toInt() * PAGE_WIDTH / 100;
+        auto width = arguments[TextWidth].toInt();
         auto caseTag = arguments[TextCaseTag];
         auto string = arguments[TextString];
         auto color = arguments[TextColor].toInt();
@@ -360,7 +360,7 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
 
         auto text = new Text;
         text->setAlign(align);
-        text->setPos(x, y);
+        text->setHSPosition(x, y);
         text->setWidth(width);
         text->setFontSize(QString(style[0]).toInt());
         text->setFontBold(style[1] == 'b');
@@ -451,7 +451,7 @@ QJsonArray MainWindow::textToJson(Text * text)
     QJsonArray array = emptyArray();
 
     array[TextEvent] = EVENT_DEFAULT;
-    array[TextX] = QString::number((((int)text->x() * 200) / PAGE_WIDTH) - 100);
+    array[TextX] = QString::number((((int)text->x() * 100) / PAGE_WIDTH) - 50);
     array[TextY] = QString::number((int)text->y());
     array[TextWidth] = QString::number(text->width * 100 / PAGE_WIDTH);
     array[TextCaseTag] = text->caseTag;

@@ -8,6 +8,7 @@
 #include "globals.h"
 #include <QColorDialog>
 #include <QGraphicsScene>
+#include <algorithm>
 
 PageSettings::PageSettings(QWidget *parent) :
     QWidget(parent),
@@ -244,6 +245,32 @@ PageSettings::PageSettings(QWidget *parent) :
 
         pageElement->setBrokenLaw(ui->lawBrokenComboBox->currentData().toInt());
     });
+    connect(ui->widthSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int w) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
+        assert(graphics);
+
+        graphics->setWidth(w);
+
+        auto diff = abs((w - (PAGE_WIDTH/3)) / 2);
+        auto xPos = (((int)graphics->x() * 100) / PAGE_WIDTH) - 50;
+        auto xNewPos = std::clamp(xPos, -diff, diff);
+        ui->xSpinBox->setValue(xNewPos);
+    });
+    connect(ui->xSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int x) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
+        assert(graphics);
+
+        auto diff = (100 - graphics->width) / 2;
+        x = std::clamp(x, -diff, diff);
+        graphics->setHSPosition(x, graphics->y());
+
+        QSignalBlocker a(ui->xSpinBox);
+        ui->xSpinBox->setValue(x);
+    });
 }
 
 PageSettings::~PageSettings()
@@ -337,6 +364,8 @@ void PageSettings::updateTextProperties(Text * text)
     QSignalBlocker a8(ui->colorBtn);
     QSignalBlocker a9(ui->colorFadeBtn);
     QSignalBlocker b0(ui->alignmentComboBox);
+    QSignalBlocker b1(ui->xSpinBox);
+    QSignalBlocker b2(ui->widthSpinBox);
 
     auto fontsNames = FontDatabase::GetFonts();
 
@@ -381,6 +410,9 @@ void PageSettings::updateTextProperties(Text * text)
     int lawIndex = ui->lawBrokenComboBox->findData(text->brokenLaw);
     assert(lawIndex != -1);
     ui->lawBrokenComboBox->setCurrentIndex(lawIndex);
+
+    ui->xSpinBox->setValue(text->xoffset);
+    ui->widthSpinBox->setValue(text->width);
 
     ui->boldButton->setChecked(text->fontBold);
 }
