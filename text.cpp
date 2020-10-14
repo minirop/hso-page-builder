@@ -124,7 +124,14 @@ void Text::setColor(QColor color)
 
 void Text::setFade(QColor color, int speed)
 {
-    if (group) group->deleteLater();
+    fadeColor = color;
+    fadeSpeed = speed;
+
+    if (group)
+    {
+        group->deleteLater();
+        group = nullptr;
+    }
 
     if (speed == 0)
     {
@@ -154,9 +161,6 @@ void Text::setFade(QColor color, int speed)
     group->setLoopCount(-1);
 
     group->start();
-
-    fadeColor = color;
-    fadeSpeed = speed;
 }
 
 QRectF Text::boundingRect() const
