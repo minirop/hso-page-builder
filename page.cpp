@@ -70,10 +70,12 @@ void Page::setBackground(QString image)
         auto searchPaths = AppSettings::GetSearchPaths();
         for (auto path : searchPaths)
         {
-            if (QFile(path + "/images/bgs/" + background).exists())
+            auto img = path + "/images/bgs/" + image;
+            if (QFile(img).exists())
             {
                 background = image;
-                setBackgroundBrush(QPixmap(path + "/images/bgs/" + background));
+                setBackgroundBrush(QPixmap(img));
+                assert(!QPixmap(img).isNull());
                 break;
             }
         }

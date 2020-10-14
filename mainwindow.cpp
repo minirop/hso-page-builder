@@ -281,6 +281,9 @@ void MainWindow::clearEverything()
     connect(settings, &PageSettings::pageTitleChanged, webpage, &Page::setTitle);
     connect(settings, &PageSettings::pageOwnerChanged, webpage, &Page::setOwner);
     connect(settings, &PageSettings::pageDescriptionChanged, webpage, &Page::setDescription);
+    connect(settings, &PageSettings::backgroundChanged, webpage, &Page::setBackground);
+    connect(settings, &PageSettings::backgroundColorChanged, webpage, &Page::setBackgroundColor);
+    connect(settings, &PageSettings::lineCountChanged, webpage, &Page::setLineCount);
 
     webpage->move(0, 0);
     webpage->show();
@@ -339,6 +342,9 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         settings->ui->pageTitleLineEdit->setText(webpage->title);
         settings->ui->pageOwnerLineEdit->setText(webpage->username);
         settings->ui->pageDescriptionAndTags->setPlainText(webpage->descriptionAndTags);
+        settings->setBackgroundColorButton(webpage->backgroundColor);
+        settings->setBackground(webpage->background);
+        settings->setLineCounts(webpage->linesCount);
     }
     else if (type == TYPE_TEXT)
     {

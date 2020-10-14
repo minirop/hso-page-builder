@@ -16,6 +16,7 @@ PageSettings::PageSettings(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
+    ui->tabWidget->setCurrentIndex(0);
 
     ui->animationComboBox->addItem("None", static_cast<int>(Animation::None));
     ui->animationComboBox->addItem("TypeWriter", static_cast<int>(Animation::TypeWriter));
@@ -271,6 +272,25 @@ PageSettings::PageSettings(QWidget *parent) :
         QSignalBlocker a(ui->xSpinBox);
         ui->xSpinBox->setValue(x);
     });
+    connect(ui->bgColorBtn, &QPushButton::clicked, [&]() {
+        auto c = QColorDialog::getColor(bgColor, this, "Background color");
+        if (c.isValid())
+        {
+            emit backgroundColorChanged(c);
+            setBackgroundColorButton(c);
+            ui->imageSlider->setEmptyColor(c);
+        }
+    });
+    connect(ui->pageHeightSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int count) {
+        emit lineCountChanged(count);
+    });
+    connect(ui->previousBG, &QPushButton::clicked, [&]() {
+        ui->imageSlider->prev();
+    });
+    connect(ui->nextBG, &QPushButton::clicked, [&]() {
+        ui->imageSlider->next();
+    });
+    connect(ui->imageSlider, &ImageSlider::backgroundChanged, this, &PageSettings::backgroundChanged);
 }
 
 PageSettings::~PageSettings()
@@ -298,6 +318,11 @@ void PageSettings::clearSelection()
     ui->elementsList->clearSelection();
     ui->stackedWidget->setCurrentIndex(0);
     ui->elementName->clear();
+}
+
+void PageSettings::setBackground(QString image)
+{
+    bgImage = image;
 }
 
 void PageSettings::itemChanged(QListWidgetItem * item, QListWidgetItem * previous)
@@ -366,6 +391,9 @@ void PageSettings::updateTextProperties(Text * text)
     QSignalBlocker b0(ui->alignmentComboBox);
     QSignalBlocker b1(ui->xSpinBox);
     QSignalBlocker b2(ui->widthSpinBox);
+    QSignalBlocker b3(ui->bgColorBtn);
+    QSignalBlocker b4(ui->pageHeightSpinBox);
+
 
     auto fontsNames = FontDatabase::GetFonts();
 
@@ -419,12 +447,28 @@ void PageSettings::updateTextProperties(Text * text)
 
 void PageSettings::setFontColorButton(QColor color)
 {
-    ui->colorBtn->setStyleSheet(QString("background-color: rgb(%1, %2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
+    setBackgroundColor(ui->colorBtn, color);
 }
 
 void PageSettings::setFadeColorButton(QColor color)
 {
-    ui->colorFadeBtn->setStyleSheet(QString("background-color: rgb(%1, %2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
+    setBackgroundColor(ui->colorFadeBtn, color);
+}
+
+void PageSettings::setBackgroundColorButton(QColor color)
+{
+    bgColor = color;
+    setBackgroundColor(ui->bgColorBtn, color);
+}
+
+void PageSettings::setLineCounts(int count)
+{
+    ui->pageHeightSpinBox->setValue(count);
+}
+
+void PageSettings::setBackgroundColor(QWidget * widget, QColor color)
+{
+    widget->setStyleSheet(QString("background-color: rgb(%1, %2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
 }
 
 void PageSettings::refresh()
@@ -447,4 +491,6 @@ void PageSettings::refresh()
         auto item = items.first();
         updateProperties(item);
     }
+
+    ui->imageSlider->refresh();
 }

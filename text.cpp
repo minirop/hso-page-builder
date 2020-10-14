@@ -34,6 +34,7 @@ void Text::setWidth(int w)
 {
     width = w;
     pageWidth = w * PAGE_WIDTH / 100;
+    textIsDirty = true;
 }
 
 void Text::setAnimation(int anim)
