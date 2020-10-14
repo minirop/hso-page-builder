@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>799</width>
+    <width>813</width>
     <height>543</height>
    </rect>
   </property>
@@ -62,7 +62,7 @@
          <item>
           <widget class="QStackedWidget" name="stackedWidget">
            <property name="currentIndex">
-            <number>1</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="empty">
             <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -360,7 +360,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QComboBox" name="lawBrokenComboBox"/>
+                <widget class="QComboBox" name="textLawBrokenComboBox"/>
                </item>
                <item>
                 <widget class="QLabel" name="label_15">
@@ -370,7 +370,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="caseTagLineEdit">
+                <widget class="QLineEdit" name="textCaseTagLineEdit">
                  <property name="minimumSize">
                   <size>
                    <width>200</width>
@@ -386,11 +386,152 @@
            <widget class="QWidget" name="gif">
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <widget class="QLabel" name="label_2">
-               <property name="text">
-                <string>GIF GIF GIF</string>
+              <layout class="QHBoxLayout" name="horizontalLayout_13">
+               <property name="spacing">
+                <number>0</number>
                </property>
-              </widget>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QListWidget" name="gifsListWidget">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                 <property name="horizontalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_2" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>10</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>10</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="prevGif">
+                 <property name="minimumSize">
+                  <size>
+                   <width>20</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>20</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>&lt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="GifSlider" name="gifSlider" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>200</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="nextGif">
+                 <property name="minimumSize">
+                  <size>
+                   <width>20</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>20</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>&gt;</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_14">
+               <item>
+                <widget class="QLabel" name="label_21">
+                 <property name="text">
+                  <string>Hue:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="hueSpinBox">
+                 <property name="minimum">
+                  <number>-100</number>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_20">
+                 <property name="text">
+                  <string>Saturation:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="saturationLightness">
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Lightness:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="lightnessSpinBox">
+                 <property name="maximum">
+                  <number>200</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </widget>
@@ -697,6 +838,12 @@
    <class>ImageSlider</class>
    <extends>QWidget</extends>
    <header>imageslider.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>GifSlider</class>
+   <extends>QWidget</extends>
+   <header>gifslider.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -19,6 +19,7 @@ SOURCES += \
     appsettings.cpp \
     fontdatabase.cpp \
     gif.cpp \
+    gifslider.cpp \
     imageslider.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -33,6 +34,7 @@ HEADERS += \
     appsettings.h \
     fontdatabase.h \
     gif.h \
+    gifslider.h \
     globals.h \
     imageslider.h \
     mainwindow.h \

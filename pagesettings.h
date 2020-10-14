@@ -53,6 +53,7 @@ private:
     void setBackgroundColor(QWidget * widget, QColor color);
 
     void refresh();
+    void refreshGifsList();
 
     friend class MainWindow;
     Ui::PageSettings *ui;

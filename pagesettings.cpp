@@ -9,6 +9,7 @@
 #include <QColorDialog>
 #include <QGraphicsScene>
 #include <algorithm>
+#include <QDir>
 
 PageSettings::PageSettings(QWidget *parent) :
     QWidget(parent),
@@ -27,13 +28,13 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->alignmentComboBox->addItem("Centre", 1);
     ui->alignmentComboBox->addItem("Right", 2);
 
-    ui->lawBrokenComboBox->addItem("None", -1);
-    ui->lawBrokenComboBox->addItem("C: Content Infringement", 1);
-    ui->lawBrokenComboBox->addItem("H: Harassment", 2);
-    ui->lawBrokenComboBox->addItem("I: Illegal or Profane Activity", 3);
-    ui->lawBrokenComboBox->addItem("M: Malicious Software", 4);
-    ui->lawBrokenComboBox->addItem("E: Extralegal Commerce", 5);
-    ui->lawBrokenComboBox->addItem("S: Submit Evidence", 6);
+    ui->textLawBrokenComboBox->addItem("None", -1);
+    ui->textLawBrokenComboBox->addItem("C: Content Infringement", 1);
+    ui->textLawBrokenComboBox->addItem("H: Harassment", 2);
+    ui->textLawBrokenComboBox->addItem("I: Illegal or Profane Activity", 3);
+    ui->textLawBrokenComboBox->addItem("M: Malicious Software", 4);
+    ui->textLawBrokenComboBox->addItem("E: Extralegal Commerce", 5);
+    ui->textLawBrokenComboBox->addItem("S: Submit Evidence", 6);
 
     connect(ui->elementsList, &QListWidget::currentItemChanged, this, &PageSettings::itemChanged);
     connect(ui->elementName, &QLineEdit::textChanged, [&](QString newName) {
@@ -246,13 +247,13 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->pageDescriptionAndTags, &QPlainTextEdit::textChanged, [&]() {
         emit pageDescriptionChanged(ui->pageDescriptionAndTags->toPlainText());
     });
-    connect(ui->lawBrokenComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
+    connect(ui->textLawBrokenComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
         assert(pageElement);
 
-        pageElement->setBrokenLaw(ui->lawBrokenComboBox->currentData().toInt());
+        pageElement->setBrokenLaw(ui->textLawBrokenComboBox->currentData().toInt());
     });
     connect(ui->widthSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int w) {
         auto item = ui->elementsList->currentItem();
@@ -299,6 +300,8 @@ PageSettings::PageSettings(QWidget *parent) :
         ui->imageSlider->next();
     });
     connect(ui->imageSlider, &ImageSlider::backgroundChanged, this, &PageSettings::backgroundChanged);
+
+    refreshGifsList();
 }
 
 PageSettings::~PageSettings()
@@ -445,9 +448,9 @@ void PageSettings::updateTextProperties(Text * text)
         break;
     }
 
-    int lawIndex = ui->lawBrokenComboBox->findData(text->brokenLaw);
+    int lawIndex = ui->textLawBrokenComboBox->findData(text->brokenLaw);
     assert(lawIndex != -1);
-    ui->lawBrokenComboBox->setCurrentIndex(lawIndex);
+    ui->textLawBrokenComboBox->setCurrentIndex(lawIndex);
 
     ui->xSpinBox->setValue(text->xoffset);
     ui->widthSpinBox->setValue(text->width);
@@ -503,4 +506,59 @@ void PageSettings::refresh()
     }
 
     ui->imageSlider->refresh();
+    refreshGifsList();
+}
+
+void PageSettings::refreshGifsList()
+{
+    auto selectedItems = ui->gifsListWidget->selectedItems();
+    QString saved;
+    if (selectedItems.size())
+        saved = selectedItems.first()->text();
+
+    ui->gifsListWidget->clear();
+
+    auto subFolders = QStringList() << "/images/static/" << "/images/shapes/";
+    QSet<QString> uniqueGifs;
+    auto paths = AppSettings::GetSearchPaths();
+    for (auto path : paths)
+    {
+        auto folders = QDir(path + "/images/gifs/").entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        for (auto folder : folders)
+        {
+            uniqueGifs.insert(folder);
+        }
+
+        for (auto subFolder : subFolders)
+        {
+            auto files = QDir(path + subFolder).entryList(QStringList() << "*.png", QDir::Files);
+            for (auto f : files)
+            {
+                uniqueGifs.insert(f);
+            }
+        }
+    }
+
+    auto foundFiles = uniqueGifs.values();
+    if (foundFiles.size())
+    {
+        foundFiles.sort();
+        for (auto foundFile : foundFiles)
+        {
+            ui->gifsListWidget->addItem(foundFile);
+        }
+
+        if (saved.size())
+        {
+            auto found = ui->gifsListWidget->findItems(saved, Qt::MatchExactly);
+            if (found.size())
+                found.first()->setSelected(true);
+            else
+                ui->gifsListWidget->item(0)->setSelected(true);
+        }
+        else
+        {
+            ui->gifsListWidget->item(0)->setSelected(true);
+        }
+    }
 }
