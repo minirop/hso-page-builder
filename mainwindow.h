@@ -27,6 +27,7 @@ private slots:
     void refresh();
     void createElement(QString type, QJsonArray definition, QStringList eventData);
     void updateZOrder();
+    void duplicateElement(QString name, PageElement * pageElement);
 
 private:
     void clearEverything();
@@ -35,6 +36,7 @@ private:
     QJsonArray gifToJson(Gif * gif);
     QJsonArray textToJson(Text * text);
     QJsonArray emptyArray();
+    QStringList pageElementToStringList(PageElement * pageElement);
 
     QHash<int, QGraphicsItem*> pageElements;
     Ui::MainWindow * ui;

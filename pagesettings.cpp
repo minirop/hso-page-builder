@@ -132,6 +132,14 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->fontSizeGroup, &QButtonGroup::idClicked, setFontCallback);
     connect(ui->boldButton, &QPushButton::clicked, setFontCallback);
 
+    connect(ui->duplicateBtn, &QPushButton::clicked, [&]() {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+        assert(pageElement);
+
+        emit duplicateElement(item->text(), pageElement);
+    });
     connect(ui->deleteBtn, &QPushButton::clicked, [&]() {
         auto item = ui->elementsList->currentItem();
         if (!item) return;
@@ -256,7 +264,7 @@ PageSettings::PageSettings(QWidget *parent) :
 
         auto diff = abs((w - (PAGE_WIDTH/3)) / 2);
         auto xPos = (((int)graphics->x() * 100) / PAGE_WIDTH) - 50;
-        auto xNewPos = std::clamp(xPos, -diff, diff);
+        auto xNewPos = std::clamp(xPos, -diff, diff-1);
         ui->xSpinBox->setValue(xNewPos);
     });
     connect(ui->xSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int x) {
@@ -266,7 +274,7 @@ PageSettings::PageSettings(QWidget *parent) :
         assert(graphics);
 
         auto diff = (100 - graphics->width) / 2;
-        x = std::clamp(x, -diff, diff);
+        x = std::clamp(x, -diff, diff-1);
         graphics->setHSPosition(x, graphics->y());
 
         QSignalBlocker a(ui->xSpinBox);
@@ -307,7 +315,7 @@ void PageSettings::select(int idSel)
 
         if (id == idSel)
         {
-            ui->elementsList->setCurrentItem(item, QItemSelectionModel::SelectCurrent);
+            ui->elementsList->setCurrentItem(item, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
             break;
         }
     }
@@ -364,6 +372,8 @@ void PageSettings::updateProperties(QListWidgetItem * item)
         case PageElement::ElementType::Text:
             updateTextProperties(qobject_cast<Text*>(elem));
             break;
+        default:
+            assert(false);
         }
     }
 }

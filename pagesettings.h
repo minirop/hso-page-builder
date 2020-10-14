@@ -11,6 +11,7 @@ class PageSettings;
 class QListWidgetItem;
 class Gif;
 class Text;
+class PageElement;
 class PageSettings : public QWidget
 {
     Q_OBJECT
@@ -37,6 +38,7 @@ signals:
     void backgroundColorChanged(QColor color);
     void backgroundChanged(QString image);
     void lineCountChanged(int count);
+    void duplicateElement(QString name, PageElement * pageElement);
 
 private slots:
     void itemChanged(QListWidgetItem * item, QListWidgetItem * previous);

@@ -56,7 +56,7 @@ private:
     QVector<QPixmap> renderedTextes;
     QString string;
     int width = 0;
-    int pageWidth = 0;
+    int renderedWidth = 0;
     int xoffset = 0;
     int align = ALIGN_LEFT;
     qreal marquee = 0;

@@ -59,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(settings, &PageSettings::pageTitleChanged, [&](QString title) {
         setWindowTitle(title);
     });
+    connect(settings, &PageSettings::duplicateElement, this, &MainWindow::duplicateElement);
 
     auto widget = new QWidget;
     setCentralWidget(widget);
@@ -188,6 +189,8 @@ void MainWindow::savePage()
                 element.append(textToJson(dynamic_cast<Text*>(pageElement)));
                 break;
             }
+            default:
+                assert(false);
             }
 
             auto definition = emptyArray();
@@ -459,7 +462,7 @@ QJsonArray MainWindow::textToJson(Text * text)
     array[TextEvent] = EVENT_DEFAULT;
     array[TextX] = QString::number((((int)text->x() * 100) / PAGE_WIDTH) - 50);
     array[TextY] = QString::number((int)text->y());
-    array[TextWidth] = QString::number(text->width * 100 / PAGE_WIDTH);
+    array[TextWidth] = QString::number(text->width);
     array[TextCaseTag] = text->caseTag;
     array[TextString] = text->string;
     array[TextColor] = QString::number(colorToInt(text->fontColor));
@@ -481,6 +484,30 @@ QJsonArray MainWindow::emptyArray()
     return QJsonArray {QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString()};
 }
 
+QStringList MainWindow::pageElementToStringList(PageElement * pageElement)
+{
+    QJsonArray array;
+
+    switch (pageElement->elementType())
+    {
+    case PageElement::ElementType::Gif:
+        array = gifToJson(dynamic_cast<Gif*>(pageElement));
+        break;
+    case PageElement::ElementType::Text:
+        array = textToJson(dynamic_cast<Text*>(pageElement));
+        break;
+    default:
+        assert(false);
+    }
+
+    QStringList list;
+    for (auto value : array)
+    {
+        list += value.toString();
+    }
+    return list;
+}
+
 void MainWindow::updateZOrder()
 {
     for (int i = 0; i < settings->ui->elementsList->count(); i++)
@@ -490,4 +517,32 @@ void MainWindow::updateZOrder()
 
         pageElements[id]->setZValue(i * -1);
     }
+}
+
+void MainWindow::duplicateElement(QString name, PageElement * pageElement)
+{
+    QString type;
+
+    switch (pageElement->elementType())
+    {
+    case PageElement::ElementType::Gif:
+        type = TYPE_GIF;
+        break;
+    case PageElement::ElementType::Text:
+        type = TYPE_TEXT;
+        break;
+    default:
+        assert(false);
+    }
+
+    QJsonArray definition;
+    definition.append(0);
+    definition.append(0);
+    definition.append(name);
+
+    auto eventData = pageElementToStringList(pageElement);
+
+    createElement(type, definition, eventData);
+
+    updateZOrder();
 }

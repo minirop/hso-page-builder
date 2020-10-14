@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="objects">
       <attribute name="title">
@@ -370,7 +370,14 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="caseTagLineEdit"/>
+                <widget class="QLineEdit" name="caseTagLineEdit">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>

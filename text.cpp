@@ -33,7 +33,7 @@ void Text::setHSPosition(int x, int y)
 void Text::setWidth(int w)
 {
     width = w;
-    pageWidth = w * PAGE_WIDTH / 100;
+    renderedWidth = w * PAGE_WIDTH / 100;
     textIsDirty = true;
 }
 
@@ -172,7 +172,7 @@ QRectF Text::boundingRect() const
         constexpr auto PI_180 = M_PI / 180;
         floatingOffset = (std::sin(floating * PI_180) * renderedTextes.size() * fontHeight * 0.25);
     }
-    return QRectF { -pageWidth / 2.0, floatingOffset, qreal(pageWidth), qreal(renderedTextes.size() * fontHeight) };
+    return QRectF { -renderedWidth / 2.0, floatingOffset, qreal(renderedWidth), qreal(renderedTextes.size() * fontHeight) };
 }
 
 void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -257,9 +257,9 @@ void Text::timerEvent(QTimerEvent * event)
     {
         marquee -= animationSpeed / 10.0;
 
-        if (marquee < -pageWidth/2 - renderedTextes[0].width())
+        if (marquee < -renderedWidth/2 - renderedTextes[0].width())
         {
-            marquee = x() + pageWidth / 2;
+            marquee = x() + renderedWidth / 2;
         }
         break;
     }
@@ -301,7 +301,7 @@ void Text::renderText(QString string)
         {
             str = str.left(typewriterProgress);
         }
-        for (int xx = 0, www = pageWidth, index = 0; index < str.size(); )
+        for (int xx = 0, www = renderedWidth, index = 0; index < str.size(); )
         {
             auto c = str[index];
             xx += font.getWidth(c.toLatin1(), fontWidth);
