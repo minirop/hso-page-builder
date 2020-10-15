@@ -410,6 +410,12 @@
                  <property name="horizontalScrollBarPolicy">
                   <enum>Qt::ScrollBarAlwaysOff</enum>
                  </property>
+                 <property name="defaultDropAction">
+                  <enum>Qt::IgnoreAction</enum>
+                 </property>
+                 <property name="alternatingRowColors">
+                  <bool>true</bool>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -511,7 +517,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="saturationLightness">
+                <widget class="QSpinBox" name="saturationSpinBox">
                  <property name="maximum">
                   <number>100</number>
                  </property>

@@ -27,7 +27,10 @@ void Gif::setSpeed(int speed)
     if (timerId != -1)
         killTimer(timerId);
     fps = speed;
-    timerId = startTimer(1000 / speed);
+    if (speed > 0)
+        timerId = startTimer(1000 / speed);
+    else
+        timerId = -1;
 }
 
 void Gif::setHSL(int h, int s, int l)
@@ -63,6 +66,7 @@ void Gif::timerEvent(QTimerEvent *event)
 void Gif::refresh()
 {
     frames.clear();
+    setSpeed(0);
 
     auto searchPaths = AppSettings::GetSearchPaths();
     for (auto path : searchPaths)

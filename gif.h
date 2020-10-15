@@ -25,6 +25,7 @@ protected:
 private:
     friend class MainWindow;
     friend class GifSlider;
+    friend class PageSettings;
 
     QVector<QPixmap> frames;
     int currentFrame = 0;

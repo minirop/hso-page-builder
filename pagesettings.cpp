@@ -185,7 +185,7 @@ PageSettings::PageSettings(QWidget *parent) :
         ui->elementsList->insertItem(to, item);
 
         ui->elementsList->clearSelection();
-        ui->elementsList->setCurrentItem(item, QItemSelectionModel::SelectCurrent);
+        ui->elementsList->setCurrentItem(item, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
     };
 
     connect(ui->moveUp, &QPushButton::clicked, [&]() {
@@ -300,6 +300,36 @@ PageSettings::PageSettings(QWidget *parent) :
         ui->imageSlider->next();
     });
     connect(ui->imageSlider, &ImageSlider::backgroundChanged, this, &PageSettings::backgroundChanged);
+    connect(ui->gifsListWidget, &QListWidget::currentItemChanged, [&](QListWidgetItem * current, QListWidgetItem * previous) {
+        Q_UNUSED(previous)
+
+        if (current)
+        {
+            ui->gifSlider->setGif(current->text());
+
+            auto item = ui->elementsList->currentItem();
+            if (!item) return;
+            auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+            assert(graphics);
+
+            graphics->nameOf = current->text();
+            graphics->refresh();
+        }
+    });
+    connect(ui->prevGif, &QPushButton::clicked, [&]() {
+        auto row = ui->gifsListWidget->currentRow();
+        if (row > 0)
+        {
+            ui->gifsListWidget->setCurrentRow(row - 1);
+        }
+    });
+    connect(ui->nextGif, &QPushButton::clicked, [&]() {
+        auto row = ui->gifsListWidget->currentRow();
+        if (row < ui->gifsListWidget->count() - 1)
+        {
+            ui->gifsListWidget->setCurrentRow(row + 1);
+        }
+    });
 
     refreshGifsList();
 }
@@ -383,9 +413,31 @@ void PageSettings::updateProperties(QListWidgetItem * item)
 
 void PageSettings::updateGifProperties(Gif * gif)
 {
-    Q_UNUSED(gif)
-
     ui->stackedWidget->setCurrentIndex(2);
+
+    QSignalBlocker a1(this);
+    QSignalBlocker a2(ui->hueSpinBox);
+    QSignalBlocker a3(ui->saturationSpinBox);
+    QSignalBlocker a4(ui->lightnessSpinBox);
+
+    ui->hueSpinBox->setValue(gif->H);
+    ui->saturationSpinBox->setValue(gif->S);
+    ui->lightnessSpinBox->setValue(gif->L);
+
+    ui->gifsListWidget->clearSelection();
+    QListWidgetItem * selectedItem = nullptr;
+    auto found = ui->gifsListWidget->findItems(gif->nameOf, Qt::MatchExactly);
+    if (found.size())
+    {
+        selectedItem = found.first();
+    }
+    else
+    {
+        selectedItem = ui->gifsListWidget->item(0);
+    }
+    ui->gifsListWidget->clearSelection();
+    ui->gifsListWidget->setCurrentItem(selectedItem, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
+    ui->gifsListWidget->scrollToItem(selectedItem);
 }
 
 void PageSettings::updateTextProperties(Text * text)
@@ -512,6 +564,7 @@ void PageSettings::refresh()
 void PageSettings::refreshGifsList()
 {
     auto selectedItems = ui->gifsListWidget->selectedItems();
+
     QString saved;
     if (selectedItems.size())
         saved = selectedItems.first()->text();
@@ -534,7 +587,7 @@ void PageSettings::refreshGifsList()
             auto files = QDir(path + subFolder).entryList(QStringList() << "*.png", QDir::Files);
             for (auto f : files)
             {
-                uniqueGifs.insert(f);
+                uniqueGifs.insert(f.chopped(4));
             }
         }
     }
@@ -548,17 +601,26 @@ void PageSettings::refreshGifsList()
             ui->gifsListWidget->addItem(foundFile);
         }
 
+        ui->gifsListWidget->clearSelection();
+        QListWidgetItem * selectedItem = nullptr;
         if (saved.size())
         {
             auto found = ui->gifsListWidget->findItems(saved, Qt::MatchExactly);
             if (found.size())
-                found.first()->setSelected(true);
+            {
+                selectedItem = found.first();
+            }
             else
-                ui->gifsListWidget->item(0)->setSelected(true);
+            {
+                selectedItem = ui->gifsListWidget->item(0);
+            }
         }
         else
         {
-            ui->gifsListWidget->item(0)->setSelected(true);
+            selectedItem = ui->gifsListWidget->item(0);
         }
+        ui->gifsListWidget->clearSelection();
+        ui->gifsListWidget->setCurrentItem(selectedItem, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
+        ui->gifsListWidget->scrollToItem(selectedItem);
     }
 }

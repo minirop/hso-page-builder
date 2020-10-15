@@ -15,10 +15,12 @@ public:
     void refresh();
 
 protected:
-    void paintEvent(QPaintEvent * event);
+    void paintEvent(QPaintEvent * event) override;
+    void timerEvent(QTimerEvent * event) override;
 
 private:
     std::unique_ptr<Gif> gif;
+    int timerId = -1;
 };
 
 #endif // GIFSLIDER_H
