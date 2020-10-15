@@ -200,7 +200,7 @@ void MainWindow::savePage()
             element.prepend(definition);
         }
 
-        for (int i = 0; i < 19; i++)
+        while (element.size() < 21)
         {
             element.push_back(emptyArray());
         }
@@ -397,15 +397,24 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
     {
         auto gif = new Gif;
 
+        auto x = arguments[GifX].toInt();
+        auto y = arguments[GifY].toInt();
+        auto color = arguments[GifHSL].split(',');
         auto image = arguments[GifNameOf];
+        auto scale = arguments[GifScale].toDouble();
+        auto rotation = arguments[GifRotation].toInt();
+        auto mirrored = arguments[GifMirror].toInt() != 0;
+        auto flipped = arguments[GifFlip].toInt() != 0;
+
         gif->nameOf = image;
         gif->refresh();
 
-        auto x = arguments[GifX].toInt();
-        auto y = arguments[GifY].toInt();
-        gif->setPos(x, y);
+        gif->setScale(scale);
+        gif->setRotation(rotation);
+        gif->mirror(mirrored);
+        gif->flip(flipped);
 
-        auto color = arguments[GifHSL].split(',');
+        gif->setPos(x, y);
 
         if (color.size() == 3)
         {

@@ -19,6 +19,9 @@ public:
     void setSpeed(int speed);
     void setHSL(int h, int s, int l);
 
+    void mirror(bool active);
+    void flip(bool active);
+
 protected:
     void timerEvent(QTimerEvent *event) override;
 
@@ -29,6 +32,8 @@ private:
 
     QVector<QPixmap> frames;
     int currentFrame = 0;
+    bool mirrored = false;
+    bool flipped = false;
     int H = 0, S = 100, L = 100;
     QString nameOf;
     int fps = 0;

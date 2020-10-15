@@ -155,8 +155,8 @@ void Page::drawForeground(QPainter * painter, const QRectF & rect)
         QPen p(QColor(0x94, 0xc4, 0xf0));
         p.setWidth(2);
         painter->setPen(p);
-        auto b = selectedItem->boundingRect().adjusted(-2, -2, 2, 2);
-        b.translate(selectedItem->pos());
+        auto bounds = selectedItem->sceneBoundingRect();
+        auto b = bounds.adjusted(-2, -2, 2, 2);
         painter->drawRect(b);
         painter->fillRect(b.left() - 1, b.top() - 10, width + 10, 10, p.color());
         painter->restore();

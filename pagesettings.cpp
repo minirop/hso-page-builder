@@ -10,6 +10,7 @@
 #include <QGraphicsScene>
 #include <algorithm>
 #include <QDir>
+#include <QDoubleSpinBox>
 
 PageSettings::PageSettings(QWidget *parent) :
     QWidget(parent),
@@ -178,6 +179,29 @@ PageSettings::PageSettings(QWidget *parent) :
 
         emit createElement(TYPE_TEXT, definition, eventData);
         emit updateZOrder();
+
+        auto count = ui->elementsList->count();
+        if (count > 0)
+        {
+            ui->elementsList->setCurrentRow(count - 1);
+        }
+    });
+    connect(ui->addGifButton, &QPushButton::clicked, [&]() {
+        QJsonArray definition;
+        definition.append(0);
+        definition.append(0);
+        definition.append(QString(TYPE_GIF));
+
+        auto eventData = QStringList() << EVENT_DEFAULT << "150" << "40" << "-1" << "0" << "000" << "1" << "0" << "0" << "0" << "-1" << "0" << "-1" << "-1" << "-1" << "0" << "0" << "0" << "0" << "0" << "0";
+
+        emit createElement(TYPE_GIF, definition, eventData);
+        emit updateZOrder();
+
+        auto count = ui->elementsList->count();
+        if (count > 0)
+        {
+            ui->elementsList->setCurrentRow(count - 1);
+        }
     });
 
     auto moveItem = [](Ui::PageSettings * ui, QListWidgetItem * item, int from, int to) {
@@ -346,6 +370,38 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->hueSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), changeHSL);
     connect(ui->saturationSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), changeHSL);
     connect(ui->lightnessSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), changeHSL);
+    connect(ui->scaleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [&](double value) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->setScale(value);
+    });
+    connect(ui->rotationSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int angle) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->setRotation(angle);
+    });
+    connect(ui->hFlipButton, &QPushButton::toggled, [&](bool toggled) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->mirror(toggled);
+    });
+    connect(ui->vFlipButton, &QPushButton::toggled, [&](bool toggled) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->flip(toggled);
+    });
 
     refreshGifsList();
 }
@@ -435,10 +491,19 @@ void PageSettings::updateGifProperties(Gif * gif)
     QSignalBlocker a2(ui->hueSpinBox);
     QSignalBlocker a3(ui->saturationSpinBox);
     QSignalBlocker a4(ui->lightnessSpinBox);
+    QSignalBlocker a5(ui->scaleSpinBox);
+    QSignalBlocker a6(ui->rotationSpinBox);
+    QSignalBlocker a7(ui->hFlipButton);
+    QSignalBlocker a8(ui->vFlipButton);
 
     ui->hueSpinBox->setValue(gif->H);
     ui->saturationSpinBox->setValue(gif->S);
     ui->lightnessSpinBox->setValue(gif->L);
+
+    ui->scaleSpinBox->setValue(gif->scale());
+    ui->rotationSpinBox->setValue(gif->rotation());
+    ui->hFlipButton->setChecked(gif->mirrored);
+    ui->vFlipButton->setChecked(gif->flipped);
 
     ui->gifsListWidget->clearSelection();
     QListWidgetItem * selectedItem = nullptr;

@@ -11,7 +11,7 @@
 
 Gif::Gif()
 {
-    setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+    setFlags(ItemIsMovable | ItemIsSelectable);
 }
 
 void Gif::addFrame(QString filename)
@@ -51,12 +51,34 @@ void Gif::setHSL(int h, int s, int l)
         timerEvent(nullptr);
 }
 
+void Gif::mirror(bool active)
+{
+    mirrored = active;
+
+    if (frames.size() == 1)
+        timerEvent(nullptr);
+}
+
+void Gif::flip(bool active)
+{
+    flipped = active;
+
+    if (frames.size() == 1)
+        timerEvent(nullptr);
+}
+
 void Gif::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event)
 
     currentFrame = (currentFrame + 1) % frames.size();
-    const QPixmap & frame = frames[currentFrame];
+    QPixmap frame = frames[currentFrame];
+
+    if (mirrored || flipped)
+    {
+        frame = frame.transformed(QTransform().scale(mirrored ? -1 : 1, flipped ? -1 : 1));
+    }
+
     setPixmap(frame);
     setOffset(-frame.width() / 2, -frame.height() / 2);
     update();
@@ -98,6 +120,13 @@ void Gif::refresh()
             addFrame(path + "/images/shapes/" + nameOf + ".png");
             break;
         }
+    }
+
+    // disable the timer if there is
+    // a sole image with a speed set.
+    if (originalFrames.size() == 1)
+    {
+        setSpeed(0);
     }
 
     setHSL(H, S, L);
