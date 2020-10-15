@@ -331,6 +331,22 @@ PageSettings::PageSettings(QWidget *parent) :
         }
     });
 
+    auto changeHSL = [&]() {
+        int H = ui->hueSpinBox->value();
+        int S = ui->saturationSpinBox->value();
+        int L = ui->lightnessSpinBox->value();
+
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->setHSL(H, S, L);
+    };
+    connect(ui->hueSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), changeHSL);
+    connect(ui->saturationSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), changeHSL);
+    connect(ui->lightnessSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), changeHSL);
+
     refreshGifsList();
 }
 

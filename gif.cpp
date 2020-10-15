@@ -16,9 +16,11 @@ Gif::Gif()
 
 void Gif::addFrame(QString filename)
 {
-    frames.push_back(QPixmap(filename));
+    QPixmap pix(filename);
+    originalFrames.push_back(pix);
+    frames.push_back(pix);
 
-    if (frames.size() == 1)
+    if (originalFrames.size() == 1)
         timerEvent(nullptr);
 }
 
@@ -39,14 +41,11 @@ void Gif::setHSL(int h, int s, int l)
     S = s;
     L = l;
 
-    QVector<QPixmap> newFrames;
-
-    for (auto pix : frames)
+    frames.clear();
+    for (auto pix : originalFrames)
     {
-        newFrames.push_back(Utils::ChangeHSL(pix, h / 100.0f, s / 100.0f, l / 100.0f));
+        frames.push_back(Utils::ChangeHSL(pix, h / 100.0f, s / 100.0f, l / 100.0f));
     }
-
-    frames = newFrames;
 
     if (frames.size() == 1)
         timerEvent(nullptr);
@@ -65,6 +64,7 @@ void Gif::timerEvent(QTimerEvent *event)
 
 void Gif::refresh()
 {
+    originalFrames.clear();
     frames.clear();
     setSpeed(0);
 

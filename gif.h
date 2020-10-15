@@ -33,6 +33,7 @@ private:
     QString nameOf;
     int fps = 0;
     int timerId = -1;
+    QVector<QPixmap> originalFrames;
 };
 
 #endif // GIF_H

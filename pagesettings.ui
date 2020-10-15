@@ -502,10 +502,10 @@
                <item>
                 <widget class="QSpinBox" name="hueSpinBox">
                  <property name="minimum">
-                  <number>-100</number>
+                  <number>-500</number>
                  </property>
                  <property name="maximum">
-                  <number>100</number>
+                  <number>500</number>
                  </property>
                 </widget>
                </item>
@@ -519,7 +519,7 @@
                <item>
                 <widget class="QSpinBox" name="saturationSpinBox">
                  <property name="maximum">
-                  <number>100</number>
+                  <number>999</number>
                  </property>
                 </widget>
                </item>
@@ -533,7 +533,7 @@
                <item>
                 <widget class="QSpinBox" name="lightnessSpinBox">
                  <property name="maximum">
-                  <number>200</number>
+                  <number>999</number>
                  </property>
                 </widget>
                </item>
