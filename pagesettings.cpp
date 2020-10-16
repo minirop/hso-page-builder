@@ -337,7 +337,6 @@ PageSettings::PageSettings(QWidget *parent) :
 
         if (current)
         {
-            ui->gifSlider->setGif(current->text());
 
             auto item = ui->elementsList->currentItem();
             if (!item) return;
@@ -346,6 +345,8 @@ PageSettings::PageSettings(QWidget *parent) :
 
             graphics->nameOf = current->text();
             graphics->refresh();
+
+            ui->gifSlider->setGif(graphics);
         }
     });
     connect(ui->prevGif, &QPushButton::clicked, [&]() {
@@ -417,7 +418,6 @@ PageSettings::PageSettings(QWidget *parent) :
         assert(graphics);
 
         graphics->setFrameOffset(offset);
-        ui->gifSlider->setFrameOffset(offset);
     });
 
     refreshGifsList();

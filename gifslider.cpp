@@ -4,32 +4,14 @@
 
 GifSlider::GifSlider(QWidget *parent) : QWidget(parent)
 {
-    gif = std::make_unique<Gif>();
-
     startTimer(10);
 }
 
 GifSlider::~GifSlider() = default;
 
-void GifSlider::setGif(QString name)
+void GifSlider::setGif(Gif * g)
 {
-    gif->nameOf = name;
-    gif->refresh();
-}
-
-void GifSlider::setFrameOffset(int f)
-{
-    gif->setFrameOffset(f);
-    gif->refresh();
-}
-
-void GifSlider::refresh()
-{
-    if (gif)
-    {
-        gif->refresh();
-    }
-    update();
+    gif = g;
 }
 
 void GifSlider::paintEvent(QPaintEvent * event)

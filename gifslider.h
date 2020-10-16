@@ -12,16 +12,14 @@ public:
     explicit GifSlider(QWidget *parent = nullptr);
     ~GifSlider();
 
-    void setGif(QString name);
-    void setFrameOffset(int f);
-    void refresh();
+    void setGif(Gif * g);
 
 protected:
     void paintEvent(QPaintEvent * event) override;
     void timerEvent(QTimerEvent * event) override;
 
 private:
-    std::unique_ptr<Gif> gif;
+    Gif * gif = nullptr;
     int timerId = -1;
 };
 
