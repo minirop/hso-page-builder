@@ -425,9 +425,10 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         auto mirrored = arguments[GifMirror].toInt() != 0;
         auto flipped = arguments[GifFlip].toInt() != 0;
         auto law = arguments[GifLawBroken].toInt();
+        auto offset = arguments[GifOffset].toInt();
 
         gif->nameOf = image;
-        gif->refresh();
+        gif->setFrameOffset(offset);
 
         gif->setScale(scale);
         gif->setRotation(rotation);

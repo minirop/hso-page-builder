@@ -18,6 +18,7 @@ public:
     void addFrame(QString filename);
     void setSpeed(int speed);
     void setHSL(int h, int s, int l);
+    void setFrameOffset(int f);
 
     void mirror(bool active);
     void flip(bool active);

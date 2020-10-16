@@ -5,9 +5,19 @@
 #include <QBitmap>
 #include <QFileInfo>
 #include <QDir>
+#include <array>
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
+
+static const constexpr std::array<const char *, 41> characters = {
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+    "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+    "u", "v", "w", "x", "y", "z", "zz0exclam",
+    "zz1quest", "zz2apost", "zz3colon", "zz4quote"
+};
+
 
 Gif::Gif()
 {
@@ -49,6 +59,12 @@ void Gif::setHSL(int h, int s, int l)
 
     if (frames.size() == 1)
         timerEvent(nullptr);
+}
+
+void Gif::setFrameOffset(int f)
+{
+    currentFrame = f;
+    refresh();
 }
 
 void Gif::mirror(bool active)
@@ -118,6 +134,16 @@ void Gif::refresh()
         else if (QFile(path + "/images/shapes/" + nameOf + ".png").exists())
         {
             addFrame(path + "/images/shapes/" + nameOf + ".png");
+            break;
+        }
+        else if (QFileInfo fi(path + "/images/wordart/" + nameOf); fi.isDir())
+        {
+            auto letter = "0";
+            if (currentFrame > 0 && currentFrame < static_cast<int>(characters.size()))
+            {
+                letter = characters[currentFrame];
+            }
+            addFrame(QString("%1/%2.png").arg(fi.absoluteFilePath()).arg(letter));
             break;
         }
     }

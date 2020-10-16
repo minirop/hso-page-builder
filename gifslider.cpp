@@ -15,7 +15,12 @@ void GifSlider::setGif(QString name)
 {
     gif->nameOf = name;
     gif->refresh();
-    update();
+}
+
+void GifSlider::setFrameOffset(int f)
+{
+    gif->setFrameOffset(f);
+    gif->refresh();
 }
 
 void GifSlider::refresh()

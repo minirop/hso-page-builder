@@ -410,6 +410,15 @@ PageSettings::PageSettings(QWidget *parent) :
 
         graphics->flip(toggled);
     });
+    connect(ui->gifFrameSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int offset) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->setFrameOffset(offset);
+        ui->gifSlider->setFrameOffset(offset);
+    });
 
     refreshGifsList();
 }
@@ -678,6 +687,12 @@ void PageSettings::refreshGifsList()
             {
                 uniqueGifs.insert(f.chopped(4));
             }
+        }
+
+        auto fonts = QDir(path + "/images/wordart/").entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        for (auto folder : fonts)
+        {
+            uniqueGifs.insert(folder);
         }
     }
 

@@ -391,7 +391,7 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_13">
                <property name="spacing">
-                <number>0</number>
+                <number>6</number>
                </property>
                <property name="rightMargin">
                 <number>0</number>
@@ -422,74 +422,102 @@
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="widget_2" native="true">
-                 <property name="minimumSize">
-                  <size>
-                   <width>10</width>
-                   <height>200</height>
-                  </size>
+                <layout class="QVBoxLayout" name="verticalLayout_8">
+                 <property name="bottomMargin">
+                  <number>0</number>
                  </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>10</width>
-                   <height>200</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="prevGif">
-                 <property name="minimumSize">
-                  <size>
-                   <width>20</width>
-                   <height>200</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>20</width>
-                   <height>200</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>&lt;</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="GifSlider" name="gifSlider" native="true">
-                 <property name="minimumSize">
-                  <size>
-                   <width>200</width>
-                   <height>200</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>200</width>
-                   <height>200</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="nextGif">
-                 <property name="minimumSize">
-                  <size>
-                   <width>20</width>
-                   <height>200</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>20</width>
-                   <height>200</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>&gt;</string>
-                 </property>
-                </widget>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_17">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QPushButton" name="prevGif">
+                     <property name="minimumSize">
+                      <size>
+                       <width>20</width>
+                       <height>200</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>20</width>
+                       <height>200</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>&lt;</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="GifSlider" name="gifSlider" native="true">
+                     <property name="minimumSize">
+                      <size>
+                       <width>200</width>
+                       <height>200</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>200</width>
+                       <height>200</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="nextGif">
+                     <property name="minimumSize">
+                      <size>
+                       <width>20</width>
+                       <height>200</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>20</width>
+                       <height>200</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>&gt;</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_18">
+                   <item>
+                    <widget class="QLabel" name="label_28">
+                     <property name="text">
+                      <string>Frame:</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="gifFrameSpinBox"/>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
                </item>
               </layout>
              </item>

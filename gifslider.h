@@ -13,6 +13,7 @@ public:
     ~GifSlider();
 
     void setGif(QString name);
+    void setFrameOffset(int f);
     void refresh();
 
 protected:
