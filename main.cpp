@@ -8,7 +8,11 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication::setStyle(QStyleFactory::create("Windows"));
+#ifndef Q_OS_WINDOWS
+    auto style = QStyleFactory::create("Windows");
+    if (style)
+        QApplication::setStyle(style);
+#endif
 
     AppSettings settings;
 

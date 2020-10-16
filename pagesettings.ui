@@ -281,7 +281,7 @@
                <item>
                 <widget class="QLabel" name="label_6">
                  <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Speed:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>Animation speed:</string>
                  </property>
                 </widget>
                </item>
@@ -341,7 +341,7 @@
                <item>
                 <widget class="QLabel" name="label_9">
                  <property name="text">
-                  <string>Speed:</string>
+                  <string>Fade speed:</string>
                  </property>
                 </widget>
                </item>
@@ -386,7 +386,7 @@
            <widget class="QWidget" name="gif">
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <property name="bottomMargin">
-              <number>20</number>
+              <number>9</number>
              </property>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_13">
@@ -751,6 +751,18 @@
           <attribute name="label">
            <string>Events</string>
           </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QLabel" name="label_27">
+             <property name="text">
+              <string>NOT AVAILABLE</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </widget>
        </item>

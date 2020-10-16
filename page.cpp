@@ -227,9 +227,14 @@ void Page::mouseMoveEvent(QMouseEvent * event)
         auto diff = (pos - lastMousePosition) / 2;
         selectedItem->moveBy(diff.x(), diff.y());
 
-        auto maxY = (linesCount * LINE_HEIGHT) - (int)selectedItem->boundingRect().height();
-        auto y = std::clamp((int)selectedItem->y(), 0, maxY);
-        selectedItem->setY(y);
+        auto pageElement = dynamic_cast<PageElement*>(selectedItem);
+        assert(pageElement);
+        if (pageElement->elementType() == PageElement::ElementType::Text)
+        {
+            auto maxY = (linesCount * LINE_HEIGHT) - (int)selectedItem->boundingRect().height();
+            auto y = std::clamp((int)selectedItem->y(), 0, maxY);
+            selectedItem->setY(y);
+        }
 
         lastMousePosition = pos;
     }
