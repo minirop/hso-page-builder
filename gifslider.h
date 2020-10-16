@@ -2,6 +2,7 @@
 #define GIFSLIDER_H
 
 #include <QWidget>
+#include <memory>
 
 class Gif;
 class GifSlider : public QWidget
