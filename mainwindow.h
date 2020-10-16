@@ -44,6 +44,7 @@ private:
     PageSettings * settings;
     FontDatabase fontDatabase;
     QWidget * area = nullptr;
+    QString openedFilename;
 };
 
 #endif // MAINWINDOW_H

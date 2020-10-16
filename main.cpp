@@ -14,6 +14,8 @@ int main(int argc, char *argv[])
         QApplication::setStyle(style);
 #endif
 
+    QApplication a(argc, argv);
+
     AppSettings settings;
 
     auto root = AppSettings::GetRootPath();
@@ -23,7 +25,7 @@ int main(int argc, char *argv[])
 #if defined(Q_OS_LINUX)
         auto defaultPath = QDir::homePath() + "/.local/share/Steam/steamapps/common/Hypnospace Outlaw/data";
 #elif defined(Q_OS_WIN32)
-        auto defaultPath = "";
+        auto defaultPath = "C:/Program Files (x86)/Steam/steamapps/common/Hypnospace Outlaw/data";
 #endif
         dir.setCurrent(defaultPath);
         if (!dir.exists())
@@ -48,7 +50,6 @@ int main(int argc, char *argv[])
         AppSettings::SetRootPath(dir.absolutePath());
     }
 
-    QApplication a(argc, argv);
     MainWindow w;
     w.showMaximized();
     return a.exec();

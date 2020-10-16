@@ -12,6 +12,7 @@
 #include <QHBoxLayout>
 #include <QScrollArea>
 #include <algorithm>
+#include <QMessageBox>
 
 QList<int> stringsToInts(QStringList strings)
 {
@@ -113,11 +114,13 @@ void MainWindow::newPage()
     emptyPage["data"] = dataArray;
 
     parseJSON(QJsonDocument(emptyPage).toJson(QJsonDocument::Compact));
+
+    openedFilename.clear();
 }
 
 void MainWindow::openPage()
 {
-    auto filename = QFileDialog::getOpenFileName(this, "Open page", QString(), "Hypnospace pages (*.hsp *.js)");
+    auto filename = QFileDialog::getOpenFileName(this, "Open page", QString(), "Hypnospace pages (*.hsp)");
     if (!filename.isEmpty())
     {
         QFile f(filename);
@@ -126,8 +129,15 @@ void MainWindow::openPage()
             auto contents = f.readAll();
             f.close();
 
+            openedFilename = filename;
+
             parseJSON(contents);
         }
+        else
+        {
+            QMessageBox::warning(this, "An error has occured", QString("Could not open '%1'").arg(filename));
+        }
+
     }
 }
 
@@ -210,7 +220,18 @@ void MainWindow::savePage()
 
     object["data"] = data;
 
-    QFile f("debug.json");
+    if (openedFilename.isEmpty())
+    {
+        openedFilename = QFileDialog::getSaveFileName(this, "Save page", QString(), "Hypnospace pages (*.hsp)");
+
+        if (openedFilename.isEmpty())
+        {
+            QMessageBox::information(this, "Important message", "The page has not been saved.");
+            return;
+        }
+    }
+
+    QFile f(openedFilename);
     if (f.open(QFile::WriteOnly))
     {
         f.write(QJsonDocument(object).toJson(QJsonDocument::Compact));
