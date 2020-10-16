@@ -7,6 +7,8 @@
 #include <QScrollBar>
 #include <QGraphicsItem>
 
+constexpr int LINE_HEIGHT = 32;
+
 Page::Page(QWidget * parent)
     : QGraphicsView(parent)
 {
@@ -52,7 +54,7 @@ Page::~Page()
 
 void Page::setLineCount(int lineCount)
 {
-    setFixedHeight(lineCount * 32 * ZOOM);
+    setFixedHeight(lineCount * LINE_HEIGHT * ZOOM);
     update();
 
     linesCount = lineCount;
@@ -174,7 +176,7 @@ void Page::wheelEvent(QWheelEvent * event)
         if (topLine > 0)
         {
             topLine--;
-            move(0, topLine * -32 * ZOOM);
+            move(0, topLine * -LINE_HEIGHT * ZOOM);
         }
     }
     else if (event->angleDelta().y() < 0)
@@ -182,7 +184,7 @@ void Page::wheelEvent(QWheelEvent * event)
         if (topLine < linesCount - 1)
         {
             topLine++;
-            move(0, topLine * -32 * ZOOM);
+            move(0, topLine * -LINE_HEIGHT * ZOOM);
         }
     }
 
@@ -224,6 +226,11 @@ void Page::mouseMoveEvent(QMouseEvent * event)
         auto pos = event->localPos();
         auto diff = (pos - lastMousePosition) / 2;
         selectedItem->moveBy(diff.x(), diff.y());
+
+        auto maxY = (linesCount * LINE_HEIGHT) - (int)selectedItem->boundingRect().height();
+        auto y = std::clamp((int)selectedItem->y(), 0, maxY);
+        selectedItem->setY(y);
+
         lastMousePosition = pos;
     }
 }
