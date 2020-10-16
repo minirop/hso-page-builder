@@ -277,9 +277,6 @@ void MainWindow::clearEverything()
     connect(webpage, &Page::selected, [&](int id) {
         settings->select(id);
     });
-    connect(webpage, &Page::clearSelection, [&]() {
-        settings->clearSelection();
-    });
     connect(settings, &PageSettings::selectedNameChanged, webpage, &Page::setSelectedName);
     connect(settings, &PageSettings::pageTitleChanged, webpage, &Page::setTitle);
     connect(settings, &PageSettings::pageOwnerChanged, webpage, &Page::setOwner);
@@ -445,10 +442,10 @@ QJsonArray MainWindow::gifToJson(Gif * gif)
     array[GifHSL] = QString("%1,%2,%3").arg(gif->H).arg(gif->S).arg(gif->L);
     array[GifCaseTag] = gif->caseTag;
     array[GifNameOf] = gif->nameOf;
-    array[GifScale] = "1";
-    array[GifRotation] = "0";
-    array[GifMirror] = "0";
-    array[GifFlip] = "0";
+    array[GifScale] = QString::number(gif->scale(), 'f', 2);
+    array[GifRotation] = QString::number((int)gif->rotation());
+    array[GifMirror] = gif->mirrored ? "1" : "0";
+    array[GifFlip] = gif->flipped ? "1" : "0";
     array[GifLinkOrScript] = "-1";
     array[GifLawBroken] = "";
     array[GifAnimFlipX] = "-1";

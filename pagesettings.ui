@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>813</width>
+    <width>817</width>
     <height>543</height>
    </rect>
   </property>
@@ -407,7 +407,7 @@
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>200</height>
+                   <height>16777215</height>
                   </size>
                  </property>
                  <property name="horizontalScrollBarPolicy">

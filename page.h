@@ -24,7 +24,6 @@ public:
 
 signals:
     void selected(int id);
-    void clearSelection();
 
 public slots:
     void setSelectedName(QString name);
@@ -35,6 +34,10 @@ public slots:
 protected:
     void drawForeground(QPainter * painter, const QRectF & rect) override;
     void wheelEvent(QWheelEvent *event) override;
+    void mousePressEvent(QMouseEvent * event) override;
+    void mouseReleaseEvent(QMouseEvent * event) override;
+    void mouseDoubleClickEvent(QMouseEvent * event) override;
+    void mouseMoveEvent(QMouseEvent * event) override;
 
 private:
     friend class MainWindow;
@@ -50,6 +53,7 @@ private:
     QGraphicsScene * scene;
     QGraphicsItem * selectedItem = nullptr;
     QString selectedName;
+    QPointF lastMousePosition;
 };
 
 #endif // PAGE_H

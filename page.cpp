@@ -32,9 +32,6 @@ Page::Page(QWidget * parent)
         {
             auto item = items.first();
             selectedItem = item;
-            auto id = item->data(ROLE_ID).toInt();
-
-            emit selected(id);
         }
         else
         {
@@ -190,4 +187,43 @@ void Page::wheelEvent(QWheelEvent * event)
     }
 
     event->accept();
+}
+
+void Page::mousePressEvent(QMouseEvent * event)
+{
+    event->accept();
+
+    lastMousePosition = event->localPos();
+}
+
+void Page::mouseReleaseEvent(QMouseEvent * event)
+{
+    event->accept();
+}
+
+void Page::mouseDoubleClickEvent(QMouseEvent * event)
+{
+    event->accept();
+
+    auto foundItems = scene->items(mapToScene(event->pos()), Qt::IntersectsItemBoundingRect);
+    if (foundItems.size())
+    {
+        auto item = foundItems.first();
+        selectedItem = item;
+        auto id = item->data(ROLE_ID).toInt();
+        emit selected(id);
+    }
+}
+
+void Page::mouseMoveEvent(QMouseEvent * event)
+{
+    event->accept();
+
+    if (selectedItem)
+    {
+        auto pos = event->localPos();
+        auto diff = (pos - lastMousePosition) / 2;
+        selectedItem->moveBy(diff.x(), diff.y());
+        lastMousePosition = pos;
+    }
 }
