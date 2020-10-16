@@ -37,6 +37,14 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->textLawBrokenComboBox->addItem("E: Extralegal Commerce", 5);
     ui->textLawBrokenComboBox->addItem("S: Submit Evidence", 6);
 
+    ui->gifLawBrokenComboBox->addItem("None", -1);
+    ui->gifLawBrokenComboBox->addItem("C: Content Infringement", 1);
+    ui->gifLawBrokenComboBox->addItem("H: Harassment", 2);
+    ui->gifLawBrokenComboBox->addItem("I: Illegal or Profane Activity", 3);
+    ui->gifLawBrokenComboBox->addItem("M: Malicious Software", 4);
+    ui->gifLawBrokenComboBox->addItem("E: Extralegal Commerce", 5);
+    ui->gifLawBrokenComboBox->addItem("S: Submit Evidence", 6);
+
     connect(ui->elementsList, &QListWidget::currentItemChanged, this, &PageSettings::itemChanged);
     connect(ui->elementName, &QLineEdit::textChanged, [&](QString newName) {
         auto item = ui->elementsList->currentItem();

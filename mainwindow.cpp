@@ -397,11 +397,13 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         auto x = arguments[GifX].toInt();
         auto y = arguments[GifY].toInt();
         auto color = arguments[GifHSL].split(',');
+        auto caseTag = arguments[GifCaseTag];
         auto image = arguments[GifNameOf];
         auto scale = arguments[GifScale].toDouble();
         auto rotation = arguments[GifRotation].toInt();
         auto mirrored = arguments[GifMirror].toInt() != 0;
         auto flipped = arguments[GifFlip].toInt() != 0;
+        auto law = arguments[GifLawBroken].toInt();
 
         gif->nameOf = image;
         gif->refresh();
@@ -410,6 +412,8 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         gif->setRotation(rotation);
         gif->mirror(mirrored);
         gif->flip(flipped);
+        gif->setCaseTag(caseTag);
+        gif->setBrokenLaw(law);
 
         gif->setPos(x, y);
 
