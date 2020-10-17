@@ -536,6 +536,8 @@ void PageSettings::updateGifProperties(Gif * gif)
     ui->gifsListWidget->clearSelection();
     ui->gifsListWidget->setCurrentItem(selectedItem, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
     ui->gifsListWidget->scrollToItem(selectedItem);
+
+    ui->gifSlider->setGif(gif);
 }
 
 void PageSettings::updateTextProperties(Text * text)
