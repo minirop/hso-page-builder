@@ -728,16 +728,6 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="2" colspan="2">
-                <widget class="QCheckBox" name="syncCheckBox">
-                 <property name="layoutDirection">
-                  <enum>Qt::RightToLeft</enum>
-                 </property>
-                 <property name="text">
-                  <string>Sync:</string>
-                 </property>
-                </widget>
-               </item>
                <item row="0" column="2">
                 <widget class="QLabel" name="label_28">
                  <property name="text">
@@ -802,6 +792,29 @@
                    <string>Simulates a button</string>
                   </property>
                  </item>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QCheckBox" name="syncCheckBox">
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLabel" name="label_30">
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="text">
+                  <string>Sync:</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
                 </widget>
                </item>
               </layout>

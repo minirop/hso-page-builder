@@ -9,6 +9,7 @@
 #include <cmath>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QApplication>
 
 static const constexpr std::array<const char *, 41> characters = {
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
@@ -34,7 +35,7 @@ void Gif::addFrame(QString filename)
 
 void Gif::setSpeed(int speed)
 {
-    fps = speed;
+    fps = 1.f / speed;
     fpsProgress = 0;
 }
 
@@ -155,13 +156,36 @@ void Gif::timerEvent(QTimerEvent *event)
     Q_UNUSED(event)
     float dt = 1.f / 60.f;
 
-    if (fps > 0)
+    if (fps > 0 && (gifAnimation == 0 || (gifAnimation == 1 && isUnderMouse())))
     {
         fpsProgress += dt;
         if (fpsProgress > fps)
         {
             currentFrame = (currentFrame + 1) % frames.size();
             fpsProgress -= fps;
+        }
+    }
+    else if (gifAnimation == 1 && !isUnderMouse())
+    {
+        currentFrame = 0;
+        fpsProgress = 0;
+    }
+    else if (gifAnimation == 3)
+    {
+        if (isUnderMouse())
+        {
+            if (QApplication::mouseButtons() == Qt::LeftButton)
+            {
+                currentFrame = 2;
+            }
+            else
+            {
+                currentFrame = 1;
+            }
+        }
+        else
+        {
+            currentFrame = 0;
         }
     }
 

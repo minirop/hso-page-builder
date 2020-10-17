@@ -70,7 +70,7 @@ private:
     float fadeProgress = 0;
     bool sync = false;
     int gifAnimation = 0;
-    int fps = 0;
+    float fps = 0;
     float fpsProgress = 0;
     int offsetFrame = 0;
     int timerId = -1;
