@@ -21,10 +21,12 @@ public:
 
     void setCaseTag(QString tag);
     void setBrokenLaw(int law);
+    void setScript(QString scpt);
 
 protected:
     QString caseTag;
     int brokenLaw = -1;
+    QString script;
 };
 
 #endif // PAGEELEMENT_H

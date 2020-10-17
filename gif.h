@@ -23,6 +23,21 @@ public:
     void mirror(bool active);
     void flip(bool active);
 
+    void setSwingOrSpin(int animation);
+    void setSwingOrSpinSpeed(int speed);
+
+    void set3DFlipX(bool b);
+    void set3DFlipXSpeed(int speed);
+
+    void set3DFlipY(bool b);
+    void set3DFlipYSpeed(int speed);
+
+    void setFade(bool b);
+    void setFadeSpeed(int speed);
+
+    void setSync(bool b);
+    void setGifAnimation(int animation);
+
 protected:
     void timerEvent(QTimerEvent *event) override;
 
@@ -37,7 +52,18 @@ private:
     bool flipped = false;
     int H = 0, S = 100, L = 100;
     QString nameOf;
+    int swingOrSpin = 0;
+    int swingOrSpinSpeed = 0;
+    bool flip3DX = false;
+    int flip3DXSpeed = 0;
+    bool flip3DY = false;
+    int flip3DYSpeed = 0;
+    bool fade = false;
+    int fadeSpeed = 0;
+    bool sync = false;
+    int gifAnimation = 0;
     int fps = 0;
+    int offsetFrame = 0;
     int timerId = -1;
     QVector<QPixmap> originalFrames;
 };

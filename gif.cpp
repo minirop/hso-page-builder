@@ -63,7 +63,7 @@ void Gif::setHSL(int h, int s, int l)
 
 void Gif::setFrameOffset(int f)
 {
-    currentFrame = f;
+    offsetFrame = f;
     refresh();
 }
 
@@ -83,17 +83,69 @@ void Gif::flip(bool active)
         timerEvent(nullptr);
 }
 
+void Gif::setSwingOrSpin(int animation)
+{
+    swingOrSpin = animation;
+}
+
+void Gif::setSwingOrSpinSpeed(int speed)
+{
+    swingOrSpinSpeed = speed;
+}
+
+void Gif::set3DFlipX(bool b)
+{
+    flip3DX = b;
+}
+
+void Gif::set3DFlipXSpeed(int speed)
+{
+    flip3DXSpeed = speed;
+}
+
+void Gif::set3DFlipY(bool b)
+{
+    flip3DY = b;
+}
+
+void Gif::set3DFlipYSpeed(int speed)
+{
+    flip3DYSpeed = speed;
+}
+
+void Gif::setFade(bool b)
+{
+    fade = b;
+}
+
+void Gif::setFadeSpeed(int speed)
+{
+    fadeSpeed = speed;
+}
+
+void Gif::setSync(bool b)
+{
+    sync = b;
+}
+
+void Gif::setGifAnimation(int animation)
+{
+    gifAnimation = animation;
+}
+
 void Gif::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event)
 
     currentFrame = (currentFrame + 1) % frames.size();
     QPixmap frame = frames[currentFrame];
-
+    QTransform transform;
     if (mirrored || flipped)
     {
-        frame = frame.transformed(QTransform().scale(mirrored ? -1 : 1, flipped ? -1 : 1));
+        transform.scale(mirrored ? -1 : 1, flipped ? -1 : 1);
     }
+
+    frame = frame.transformed(transform);
 
     setPixmap(frame);
     setOffset(-frame.width() / 2, -frame.height() / 2);
@@ -139,9 +191,13 @@ void Gif::refresh()
         else if (QFileInfo fi(path + "/images/wordart/" + nameOf); fi.isDir())
         {
             auto letter = "0";
-            if (currentFrame > 0 && currentFrame < static_cast<int>(characters.size()))
+            if (offsetFrame > 0 && offsetFrame < static_cast<int>(characters.size()))
             {
-                letter = characters[currentFrame];
+                letter = characters[offsetFrame];
+                if (!QFile(QString("%1/%2.png").arg(fi.absoluteFilePath()).arg(letter)).exists())
+                {
+                    letter = "0";
+                }
             }
             addFrame(QString("%1/%2.png").arg(fi.absoluteFilePath()).arg(letter));
             break;

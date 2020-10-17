@@ -25,10 +25,6 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->animationComboBox->addItem("Floating", static_cast<int>(Animation::Floating));
     ui->animationComboBox->addItem("Marquee", static_cast<int>(Animation::Marquee));
 
-    ui->alignmentComboBox->addItem("Left", 0);
-    ui->alignmentComboBox->addItem("Centre", 1);
-    ui->alignmentComboBox->addItem("Right", 2);
-
     ui->textLawBrokenComboBox->addItem("None", -1);
     ui->textLawBrokenComboBox->addItem("C: Content Infringement", 1);
     ui->textLawBrokenComboBox->addItem("H: Harassment", 2);
@@ -97,7 +93,7 @@ PageSettings::PageSettings(QWidget *parent) :
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
-        graphics->setAlign(ui->alignmentComboBox->currentData().toInt());
+        graphics->setAlign(ui->alignmentComboBox->currentIndex());
     });
 
     connect(ui->colorFadeBtn, &QPushButton::clicked, [&]() {
@@ -183,7 +179,7 @@ PageSettings::PageSettings(QWidget *parent) :
         definition.append(0);
         definition.append(QString(TYPE_TEXT));
 
-        auto eventData = QStringList() << EVENT_DEFAULT << "0" << "0" << "100" << "-1" << "Hypnospace" << "1741311" << "HypnoFont" << "0n" << "1" << "-1" << "-1" << "0" << "0" << "" << "0";
+        auto eventData = QStringList() << EVENT_DEFAULT << "0" << "0" << "100" << "-1" << "Hypnospace" << "1741311" << "HypnoFont" << "0n" << "1" << "-1" << "-1" << "0" << "0" << "0" << "0" << "0";
 
         emit createElement(TYPE_TEXT, definition, eventData);
         emit updateZOrder();
@@ -313,6 +309,14 @@ PageSettings::PageSettings(QWidget *parent) :
         QSignalBlocker a(ui->xSpinBox);
         ui->xSpinBox->setValue(x);
     });
+    connect(ui->noContentCheckBox, &QCheckBox::toggled, [&](bool c) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
+        assert(graphics);
+
+        graphics->setNoContent(c);
+    });
     connect(ui->bgColorBtn, &QPushButton::clicked, [&]() {
         auto c = QColorDialog::getColor(bgColor, this, "Background color");
         if (c.isValid())
@@ -419,6 +423,86 @@ PageSettings::PageSettings(QWidget *parent) :
 
         graphics->setFrameOffset(offset);
     });
+    connect(ui->swingOrSpinComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int value){
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->setSwingOrSpin(value);
+    });
+    connect(ui->swingOrSpinSpeed, QOverload<int>::of(&QSpinBox::valueChanged), [&](int value){
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->setSwingOrSpinSpeed(value);
+    });
+    connect(ui->flip3DXCheckBox, &QCheckBox::toggled, [&](bool c) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->set3DFlipX(c);
+    });
+    connect(ui->flip3DXSpeed, QOverload<int>::of(&QSpinBox::valueChanged), [&](int value){
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->set3DFlipXSpeed(value);
+    });
+    connect(ui->flip3DYCheckBox, &QCheckBox::toggled, [&](bool c) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->set3DFlipY(c);
+    });
+    connect(ui->flip3DYSpeed, QOverload<int>::of(&QSpinBox::valueChanged), [&](int value){
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->set3DFlipYSpeed(value);
+    });
+    connect(ui->gifFadeCheckBox, &QCheckBox::toggled, [&](bool c) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->setFade(c);
+    });
+    connect(ui->gifFadeSpeed, QOverload<int>::of(&QSpinBox::valueChanged), [&](int value){
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->setFadeSpeed(value);
+    });
+    connect(ui->syncCheckBox, &QCheckBox::toggled, [&](bool c) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->setSync(c);
+    });
+    connect(ui->gifAnimationComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int value){
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->setGifAnimation(value);
+    });
 
     refreshGifsList();
 }
@@ -512,6 +596,17 @@ void PageSettings::updateGifProperties(Gif * gif)
     QSignalBlocker a6(ui->rotationSpinBox);
     QSignalBlocker a7(ui->hFlipButton);
     QSignalBlocker a8(ui->vFlipButton);
+    QSignalBlocker a9(ui->swingOrSpinComboBox);
+    QSignalBlocker b0(ui->swingOrSpinSpeed);
+    QSignalBlocker b1(ui->flip3DXCheckBox);
+    QSignalBlocker b2(ui->flip3DXSpeed);
+    QSignalBlocker b3(ui->flip3DYCheckBox);
+    QSignalBlocker b4(ui->flip3DYSpeed);
+    QSignalBlocker b5(ui->gifFadeCheckBox);
+    QSignalBlocker b6(ui->gifFadeSpeed);
+    QSignalBlocker b7(ui->syncCheckBox);
+    QSignalBlocker b8(ui->gifAnimationComboBox);
+    QSignalBlocker b9(ui->gifFrameSpinBox);
 
     ui->hueSpinBox->setValue(gif->H);
     ui->saturationSpinBox->setValue(gif->S);
@@ -538,6 +633,19 @@ void PageSettings::updateGifProperties(Gif * gif)
     ui->gifsListWidget->scrollToItem(selectedItem);
 
     ui->gifSlider->setGif(gif);
+
+    ui->swingOrSpinComboBox->setCurrentIndex(gif->swingOrSpin);
+    ui->swingOrSpinSpeed->setValue(gif->swingOrSpinSpeed);
+    ui->flip3DXCheckBox->setChecked(gif->flip3DX);
+    ui->flip3DXSpeed->setValue(gif->flip3DXSpeed);
+    ui->flip3DYCheckBox->setChecked(gif->flip3DY);
+    ui->flip3DYSpeed->setValue(gif->flip3DYSpeed);
+    ui->gifFadeCheckBox->setChecked(gif->fade);
+    ui->gifFadeSpeed->setValue(gif->fadeSpeed);
+    ui->syncCheckBox->setChecked(gif->sync);
+    ui->gifAnimationComboBox->setCurrentIndex(gif->gifAnimation);
+
+    ui->gifFrameSpinBox->setValue(gif->offsetFrame);
 }
 
 void PageSettings::updateTextProperties(Text * text)
@@ -558,7 +666,7 @@ void PageSettings::updateTextProperties(Text * text)
     QSignalBlocker b2(ui->widthSpinBox);
     QSignalBlocker b3(ui->bgColorBtn);
     QSignalBlocker b4(ui->pageHeightSpinBox);
-
+    QSignalBlocker b5(ui->noContentCheckBox);
 
     auto fontsNames = FontDatabase::GetFonts();
 
@@ -580,9 +688,7 @@ void PageSettings::updateTextProperties(Text * text)
     ui->animationComboBox->setCurrentIndex(animIndex);
     ui->speedSpinBox->setValue(text->animationSpeed);
 
-    int alignIndex = ui->alignmentComboBox->findData(text->align);
-    assert(alignIndex != -1);
-    ui->alignmentComboBox->setCurrentIndex(alignIndex);
+    ui->alignmentComboBox->setCurrentIndex(text->align);
 
     setFadeColorButton(text->fadeColor);
     ui->fadeSpeedSpinBox->setValue(text->fadeSpeed);
@@ -608,6 +714,7 @@ void PageSettings::updateTextProperties(Text * text)
     ui->widthSpinBox->setValue(text->width);
 
     ui->boldButton->setChecked(text->fontBold);
+    ui->noContentCheckBox->setChecked(text->noContent);
 }
 
 void PageSettings::setFontColorButton(QColor color)

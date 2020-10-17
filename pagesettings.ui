@@ -206,7 +206,23 @@
                 </widget>
                </item>
                <item>
-                <widget class="QComboBox" name="alignmentComboBox"/>
+                <widget class="QComboBox" name="alignmentComboBox">
+                 <item>
+                  <property name="text">
+                   <string>Left</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Centre</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Right</string>
+                  </property>
+                 </item>
+                </widget>
                </item>
                <item>
                 <widget class="QLabel" name="label_16">
@@ -245,6 +261,16 @@
                  </property>
                  <property name="maximum">
                   <number>50</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="noContentCheckBox">
+                 <property name="layoutDirection">
+                  <enum>Qt::RightToLeft</enum>
+                 </property>
+                 <property name="text">
+                  <string>No content:</string>
                  </property>
                 </widget>
                </item>
@@ -488,23 +514,6 @@
                   </layout>
                  </item>
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_18">
-                   <item>
-                    <widget class="QLabel" name="label_28">
-                     <property name="text">
-                      <string>Frame:</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QSpinBox" name="gifFrameSpinBox"/>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
                   <spacer name="verticalSpacer">
                    <property name="orientation">
                     <enum>Qt::Vertical</enum>
@@ -604,6 +613,9 @@
                </item>
                <item>
                 <widget class="QSpinBox" name="rotationSpinBox">
+                 <property name="wrapping">
+                  <bool>true</bool>
+                 </property>
                  <property name="maximum">
                   <number>359</number>
                  </property>
@@ -666,6 +678,123 @@
                   </size>
                  </property>
                 </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QGridLayout" name="gridLayout_3">
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item row="1" column="0">
+                <widget class="QCheckBox" name="flip3DXCheckBox">
+                 <property name="layoutDirection">
+                  <enum>Qt::RightToLeft</enum>
+                 </property>
+                 <property name="text">
+                  <string>3D flip (X)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <widget class="QSpinBox" name="gifFrameSpinBox"/>
+               </item>
+               <item row="0" column="0">
+                <widget class="QComboBox" name="swingOrSpinComboBox">
+                 <item>
+                  <property name="text">
+                   <string>None</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Swing</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Spin</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QCheckBox" name="flip3DYCheckBox">
+                 <property name="layoutDirection">
+                  <enum>Qt::RightToLeft</enum>
+                 </property>
+                 <property name="text">
+                  <string>3D Flip (Y)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2" colspan="2">
+                <widget class="QCheckBox" name="syncCheckBox">
+                 <property name="layoutDirection">
+                  <enum>Qt::RightToLeft</enum>
+                 </property>
+                 <property name="text">
+                  <string>Sync:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="2" colspan="2">
+                <widget class="QLabel" name="label_29">
+                 <property name="text">
+                  <string>Animated image:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QLabel" name="label_28">
+                 <property name="text">
+                  <string>Frame:</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="2" colspan="2">
+                <widget class="QComboBox" name="gifAnimationComboBox">
+                 <item>
+                  <property name="text">
+                   <string>Always animate</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Animate on mouse over</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Still image</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QCheckBox" name="gifFadeCheckBox">
+                 <property name="layoutDirection">
+                  <enum>Qt::RightToLeft</enum>
+                 </property>
+                 <property name="text">
+                  <string>Fade</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QSpinBox" name="swingOrSpinSpeed"/>
+               </item>
+               <item row="1" column="1">
+                <widget class="QSpinBox" name="flip3DXSpeed"/>
+               </item>
+               <item row="2" column="1">
+                <widget class="QSpinBox" name="flip3DYSpeed"/>
+               </item>
+               <item row="3" column="1">
+                <widget class="QSpinBox" name="gifFadeSpeed"/>
                </item>
               </layout>
              </item>

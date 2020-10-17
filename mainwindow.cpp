@@ -384,6 +384,7 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         auto animationSpeed = arguments[TextAnimSpeed].toInt();
         auto fadeColor = arguments[TextColorFadeTo].toInt();
         auto fadeSpeed = arguments[TextColorFadeSpeed].toInt();
+        auto noContent = arguments[TextNoContent].toInt() != 0;
 
         auto text = new Text;
         text->setAlign(align);
@@ -396,6 +397,7 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         text->setAnimationSpeed(animationSpeed);
         text->setCaseTag(caseTag);
         text->setBrokenLaw(law);
+        text->setNoContent(noContent);
 
         if (color >= 0)
         {
@@ -472,17 +474,17 @@ QJsonArray MainWindow::gifToJson(Gif * gif)
     array[GifRotation] = QString::number((int)gif->rotation());
     array[GifMirror] = gif->mirrored ? "1" : "0";
     array[GifFlip] = gif->flipped ? "1" : "0";
-    array[GifLinkOrScript] = "-1";
-    array[GifLawBroken] = "";
-    array[GifAnimFlipX] = "-1";
-    array[GifAnimFlipY] = "-1";
-    array[GifAnimFade] = "-1";
-    array[GifAnimTurn] = "0";
-    array[GifAnimTurnSpeed] = "0";
+    array[GifLinkOrScript] = gif->script;
+    array[GifLawBroken] = QString::number(gif->brokenLaw);
+    array[GifAnimFlipX] = QString::number(gif->flip3DX ? gif->flip3DXSpeed : -1);
+    array[GifAnimFlipY] = QString::number(gif->flip3DY ? gif->flip3DYSpeed : -1);
+    array[GifAnimFade] = QString::number(gif->fade ? gif->fadeSpeed : -1);
+    array[GifAnimTurn] = QString::number(gif->swingOrSpin);
+    array[GifAnimTurnSpeed] = QString::number(gif->swingOrSpinSpeed);
     array[GifFPS] = QString::number(gif->fps);
-    array[GifOffset] = "0";
-    array[GifSync] = "0";
-    array[GifAnimMouseOver] = "0";
+    array[GifOffset] = QString::number(gif->offsetFrame);
+    array[GifSync] = gif->sync ? "1" : "0";
+    array[GifAnimMouseOver] = QString::number(gif->gifAnimation);
 
     return array;
 }
@@ -501,12 +503,13 @@ QJsonArray MainWindow::textToJson(Text * text)
     array[TextFont] = text->fontName;
     array[TextStyle] = QString("%1%2").arg(text->fontSize).arg(text->fontBold ? 'b' : 'n');
     array[TextAlign] = QString::number(text->align);
-    array[TextLinkOrScript] = "-1";
+    array[TextLinkOrScript] = text->script;
     array[TextLawBroken] = QString::number(text->brokenLaw);
     array[TextAnimation] = QString::number(static_cast<int>(text->animation));
     array[TextAnimSpeed] = QString::number(text->animationSpeed);
     array[TextColorFadeTo] = QString::number(colorToInt(text->fadeColor));
     array[TextColorFadeSpeed] = QString::number(text->fadeSpeed);
+    array[TextNoContent] = text->noContent ? "1" : "0";
 
     return array;
 }

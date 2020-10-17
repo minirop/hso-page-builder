@@ -164,6 +164,11 @@ void Text::setFade(QColor color, int speed)
     group->start();
 }
 
+void Text::setNoContent(bool b)
+{
+    noContent = b;
+}
+
 QRectF Text::boundingRect() const
 {
     qreal floatingOffset = 0.0;

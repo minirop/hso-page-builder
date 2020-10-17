@@ -38,6 +38,7 @@ public:
     void setFontColor(QColor color);
     void setColor(QColor color);
     void setFade(QColor color, int speed);
+    void setNoContent(bool b);
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -79,6 +80,7 @@ private:
     QColor fadeColor = Qt::black;
     int fadeSpeed = 0;
     QGraphicsColorizeEffect * colorizeEffect = nullptr;
+    bool noContent = false;
 };
 
 #endif // TEXT_H
