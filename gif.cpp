@@ -199,11 +199,11 @@ void Gif::timerEvent(QTimerEvent *event)
     {
     case 1:
         swingOrSpinProgress += swingOrSpinSpeed * 0.25 * dt;
-        transform.rotate(sin(swingOrSpinProgress) * 20);
+        transform.rotate(std::sin(swingOrSpinProgress) * 20);
         break;
     case 2:
-        swingOrSpinProgress += swingOrSpinSpeed * 0.1;
-        transform.rotate(swingOrSpinProgress);
+        swingOrSpinProgress += swingOrSpinSpeed * 0.1 * dt;
+        transform.rotateRadians(swingOrSpinProgress);
         break;
     }
 
