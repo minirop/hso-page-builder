@@ -37,6 +37,7 @@ void ImageSlider::refresh()
     }
 
     backgrounds = uniqueBG.values();
+    backgrounds.sort();
     backgrounds.prepend(QString()); // "no backgrounds"
 
     current = backgrounds.indexOf(currentName);
