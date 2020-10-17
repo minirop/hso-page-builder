@@ -22,7 +22,7 @@ void GifSlider::paintEvent(QPaintEvent * event)
 
     QPainter p(this);
 
-    auto pixmap = gif->pixmap();
+    auto pixmap = gif->unscaledPixmap();
     p.drawPixmap(rect(), pixmap);
 }
 

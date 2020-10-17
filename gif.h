@@ -38,6 +38,8 @@ public:
     void setSync(bool b);
     void setGifAnimation(int animation);
 
+    QPixmap unscaledPixmap() const;
+
 protected:
     void timerEvent(QTimerEvent *event) override;
 
@@ -45,6 +47,8 @@ private:
     friend class MainWindow;
     friend class GifSlider;
     friend class PageSettings;
+
+    void resetAllAnimations();
 
     QVector<QPixmap> frames;
     int currentFrame = 0;
@@ -54,15 +58,20 @@ private:
     QString nameOf;
     int swingOrSpin = 0;
     int swingOrSpinSpeed = 0;
+    float swingOrSpinProgress = 0;
     bool flip3DX = false;
     int flip3DXSpeed = 0;
+    float flip3DXProgress = 0;
     bool flip3DY = false;
     int flip3DYSpeed = 0;
+    float flip3DYProgress = 0;
     bool fade = false;
     int fadeSpeed = 0;
+    float fadeProgress = 0;
     bool sync = false;
     int gifAnimation = 0;
     int fps = 0;
+    float fpsProgress = 0;
     int offsetFrame = 0;
     int timerId = -1;
     QVector<QPixmap> originalFrames;

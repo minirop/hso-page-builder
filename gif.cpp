@@ -6,7 +6,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <array>
-
+#include <cmath>
 #include <QGraphicsView>
 #include <QGraphicsScene>
 
@@ -22,6 +22,7 @@ static const constexpr std::array<const char *, 41> characters = {
 Gif::Gif()
 {
     setFlags(ItemIsMovable | ItemIsSelectable);
+    timerId = startTimer(1000 / 60);
 }
 
 void Gif::addFrame(QString filename)
@@ -29,20 +30,12 @@ void Gif::addFrame(QString filename)
     QPixmap pix(filename);
     originalFrames.push_back(pix);
     frames.push_back(pix);
-
-    if (originalFrames.size() == 1)
-        timerEvent(nullptr);
 }
 
 void Gif::setSpeed(int speed)
 {
-    if (timerId != -1)
-        killTimer(timerId);
     fps = speed;
-    if (speed > 0)
-        timerId = startTimer(1000 / speed);
-    else
-        timerId = -1;
+    fpsProgress = 0;
 }
 
 void Gif::setHSL(int h, int s, int l)
@@ -64,6 +57,10 @@ void Gif::setHSL(int h, int s, int l)
 void Gif::setFrameOffset(int f)
 {
     offsetFrame = f;
+    if (originalFrames.size() > 1)
+    {
+        currentFrame = f;
+    }
     refresh();
 }
 
@@ -86,6 +83,7 @@ void Gif::flip(bool active)
 void Gif::setSwingOrSpin(int animation)
 {
     swingOrSpin = animation;
+    resetAllAnimations();
 }
 
 void Gif::setSwingOrSpinSpeed(int speed)
@@ -96,6 +94,7 @@ void Gif::setSwingOrSpinSpeed(int speed)
 void Gif::set3DFlipX(bool b)
 {
     flip3DX = b;
+    resetAllAnimations();
 }
 
 void Gif::set3DFlipXSpeed(int speed)
@@ -106,6 +105,7 @@ void Gif::set3DFlipXSpeed(int speed)
 void Gif::set3DFlipY(bool b)
 {
     flip3DY = b;
+    resetAllAnimations();
 }
 
 void Gif::set3DFlipYSpeed(int speed)
@@ -116,6 +116,7 @@ void Gif::set3DFlipYSpeed(int speed)
 void Gif::setFade(bool b)
 {
     fade = b;
+    fadeProgress = 0;
 }
 
 void Gif::setFadeSpeed(int speed)
@@ -131,13 +132,39 @@ void Gif::setSync(bool b)
 void Gif::setGifAnimation(int animation)
 {
     gifAnimation = animation;
+    fpsProgress = 0;
+}
+
+QPixmap Gif::unscaledPixmap() const
+{
+    if (currentFrame >= frames.size())
+    {
+        return frames[currentFrame];
+    }
+
+    return frames[0];
 }
 
 void Gif::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event)
+    float dt = 1.f / 60.f;
 
-    currentFrame = (currentFrame + 1) % frames.size();
+    if (fps > 0)
+    {
+        fpsProgress += dt;
+        if (fpsProgress > fps)
+        {
+            currentFrame = (currentFrame + 1) % frames.size();
+            fpsProgress -= fps;
+        }
+    }
+
+    if (currentFrame >= frames.size())
+    {
+        currentFrame = 0;
+    }
+
     QPixmap frame = frames[currentFrame];
     QTransform transform;
     if (mirrored || flipped)
@@ -145,11 +172,30 @@ void Gif::timerEvent(QTimerEvent *event)
         transform.scale(mirrored ? -1 : 1, flipped ? -1 : 1);
     }
 
+    if (flip3DX)
+    {
+        flip3DXProgress += flip3DXSpeed * 0.1 * dt;
+        transform.scale(std::sin(flip3DXProgress), 1);
+    }
+
+    if (flip3DY)
+    {
+        flip3DYProgress += flip3DYSpeed * 0.1 * dt;
+        transform.scale(1, std::sin(flip3DYProgress));
+    }
+
     frame = frame.transformed(transform);
 
     setPixmap(frame);
     setOffset(-frame.width() / 2, -frame.height() / 2);
     update();
+}
+
+void Gif::resetAllAnimations()
+{
+    swingOrSpinProgress = 0;
+    flip3DXProgress = 0;
+    flip3DYProgress = 0;
 }
 
 void Gif::refresh()
@@ -204,12 +250,13 @@ void Gif::refresh()
         }
     }
 
+    setHSL(H, S, L);
+
     // disable the timer if there is
     // a sole image with a speed set.
     if (originalFrames.size() == 1)
     {
         setSpeed(0);
+        timerEvent(nullptr);
     }
-
-    setHSL(H, S, L);
 }

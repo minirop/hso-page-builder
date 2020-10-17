@@ -738,13 +738,6 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="2" colspan="2">
-                <widget class="QLabel" name="label_29">
-                 <property name="text">
-                  <string>Animated image:</string>
-                 </property>
-                </widget>
-               </item>
                <item row="0" column="2">
                 <widget class="QLabel" name="label_28">
                  <property name="text">
@@ -753,25 +746,6 @@
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
-                </widget>
-               </item>
-               <item row="3" column="2" colspan="2">
-                <widget class="QComboBox" name="gifAnimationComboBox">
-                 <item>
-                  <property name="text">
-                   <string>Always animate</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Animate on mouse over</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Still image</string>
-                  </property>
-                 </item>
                 </widget>
                </item>
                <item row="3" column="0">
@@ -795,6 +769,40 @@
                </item>
                <item row="3" column="1">
                 <widget class="QSpinBox" name="gifFadeSpeed"/>
+               </item>
+               <item row="2" column="2">
+                <widget class="QLabel" name="label_29">
+                 <property name="text">
+                  <string>Animated image:</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="3">
+                <widget class="QComboBox" name="gifAnimationComboBox">
+                 <item>
+                  <property name="text">
+                   <string>Always animate</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Animate on mouse over</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Still image</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Simulates a button</string>
+                  </property>
+                 </item>
+                </widget>
                </item>
               </layout>
              </item>
