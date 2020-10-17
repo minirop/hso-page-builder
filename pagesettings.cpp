@@ -283,6 +283,14 @@ PageSettings::PageSettings(QWidget *parent) :
 
         pageElement->setBrokenLaw(ui->textLawBrokenComboBox->currentData().toInt());
     });
+    connect(ui->textCaseTagLineEdit, &QLineEdit::textChanged, [&](const QString & newText) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
+        assert(graphics);
+
+        graphics->setCaseTag(newText);
+    });
     connect(ui->widthSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int w) {
         auto item = ui->elementsList->currentItem();
         if (!item) return;
@@ -422,6 +430,22 @@ PageSettings::PageSettings(QWidget *parent) :
         assert(graphics);
 
         graphics->setFrameOffset(offset);
+    });
+    connect(ui->gifLawBrokenComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+        assert(pageElement);
+
+        pageElement->setBrokenLaw(ui->gifLawBrokenComboBox->currentData().toInt());
+    });
+    connect(ui->gifCaseTagLineEdit, &QLineEdit::textChanged, [&](const QString & newText) {
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+        assert(graphics);
+
+        graphics->setCaseTag(newText);
     });
     connect(ui->swingOrSpinComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int value){
         auto item = ui->elementsList->currentItem();
@@ -607,6 +631,7 @@ void PageSettings::updateGifProperties(Gif * gif)
     QSignalBlocker b7(ui->syncCheckBox);
     QSignalBlocker b8(ui->gifAnimationComboBox);
     QSignalBlocker b9(ui->gifFrameSpinBox);
+    QSignalBlocker c0(ui->gifCaseTagLineEdit);
 
     ui->hueSpinBox->setValue(gif->H);
     ui->saturationSpinBox->setValue(gif->S);
@@ -646,6 +671,11 @@ void PageSettings::updateGifProperties(Gif * gif)
     ui->gifAnimationComboBox->setCurrentIndex(gif->gifAnimation);
 
     ui->gifFrameSpinBox->setValue(gif->offsetFrame);
+
+    int lawIndex = ui->gifLawBrokenComboBox->findData(gif->brokenLaw);
+    assert(lawIndex != -1);
+    ui->gifLawBrokenComboBox->setCurrentIndex(lawIndex);
+    ui->gifCaseTagLineEdit->setText(gif->caseTag);
 }
 
 void PageSettings::updateTextProperties(Text * text)
@@ -667,6 +697,7 @@ void PageSettings::updateTextProperties(Text * text)
     QSignalBlocker b3(ui->bgColorBtn);
     QSignalBlocker b4(ui->pageHeightSpinBox);
     QSignalBlocker b5(ui->noContentCheckBox);
+    QSignalBlocker b6(ui->textCaseTagLineEdit);
 
     auto fontsNames = FontDatabase::GetFonts();
 
@@ -709,6 +740,7 @@ void PageSettings::updateTextProperties(Text * text)
     int lawIndex = ui->textLawBrokenComboBox->findData(text->brokenLaw);
     assert(lawIndex != -1);
     ui->textLawBrokenComboBox->setCurrentIndex(lawIndex);
+    ui->textCaseTagLineEdit->setText(text->caseTag);
 
     ui->xSpinBox->setValue(text->xoffset);
     ui->widthSpinBox->setValue(text->width);
