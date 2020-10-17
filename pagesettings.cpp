@@ -179,7 +179,7 @@ PageSettings::PageSettings(QWidget *parent) :
         definition.append(0);
         definition.append(QString(TYPE_TEXT));
 
-        auto eventData = QStringList() << EVENT_DEFAULT << "0" << "0" << "100" << "-1" << "Hypnospace" << "1741311" << "HypnoFont" << "0n" << "1" << "-1" << "-1" << "0" << "0" << "0" << "0" << "0";
+        auto eventData = QStringList() << EVENT_DEFAULT << "0" << "0" << "100" << "" << "Hypnospace" << "1741311" << "HypnoFont" << "0n" << "1" << "-1" << "-1" << "0" << "0" << "0" << "0" << "0";
 
         emit createElement(TYPE_TEXT, definition, eventData);
         emit updateZOrder();
@@ -196,7 +196,7 @@ PageSettings::PageSettings(QWidget *parent) :
         definition.append(0);
         definition.append(QString(TYPE_GIF));
 
-        auto eventData = QStringList() << EVENT_DEFAULT << "150" << "40" << "-1" << "0" << "000" << "1" << "0" << "0" << "0" << "-1" << "0" << "-1" << "-1" << "-1" << "0" << "0" << "0" << "0" << "0" << "0";
+        auto eventData = QStringList() << EVENT_DEFAULT << "150" << "40" << "-1" << "" << "000" << "1" << "0" << "0" << "0" << "-1" << "0" << "-1" << "-1" << "-1" << "0" << "0" << "0" << "0" << "0" << "0";
 
         emit createElement(TYPE_GIF, definition, eventData);
         emit updateZOrder();
