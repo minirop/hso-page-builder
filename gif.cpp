@@ -89,6 +89,7 @@ void Gif::setSwingOrSpin(int animation)
 void Gif::setSwingOrSpinSpeed(int speed)
 {
     swingOrSpinSpeed = speed;
+    resetAllAnimations();
 }
 
 void Gif::set3DFlipX(bool b)
@@ -100,6 +101,7 @@ void Gif::set3DFlipX(bool b)
 void Gif::set3DFlipXSpeed(int speed)
 {
     flip3DXSpeed = speed;
+    resetAllAnimations();
 }
 
 void Gif::set3DFlipY(bool b)
@@ -111,28 +113,31 @@ void Gif::set3DFlipY(bool b)
 void Gif::set3DFlipYSpeed(int speed)
 {
     flip3DYSpeed = speed;
+    resetAllAnimations();
 }
 
 void Gif::setFade(bool b)
 {
     fade = b;
-    fadeProgress = 0;
+    resetAllAnimations();
 }
 
 void Gif::setFadeSpeed(int speed)
 {
     fadeSpeed = speed;
+    resetAllAnimations();
 }
 
 void Gif::setSync(bool b)
 {
     sync = b;
+    resetAllAnimations();
 }
 
 void Gif::setGifAnimation(int animation)
 {
     gifAnimation = animation;
-    fpsProgress = 0;
+    resetAllAnimations();
 }
 
 QPixmap Gif::unscaledPixmap() const
@@ -167,9 +172,15 @@ void Gif::timerEvent(QTimerEvent *event)
 
     QPixmap frame = frames[currentFrame];
     QTransform transform;
-    if (mirrored || flipped)
+
+    if (mirrored)
     {
-        transform.scale(mirrored ? -1 : 1, flipped ? -1 : 1);
+        transform.scale(-1, 1);
+    }
+
+    if (flipped)
+    {
+        transform.scale(1, -1);
     }
 
     if (flip3DX)
@@ -184,6 +195,18 @@ void Gif::timerEvent(QTimerEvent *event)
         transform.scale(1, std::sin(flip3DYProgress));
     }
 
+    switch (swingOrSpin)
+    {
+    case 1:
+        swingOrSpinProgress += swingOrSpinSpeed * 0.25 * dt;
+        transform.rotate(sin(swingOrSpinProgress) * 20);
+        break;
+    case 2:
+        swingOrSpinProgress += swingOrSpinSpeed * 0.1;
+        transform.rotate(swingOrSpinProgress);
+        break;
+    }
+
     frame = frame.transformed(transform);
 
     setPixmap(frame);
@@ -196,6 +219,7 @@ void Gif::resetAllAnimations()
     swingOrSpinProgress = 0;
     flip3DXProgress = 0;
     flip3DYProgress = 0;
+    fadeProgress = 0;
 }
 
 void Gif::refresh()

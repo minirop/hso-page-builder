@@ -481,7 +481,7 @@ QJsonArray MainWindow::gifToJson(Gif * gif)
     array[GifAnimFade] = QString::number(gif->fade ? gif->fadeSpeed : -1);
     array[GifAnimTurn] = QString::number(gif->swingOrSpin);
     array[GifAnimTurnSpeed] = QString::number(gif->swingOrSpinSpeed);
-    array[GifFPS] = QString::number(gif->fps);
+    array[GifFPS] = "0"; // unused
     array[GifOffset] = QString::number(gif->offsetFrame);
     array[GifSync] = gif->sync ? "1" : "0";
     array[GifAnimMouseOver] = QString::number(gif->gifAnimation);
