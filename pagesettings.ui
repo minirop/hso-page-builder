@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>817</width>
-    <height>543</height>
+    <width>974</width>
+    <height>690</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -868,7 +868,7 @@
             <x>0</x>
             <y>0</y>
             <width>350</width>
-            <height>435</height>
+            <height>582</height>
            </rect>
           </property>
           <attribute name="label">
@@ -943,7 +943,7 @@
             <x>0</x>
             <y>0</y>
             <width>350</width>
-            <height>435</height>
+            <height>582</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1037,6 +1037,12 @@
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_19">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
               <string>Background color:</string>
              </property>
@@ -1066,6 +1072,12 @@
            </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_18">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
               <string>Page height:</string>
              </property>
@@ -1150,12 +1162,18 @@
              <property name="text">
               <string>Music:</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
             </widget>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_34">
              <property name="text">
               <string>Mouse cursor:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
