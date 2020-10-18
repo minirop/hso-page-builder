@@ -18,5 +18,6 @@ void PageElement::setBrokenLaw(int law)
 
 void PageElement::setScript(QString scpt)
 {
+    if (scpt == "0" || scpt == "-1") scpt.clear();
     script = scpt;
 }

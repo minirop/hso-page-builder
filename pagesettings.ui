@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="objects">
       <attribute name="title">
@@ -278,6 +278,16 @@
              </item>
              <item>
               <widget class="QTextEdit" name="textEdit"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_33">
+               <property name="text">
+                <string>Link / Script:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPlainTextEdit" name="textScriptTextEdit"/>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -649,6 +659,16 @@
                 </widget>
                </item>
               </layout>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_35">
+               <property name="text">
+                <string>Link / Script:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPlainTextEdit" name="gifScriptTextEdit"/>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_16">

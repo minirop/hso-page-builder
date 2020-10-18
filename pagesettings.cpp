@@ -540,6 +540,21 @@ PageSettings::PageSettings(QWidget *parent) :
         emit cursorChanged(value);
     });
 
+    auto scriptChanged = [&](QPlainTextEdit * textEdit) {
+        auto lambda = [&]() {
+            auto item = ui->elementsList->currentItem();
+            if (!item) return;
+            auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+            assert(pageElement);
+
+            pageElement->setScript(textEdit->toPlainText());
+        };
+
+        return lambda;
+    };
+    connect(ui->textScriptTextEdit, &QPlainTextEdit::textChanged, scriptChanged(ui->textScriptTextEdit));
+    connect(ui->gifScriptTextEdit, &QPlainTextEdit::textChanged, scriptChanged(ui->gifScriptTextEdit));
+
     refreshGifsList();
     refreshMusicList();
 }
@@ -645,6 +660,7 @@ void PageSettings::updateGifProperties(Gif * gif)
     QSignalBlocker b8(ui->gifAnimationComboBox);
     QSignalBlocker b9(ui->gifFrameSpinBox);
     QSignalBlocker c0(ui->gifCaseTagLineEdit);
+    QSignalBlocker c1(ui->gifScriptTextEdit);
 
     ui->hueSpinBox->setValue(gif->H);
     ui->saturationSpinBox->setValue(gif->S);
@@ -689,6 +705,7 @@ void PageSettings::updateGifProperties(Gif * gif)
     assert(lawIndex != -1);
     ui->gifLawBrokenComboBox->setCurrentIndex(lawIndex);
     ui->gifCaseTagLineEdit->setText(gif->caseTag);
+    ui->gifScriptTextEdit->setPlainText(gif->script);
 }
 
 void PageSettings::updateTextProperties(Text * text)
@@ -711,6 +728,7 @@ void PageSettings::updateTextProperties(Text * text)
     QSignalBlocker b4(ui->pageHeightSpinBox);
     QSignalBlocker b5(ui->noContentCheckBox);
     QSignalBlocker b6(ui->textCaseTagLineEdit);
+    QSignalBlocker b7(ui->textScriptTextEdit);
 
     auto fontsNames = FontDatabase::GetFonts();
 
@@ -760,6 +778,7 @@ void PageSettings::updateTextProperties(Text * text)
 
     ui->boldButton->setChecked(text->fontBold);
     ui->noContentCheckBox->setChecked(text->noContent);
+    ui->textScriptTextEdit->setPlainText(text->script);
 }
 
 void PageSettings::setFontColorButton(QColor color)

@@ -407,6 +407,7 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         text->setCaseTag(caseTag);
         text->setBrokenLaw(law);
         text->setNoContent(noContent);
+        text->setScript(script);
 
         if (color >= 0)
         {
@@ -435,8 +436,16 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         auto rotation = arguments[GifRotation].toInt();
         auto mirrored = arguments[GifMirror].toInt() != 0;
         auto flipped = arguments[GifFlip].toInt() != 0;
+        auto script = arguments[GifLinkOrScript];
         auto law = arguments[GifLawBroken].toInt();
+        auto animFlipX = arguments[GifAnimFlipX].toInt();
+        auto animFlipY = arguments[GifAnimFlipY].toInt();
+        auto animFade = arguments[GifAnimFade].toInt();
+        auto animTurn = arguments[GifAnimTurn].toInt();
+        auto animTurnSpeed = arguments[GifAnimTurnSpeed].toInt();
         auto offset = arguments[GifOffset].toInt();
+        auto sync = arguments[GifSync].toInt() != 0;
+        auto animMouseOver = arguments[GifAnimMouseOver].toInt();
 
         gif->nameOf = image;
         gif->setFrameOffset(offset);
@@ -447,6 +456,45 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         gif->flip(flipped);
         gif->setCaseTag(caseTag);
         gif->setBrokenLaw(law);
+        gif->setScript(script);
+
+        if (animFlipX == -1)
+        {
+            gif->set3DFlipX(false);
+            gif->set3DFlipXSpeed(0);
+        }
+        else
+        {
+            gif->set3DFlipX(true);
+            gif->set3DFlipXSpeed(animFlipX);
+        }
+
+        if (animFlipY == -1)
+        {
+            gif->set3DFlipY(false);
+            gif->set3DFlipYSpeed(0);
+        }
+        else
+        {
+            gif->set3DFlipY(true);
+            gif->set3DFlipYSpeed(animFlipY);
+        }
+
+        if (animFade == -1)
+        {
+            gif->setFade(false);
+            gif->setFadeSpeed(0);
+        }
+        else
+        {
+            gif->setFade(true);
+            gif->setFadeSpeed(animFade);
+        }
+
+        gif->setSwingOrSpin(animTurn);
+        gif->setSwingOrSpinSpeed(animTurnSpeed);
+        gif->setSync(sync);
+        gif->setGifAnimation(animMouseOver);
 
         gif->setPos(x, y);
 
