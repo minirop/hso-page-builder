@@ -137,6 +137,16 @@ void Page::setDescription(QString description)
     descriptionAndTags = description;
 }
 
+void Page::setMusic(QString newMusic)
+{
+    music = newMusic;
+}
+
+void Page::setPageCursor(int newCursor)
+{
+    cursor = newCursor;
+}
+
 void Page::drawForeground(QPainter * painter, const QRectF & rect)
 {
     Q_UNUSED(rect)

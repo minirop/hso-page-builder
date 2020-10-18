@@ -30,6 +30,8 @@ public slots:
     void setTitle(QString newTitle);
     void setOwner(QString newOwner);
     void setDescription(QString description);
+    void setMusic(QString newMusic);
+    void setPageCursor(int newCursor);
 
 protected:
     void drawForeground(QPainter * painter, const QRectF & rect) override;
@@ -50,6 +52,7 @@ private:
     QString username;
     QString music;
     QString descriptionAndTags;
+    int cursor = 0;
     QGraphicsScene * scene;
     QGraphicsItem * selectedItem = nullptr;
     QString selectedName;

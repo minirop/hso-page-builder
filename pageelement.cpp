@@ -6,6 +6,7 @@ PageElement::PageElement()
 
 void PageElement::setCaseTag(QString tag)
 {
+    if (tag == "0" || tag == "-1") tag.clear();
     caseTag = tag;
 }
 

@@ -11,6 +11,9 @@
 #include <algorithm>
 #include <QDir>
 #include <QDoubleSpinBox>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 
 PageSettings::PageSettings(QWidget *parent) :
     QWidget(parent),
@@ -56,6 +59,7 @@ PageSettings::PageSettings(QWidget *parent) :
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
+
         graphics->setString(ui->textEdit->toPlainText());
     });
     connect(ui->colorBtn, &QPushButton::clicked, [&]() {
@@ -527,8 +531,17 @@ PageSettings::PageSettings(QWidget *parent) :
 
         graphics->setGifAnimation(value);
     });
+    connect(ui->musicComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int value){
+        Q_UNUSED(value)
+
+        emit musicChanged(ui->musicComboBox->currentData().toString());
+    });
+    connect(ui->cursorComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int value){
+        emit cursorChanged(value);
+    });
 
     refreshGifsList();
+    refreshMusicList();
 }
 
 PageSettings::~PageSettings()
@@ -770,6 +783,18 @@ void PageSettings::setLineCounts(int count)
     ui->pageHeightSpinBox->setValue(count);
 }
 
+void PageSettings::setPageCursor(int pageCursor)
+{
+    ui->cursorComboBox->setCurrentIndex(pageCursor);
+}
+
+void PageSettings::setMusic(QString music)
+{
+    auto index = ui->musicComboBox->findData(music);
+    if (index == -1) index = 0;
+    ui->musicComboBox->setCurrentIndex(index);
+}
+
 void PageSettings::setBackgroundColor(QWidget * widget, QColor color)
 {
     widget->setStyleSheet(QString("background-color: rgb(%1, %2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
@@ -798,6 +823,7 @@ void PageSettings::refresh()
 
     ui->imageSlider->refresh();
     refreshGifsList();
+    refreshMusicList();
 }
 
 void PageSettings::refreshGifsList()
@@ -868,4 +894,65 @@ void PageSettings::refreshGifsList()
         ui->gifsListWidget->setCurrentItem(selectedItem, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
         ui->gifsListWidget->scrollToItem(selectedItem);
     }
+}
+
+void PageSettings::refreshMusicList()
+{
+    auto currentdata = ui->musicComboBox->currentData();
+    ui->musicComboBox->clear();
+
+    QStringList doneMusics;
+
+    auto paths = AppSettings::GetSearchPaths();
+    for (auto path : paths)
+    {
+        QDir dir(path + "/audio/music");
+
+        for (auto txt : dir.entryList(QStringList() << "*.txt", QDir::Files, QDir::Name))
+        {
+            if (doneMusics.contains(txt)) continue;
+            doneMusics.append(txt);
+
+            QFile file(dir.absoluteFilePath(txt));
+            if (file.open(QFile::ReadOnly))
+            {
+                auto data = file.readAll().split('|');
+
+                auto formattedName = QString("\"%1\" by %2").arg(QString(data[0])).arg(QString(data[1]));
+                ui->musicComboBox->addItem(formattedName, "audio\\music\\" + txt.replace(".txt", ".ogg"));
+
+                file.close();
+            }
+        }
+
+        dir.setPath(path + "/audio/hsm/pageloops");
+
+        for (auto hsm : dir.entryList(QStringList() << "*.hsm", QDir::Files, QDir::Name))
+        {
+            if (doneMusics.contains(hsm)) continue;
+            doneMusics.append(hsm);
+
+            QFile file(dir.absoluteFilePath(hsm));
+            if (file.open(QFile::ReadOnly))
+            {
+                auto data = file.readAll();
+                auto json = QJsonDocument::fromJson(data);
+                auto obj = json.object();
+                auto jsonData = obj["data"].toArray();
+                auto jsonBox = jsonData[0].toArray();
+                auto jsonLine = jsonBox[0].toArray();
+
+                auto formattedName = QString("\"%1\" by %2").arg(jsonLine[0].toString()).arg(jsonLine[1].toString());
+                ui->musicComboBox->addItem(formattedName, "audio\\hsm\\pageloops\\" + hsm);
+
+                file.close();
+            }
+        }
+    }
+
+    ui->musicComboBox->model()->sort(0);
+    ui->musicComboBox->insertItem(0, "No Music", "");
+    auto index = ui->musicComboBox->findData(currentdata);
+    if (index == -1) index = 0;
+    ui->musicComboBox->setCurrentIndex(index);
 }

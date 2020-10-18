@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="objects">
       <attribute name="title">
@@ -986,6 +986,16 @@
         <widget class="QPlainTextEdit" name="pageDescriptionAndTags"/>
        </item>
        <item>
+        <widget class="QLabel" name="label_31">
+         <property name="text">
+          <string>On-load script:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPlainTextEdit" name="plainTextEdit"/>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_10">
          <property name="spacing">
           <number>20</number>
@@ -1111,17 +1121,57 @@
           </layout>
          </item>
          <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <property name="rightMargin">
+            <number>10</number>
            </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>0</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_32">
+             <property name="text">
+              <string>Music:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_34">
+             <property name="text">
+              <string>Mouse cursor:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="cursorComboBox">
+             <item>
+              <property name="text">
+               <string>Default</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Fire</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Snowflake</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Magic</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Blood</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="musicComboBox"/>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>

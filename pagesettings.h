@@ -26,6 +26,8 @@ public:
     void setBackground(QString image);
     void setBackgroundColorButton(QColor color);
     void setLineCounts(int count);
+    void setPageCursor(int pageCursor);
+    void setMusic(QString music);
 
 signals:
     void selectionChanged(int newSelection, int oldSelection);
@@ -39,6 +41,8 @@ signals:
     void backgroundChanged(QString image);
     void lineCountChanged(int count);
     void duplicateElement(QString name, PageElement * pageElement);
+    void musicChanged(QString music);
+    void cursorChanged(int cursor);
 
 private slots:
     void itemChanged(QListWidgetItem * item, QListWidgetItem * previous);
@@ -54,6 +58,7 @@ private:
 
     void refresh();
     void refreshGifsList();
+    void refreshMusicList();
 
     friend class MainWindow;
     Ui::PageSettings *ui;

@@ -229,6 +229,11 @@ void MainWindow::savePage()
             QMessageBox::information(this, "Important message", "The page has not been saved.");
             return;
         }
+
+        if (!openedFilename.endsWith(".hsp"))
+        {
+            openedFilename += ".hsp";
+        }
     }
 
     QFile f(openedFilename);
@@ -305,6 +310,8 @@ void MainWindow::clearEverything()
     connect(settings, &PageSettings::backgroundChanged, webpage, &Page::setBackground);
     connect(settings, &PageSettings::backgroundColorChanged, webpage, &Page::setBackgroundColor);
     connect(settings, &PageSettings::lineCountChanged, webpage, &Page::setLineCount);
+    connect(settings, &PageSettings::musicChanged, webpage, &Page::setMusic);
+    connect(settings, &PageSettings::cursorChanged, webpage, &Page::setPageCursor);
 
     webpage->move(0, 0);
     webpage->show();
@@ -366,6 +373,8 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         settings->setBackgroundColorButton(webpage->backgroundColor);
         settings->setBackground(webpage->background);
         settings->setLineCounts(webpage->linesCount);
+        settings->setPageCursor(webpage->cursor);
+        settings->setMusic(webpage->music);
     }
     else if (type == TYPE_TEXT)
     {
