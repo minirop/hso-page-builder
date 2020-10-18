@@ -103,6 +103,21 @@ void Page::setBackgroundColor(QColor color)
     AppSettings::SetPageDirty();
 }
 
+void Page::setHomePage(bool b)
+{
+    isUserHomePage = b;
+}
+
+void Page::setOnLoadScript(QString scpt)
+{
+    onLoadScript = scpt;
+}
+
+void Page::setPageStyle(int style)
+{
+    pageStyle = style;
+}
+
 void Page::addElement(QGraphicsItem * element)
 {
     scene->addItem(element);

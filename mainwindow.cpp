@@ -195,12 +195,12 @@ void MainWindow::savePage()
             metadata[WebHeight] = QString::number(webpage->linesCount);
             metadata[WebMusic] = webpage->music;
             metadata[WebBGImage] = webpage->background;
-            metadata[WebMouseFX] = "0";
-            metadata[WebBGColor] = "0";
+            metadata[WebMouseFX] = QString::number(webpage->cursor);
+            metadata[WebBGColor] = QString::number(colorToInt(webpage->backgroundColor));
             metadata[WebDescriptionAndTags] = webpage->descriptionAndTags;
-            metadata[WebPageStyle] = "";
-            metadata[WebUserHOME] = "0";
-            metadata[WebOnLoadScript] = "";
+            metadata[WebPageStyle] = QString::number(webpage->pageStyle);
+            metadata[WebUserHOME] = webpage->isUserHomePage ? "1" : "0";
+            metadata[WebOnLoadScript] = webpage->onLoadScript;
             element.append(metadata);
         }
         else

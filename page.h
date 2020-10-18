@@ -18,6 +18,9 @@ public:
     void setLineCount(int lineCount);
     void setBackground(QString image);
     void setBackgroundColor(QColor color);
+    void setHomePage(bool b);
+    void setOnLoadScript(QString scpt);
+    void setPageStyle(int style);
 
     void addElement(QGraphicsItem *element);
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -52,7 +55,10 @@ private:
     QString username;
     QString music;
     QString descriptionAndTags;
+    QString onLoadScript;
     int cursor = 0;
+    int pageStyle = 0;
+    bool isUserHomePage = false;
     QGraphicsScene * scene;
     QGraphicsItem * selectedItem = nullptr;
     QString selectedName;

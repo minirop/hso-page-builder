@@ -297,7 +297,7 @@ void Gif::refresh()
             addFrame(path + "/images/shapes/" + nameOf + ".png");
             break;
         }
-        else if (QFileInfo fi(path + "/images/wordart/" + nameOf); fi.isDir())
+        else if (QFileInfo fi(path + "/images/wordart/" + nameOf.toLower()); fi.isDir())
         {
             auto letter = "0";
             if (offsetFrame > 0 && offsetFrame < static_cast<int>(characters.size()))
