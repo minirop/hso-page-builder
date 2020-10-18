@@ -20,9 +20,13 @@ public:
 
     static QStringList GetSearchPaths();
 
+    static void SetPageDirty(bool dirty = true);
+    static bool IsPageDirty();
+
 private:
     static inline AppSettings * instance = nullptr;
     QSettings settings;
+    bool isDirty = false;
 };
 
 #endif // APPSETTINGS_H

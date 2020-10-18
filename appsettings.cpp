@@ -1,5 +1,6 @@
 #include "appsettings.h"
 #include <QDir>
+#include <QDebug>
 
 #define ROOT_PATH "paths/root"
 #define MODS_PATH "config/mods"
@@ -54,4 +55,18 @@ QStringList AppSettings::GetSearchPaths()
     paths += GetRootPath();
 
     return paths;
+}
+
+void AppSettings::SetPageDirty(bool dirty)
+{
+    if (instance->isDirty != dirty)
+    {
+        qDebug() << "new dirty state:" << dirty;
+    }
+    instance->isDirty = dirty;
+}
+
+bool AppSettings::IsPageDirty()
+{
+    return instance->isDirty;
 }

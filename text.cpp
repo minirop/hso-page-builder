@@ -1,6 +1,7 @@
 #include "text.h"
 #include "fontdatabase.h"
 #include "globals.h"
+#include "appsettings.h"
 #include <QPainter>
 #include <QFileInfo>
 #include <QBitmap>
@@ -28,6 +29,7 @@ void Text::setHSPosition(int x, int y)
 {
     xoffset = x;
     setPos((x + 50) * (PAGE_WIDTH / 100), y);
+    AppSettings::SetPageDirty();
 }
 
 void Text::setWidth(int w)
@@ -35,6 +37,7 @@ void Text::setWidth(int w)
     width = w;
     renderedWidth = w * PAGE_WIDTH / 100;
     textIsDirty = true;
+    AppSettings::SetPageDirty();
 }
 
 void Text::setAnimation(int anim)
@@ -57,11 +60,13 @@ void Text::setAnimation(int anim)
         break;
     }
     textIsDirty = true;
+    AppSettings::SetPageDirty();
 }
 
 void Text::setAnimationSpeed(int spd)
 {
     animationSpeed = spd;
+    AppSettings::SetPageDirty();
 }
 
 void Text::setAlign(int halign)
@@ -79,6 +84,7 @@ void Text::setAlign(int halign)
         break;
     }
     textIsDirty = true;
+    AppSettings::SetPageDirty();
 }
 
 void Text::setString(QString str)
@@ -87,24 +93,28 @@ void Text::setString(QString str)
     textIsDirty = true;
 
     renderText(string);
+    AppSettings::SetPageDirty();
 }
 
 void Text::setFontSize(int size)
 {
     fontSize = size;
     fontIsDirty = true;
+    AppSettings::SetPageDirty();
 }
 
 void Text::setFontBold(bool bold)
 {
     fontBold = bold;
     fontIsDirty = true;
+    AppSettings::SetPageDirty();
 }
 
 void Text::setFont(QString name)
 {
     fontName = name;
     fontIsDirty = true;
+    AppSettings::SetPageDirty();
 }
 
 void Text::setFontColor(QColor color)
@@ -115,6 +125,7 @@ void Text::setFontColor(QColor color)
     {
         setFade(fadeColor, fadeSpeed);
     }
+    AppSettings::SetPageDirty();
 }
 
 void Text::setColor(QColor color)
@@ -137,6 +148,7 @@ void Text::setFade(QColor color, int speed)
     if (speed == 0)
     {
         setColor(fontColor);
+        AppSettings::SetPageDirty();
         return;
     }
 
@@ -162,11 +174,13 @@ void Text::setFade(QColor color, int speed)
     group->setLoopCount(-1);
 
     group->start();
+    AppSettings::SetPageDirty();
 }
 
 void Text::setNoContent(bool b)
 {
     noContent = b;
+    AppSettings::SetPageDirty();
 }
 
 QRectF Text::boundingRect() const

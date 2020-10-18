@@ -14,6 +14,17 @@
 #include <algorithm>
 #include <QMessageBox>
 
+#define CHECK_MODIFICATIONS { \
+        if (AppSettings::IsPageDirty()) \
+        { \
+            auto btn = QMessageBox::information(this, "Unsaved modifications", "This page has been modified, do you want to discard unsaved modifications?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No); \
+            if (btn == QMessageBox::No) \
+            { \
+                return; \
+            } \
+        } \
+    }
+
 QList<int> stringsToInts(QStringList strings)
 {
     QList<int> ints;
@@ -85,8 +96,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::closeEvent(QCloseEvent * event)
+{
+    event->setAccepted(false);
+    CHECK_MODIFICATIONS
+    event->setAccepted(true);
+}
+
 void MainWindow::newPage()
 {
+    CHECK_MODIFICATIONS
+
     QJsonObject emptyPage;
 
     QJsonArray element;
@@ -116,10 +136,14 @@ void MainWindow::newPage()
     parseJSON(QJsonDocument(emptyPage).toJson(QJsonDocument::Compact));
 
     openedFilename.clear();
+
+    AppSettings::SetPageDirty(false);
 }
 
 void MainWindow::openPage()
 {
+    CHECK_MODIFICATIONS
+
     auto filename = QFileDialog::getOpenFileName(this, "Open page", QString(), "Hypnospace pages (*.hsp)");
     if (!filename.isEmpty())
     {
@@ -132,12 +156,13 @@ void MainWindow::openPage()
             openedFilename = filename;
 
             parseJSON(contents);
+
+            AppSettings::SetPageDirty(false);
         }
         else
         {
             QMessageBox::warning(this, "An error has occured", QString("Could not open '%1'").arg(filename));
         }
-
     }
 }
 
@@ -241,6 +266,12 @@ void MainWindow::savePage()
     {
         f.write(QJsonDocument(object).toJson(QJsonDocument::Compact));
         f.close();
+
+        AppSettings::SetPageDirty(false);
+    }
+    else
+    {
+        QMessageBox::critical(this, "Error whilst saving", QString("Could not write the current page into '%1'.").arg(openedFilename));
     }
 }
 

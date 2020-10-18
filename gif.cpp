@@ -37,6 +37,7 @@ void Gif::setSpeed(int speed)
 {
     fps = 1.f / speed;
     fpsProgress = 0;
+    AppSettings::SetPageDirty();
 }
 
 void Gif::setHSL(int h, int s, int l)
@@ -53,6 +54,7 @@ void Gif::setHSL(int h, int s, int l)
 
     if (frames.size() == 1)
         timerEvent(nullptr);
+    AppSettings::SetPageDirty();
 }
 
 void Gif::setFrameOffset(int f)
@@ -63,6 +65,7 @@ void Gif::setFrameOffset(int f)
         currentFrame = f;
     }
     refresh();
+    AppSettings::SetPageDirty();
 }
 
 void Gif::mirror(bool active)
@@ -71,6 +74,7 @@ void Gif::mirror(bool active)
 
     if (frames.size() == 1)
         timerEvent(nullptr);
+    AppSettings::SetPageDirty();
 }
 
 void Gif::flip(bool active)
@@ -79,66 +83,77 @@ void Gif::flip(bool active)
 
     if (frames.size() == 1)
         timerEvent(nullptr);
+    AppSettings::SetPageDirty();
 }
 
 void Gif::setSwingOrSpin(int animation)
 {
     swingOrSpin = animation;
     resetAllAnimations();
+    AppSettings::SetPageDirty();
 }
 
 void Gif::setSwingOrSpinSpeed(int speed)
 {
     swingOrSpinSpeed = speed;
     resetAllAnimations();
+    AppSettings::SetPageDirty();
 }
 
 void Gif::set3DFlipX(bool b)
 {
     flip3DX = b;
     resetAllAnimations();
+    AppSettings::SetPageDirty();
 }
 
 void Gif::set3DFlipXSpeed(int speed)
 {
     flip3DXSpeed = speed;
     resetAllAnimations();
+    AppSettings::SetPageDirty();
 }
 
 void Gif::set3DFlipY(bool b)
 {
     flip3DY = b;
     resetAllAnimations();
+    AppSettings::SetPageDirty();
 }
 
 void Gif::set3DFlipYSpeed(int speed)
 {
     flip3DYSpeed = speed;
     resetAllAnimations();
+    AppSettings::SetPageDirty();
 }
 
 void Gif::setFade(bool b)
 {
     fade = b;
     resetAllAnimations();
+    AppSettings::SetPageDirty();
 }
 
 void Gif::setFadeSpeed(int speed)
 {
     fadeSpeed = speed;
     resetAllAnimations();
+    AppSettings::SetPageDirty();
 }
 
 void Gif::setSync(bool b)
 {
     sync = b;
     resetAllAnimations();
+    AppSettings::SetPageDirty();
 }
 
 void Gif::setGifAnimation(int animation)
 {
     gifAnimation = animation;
     resetAllAnimations();
+    AppSettings::SetPageDirty();
 }
 
 QPixmap Gif::unscaledPixmap() const

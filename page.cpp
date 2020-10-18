@@ -58,6 +58,7 @@ void Page::setLineCount(int lineCount)
     update();
 
     linesCount = lineCount;
+    AppSettings::SetPageDirty();
 }
 
 void Page::setBackground(QString image)
@@ -86,6 +87,7 @@ void Page::setBackground(QString image)
     }
 
     update();
+    AppSettings::SetPageDirty();
 }
 
 void Page::setBackgroundColor(QColor color)
@@ -98,6 +100,7 @@ void Page::setBackgroundColor(QColor color)
     }
 
     update();
+    AppSettings::SetPageDirty();
 }
 
 void Page::addElement(QGraphicsItem * element)
@@ -125,26 +128,31 @@ void Page::setSelectedName(QString name)
 void Page::setTitle(QString newTitle)
 {
     title = newTitle;
+    AppSettings::SetPageDirty();
 }
 
 void Page::setOwner(QString newOwner)
 {
     username = newOwner;
+    AppSettings::SetPageDirty();
 }
 
 void Page::setDescription(QString description)
 {
     descriptionAndTags = description;
+    AppSettings::SetPageDirty();
 }
 
 void Page::setMusic(QString newMusic)
 {
     music = newMusic;
+    AppSettings::SetPageDirty();
 }
 
 void Page::setPageCursor(int newCursor)
 {
     cursor = newCursor;
+    AppSettings::SetPageDirty();
 }
 
 void Page::drawForeground(QPainter * painter, const QRectF & rect)
@@ -247,5 +255,6 @@ void Page::mouseMoveEvent(QMouseEvent * event)
         }
 
         lastMousePosition = pos;
+        AppSettings::SetPageDirty();
     }
 }
