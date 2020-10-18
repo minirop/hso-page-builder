@@ -158,7 +158,7 @@ void Gif::setGifAnimation(int animation)
 
 QPixmap Gif::unscaledPixmap() const
 {
-    if (currentFrame >= frames.size())
+    if (currentFrame < frames.size())
     {
         return frames[currentFrame];
     }

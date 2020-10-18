@@ -284,6 +284,8 @@ PageSettings::PageSettings(QWidget *parent) :
     });
     connect(ui->pageStyleSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int value) {
         emit pageStyleChanged(value);
+
+        ui->pageStylePreview->setPixmap(AppSettings::GetFilePath(QString("/images/gifs/zoneselectorb/zoneselectorb%1.png").arg(value, 2, 10, QChar('0'))));
     });
     connect(ui->textLawBrokenComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
         auto item = ui->elementsList->currentItem();
@@ -560,6 +562,10 @@ PageSettings::PageSettings(QWidget *parent) :
     };
     connect(ui->textScriptTextEdit, &QPlainTextEdit::textChanged, scriptChanged(ui->textScriptTextEdit));
     connect(ui->gifScriptTextEdit, &QPlainTextEdit::textChanged, scriptChanged(ui->gifScriptTextEdit));
+
+    // to force the page style image to be displayed.
+    setPageStyle(2);
+    setPageStyle(1);
 
     refreshGifsList();
     refreshMusicList();

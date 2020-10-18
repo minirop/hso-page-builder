@@ -20,6 +20,8 @@ public:
 
     static QStringList GetSearchPaths();
 
+    static QString GetFilePath(QString filename);
+
     static void SetPageDirty(bool dirty = true);
     static bool IsPageDirty();
 

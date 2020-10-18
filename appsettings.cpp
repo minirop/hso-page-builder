@@ -56,6 +56,22 @@ QStringList AppSettings::GetSearchPaths()
     return paths;
 }
 
+QString AppSettings::GetFilePath(QString filename)
+{
+    if (filename[0] != '/') filename = "/" + filename;
+
+    auto paths = GetSearchPaths();
+    for (auto path : paths)
+    {
+        if (QFile(path + filename).exists())
+        {
+            return path + filename;
+        }
+    }
+
+    return QString();
+}
+
 void AppSettings::SetPageDirty(bool dirty)
 {
     instance->isDirty = dirty;

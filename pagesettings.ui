@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="objects">
       <attribute name="title">
@@ -1164,7 +1164,17 @@
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="pageStyleSpinBox"/>
+            <widget class="QSpinBox" name="pageStyleSpinBox">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>49</number>
+             </property>
+             <property name="value">
+              <number>1</number>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QLabel" name="pageStylePreview">
