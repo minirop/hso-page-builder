@@ -106,16 +106,19 @@ void Page::setBackgroundColor(QColor color)
 void Page::setHomePage(bool b)
 {
     isUserHomePage = b;
+    AppSettings::SetPageDirty();
 }
 
 void Page::setOnLoadScript(QString scpt)
 {
     onLoadScript = scpt;
+    AppSettings::SetPageDirty();
 }
 
 void Page::setPageStyle(int style)
 {
     pageStyle = style;
+    AppSettings::SetPageDirty();
 }
 
 void Page::addElement(QGraphicsItem * element)

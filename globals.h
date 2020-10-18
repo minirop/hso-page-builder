@@ -32,7 +32,7 @@ enum WebpageData {
     WebDescriptionAndTags,
     WebPageStyle,
     WebUserHOME,
-    WebOnLoadScript,
+    WebOnLoadScript
 };
 
 enum TextData {

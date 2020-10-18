@@ -273,11 +273,17 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->pageTitleLineEdit, &QLineEdit::textChanged, [&](QString title) {
         emit pageTitleChanged(title);
     });
-    connect(ui->pageOwnerLineEdit, &QLineEdit::textChanged, [&](QString owner) {
-        emit pageOwnerChanged(owner);
+    connect(ui->pageOwnerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
+        emit pageOwnerChanged(ui->pageOwnerComboBox->currentText());
     });
     connect(ui->pageDescriptionAndTags, &QPlainTextEdit::textChanged, [&]() {
         emit pageDescriptionChanged(ui->pageDescriptionAndTags->toPlainText());
+    });
+    connect(ui->onLoadScriptTextEdit, &QPlainTextEdit::textChanged, [&]() {
+        emit onLoadScriptChanged(ui->onLoadScriptTextEdit->toPlainText());
+    });
+    connect(ui->pageStyleSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int value) {
+        emit pageStyleChanged(value);
     });
     connect(ui->textLawBrokenComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&]() {
         auto item = ui->elementsList->currentItem();
@@ -540,9 +546,9 @@ PageSettings::PageSettings(QWidget *parent) :
         emit cursorChanged(value);
     });
 
-    auto scriptChanged = [&](QPlainTextEdit * textEdit) {
-        auto lambda = [&]() {
-            auto item = ui->elementsList->currentItem();
+    auto scriptChanged = [ths = this](QPlainTextEdit * textEdit) {
+        auto lambda = [ths, textEdit]() {
+            auto item = ths->ui->elementsList->currentItem();
             if (!item) return;
             auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
             assert(pageElement);
@@ -557,6 +563,7 @@ PageSettings::PageSettings(QWidget *parent) :
 
     refreshGifsList();
     refreshMusicList();
+    refreshUsers();
 }
 
 PageSettings::~PageSettings()
@@ -588,7 +595,7 @@ void PageSettings::clearSelection()
 
 void PageSettings::setBackground(QString image)
 {
-    bgImage = image;
+    ui->imageSlider->setImage(image);
 }
 
 void PageSettings::itemChanged(QListWidgetItem * item, QListWidgetItem * previous)
@@ -794,6 +801,7 @@ void PageSettings::setFadeColorButton(QColor color)
 void PageSettings::setBackgroundColorButton(QColor color)
 {
     bgColor = color;
+    ui->imageSlider->setEmptyColor(color);
     setBackgroundColor(ui->bgColorBtn, color);
 }
 
@@ -812,6 +820,16 @@ void PageSettings::setMusic(QString music)
     auto index = ui->musicComboBox->findData(music);
     if (index == -1) index = 0;
     ui->musicComboBox->setCurrentIndex(index);
+}
+
+void PageSettings::setOnLoadScript(QString script)
+{
+    ui->onLoadScriptTextEdit->setPlainText(script);
+}
+
+void PageSettings::setPageStyle(int style)
+{
+    ui->pageStyleSpinBox->setValue(style);
 }
 
 void PageSettings::setBackgroundColor(QWidget * widget, QColor color)
@@ -841,8 +859,10 @@ void PageSettings::refresh()
     }
 
     ui->imageSlider->refresh();
+
     refreshGifsList();
     refreshMusicList();
+    refreshUsers();
 }
 
 void PageSettings::refreshGifsList()
@@ -974,4 +994,47 @@ void PageSettings::refreshMusicList()
     auto index = ui->musicComboBox->findData(currentdata);
     if (index == -1) index = 0;
     ui->musicComboBox->setCurrentIndex(index);
+}
+
+void PageSettings::refreshUsers()
+{
+    auto currentOwner = ui->pageOwnerComboBox->currentText();
+    ui->pageOwnerComboBox->clear();
+
+    QSet<QString> uniqueNames;
+
+    auto paths = AppSettings::GetSearchPaths();
+    for (auto path : paths)
+    {
+        QFile file(path + "/misc/chardata.hsd");
+        if (file.open(QFile::ReadOnly))
+        {
+            auto data = file.readAll();
+            auto json = QJsonDocument::fromJson(data);
+            auto obj = json.object();
+            auto jsonData = obj["data"].toArray();
+            for (auto jsonUserData : jsonData)
+            {
+                auto jsonBox = jsonUserData.toArray();
+                auto jsonLine = jsonBox[0].toArray();
+                auto username = jsonLine[0].toString();
+
+                uniqueNames.insert(username);
+            }
+
+            file.close();
+        }
+    }
+
+    auto names = uniqueNames.values();
+    names.sort();
+
+    for (auto name : names)
+    {
+        ui->pageOwnerComboBox->addItem(name);
+    }
+
+    auto index = ui->pageOwnerComboBox->findText(currentOwner);
+    if (index == -1) index = 0;
+    ui->pageOwnerComboBox->setCurrentIndex(index);
 }

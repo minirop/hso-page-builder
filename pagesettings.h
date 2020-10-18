@@ -28,6 +28,8 @@ public:
     void setLineCounts(int count);
     void setPageCursor(int pageCursor);
     void setMusic(QString music);
+    void setOnLoadScript(QString script);
+    void setPageStyle(int style);
 
 signals:
     void selectionChanged(int newSelection, int oldSelection);
@@ -43,6 +45,9 @@ signals:
     void duplicateElement(QString name, PageElement * pageElement);
     void musicChanged(QString music);
     void cursorChanged(int cursor);
+    void pageStyleChanged(int style);
+    void homePageChanged(bool b);
+    void onLoadScriptChanged(QString script);
 
 private slots:
     void itemChanged(QListWidgetItem * item, QListWidgetItem * previous);
@@ -59,12 +64,12 @@ private:
     void refresh();
     void refreshGifsList();
     void refreshMusicList();
+    void refreshUsers();
 
     friend class MainWindow;
     Ui::PageSettings *ui;
 
     QColor bgColor;
-    QString bgImage;
 };
 
 #endif // PAGESETTINGS_H

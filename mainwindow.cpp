@@ -343,6 +343,9 @@ void MainWindow::clearEverything()
     connect(settings, &PageSettings::lineCountChanged, webpage, &Page::setLineCount);
     connect(settings, &PageSettings::musicChanged, webpage, &Page::setMusic);
     connect(settings, &PageSettings::cursorChanged, webpage, &Page::setPageCursor);
+    connect(settings, &PageSettings::pageStyleChanged, webpage, &Page::setPageStyle);
+    connect(settings, &PageSettings::homePageChanged, webpage, &Page::setHomePage);
+    connect(settings, &PageSettings::onLoadScriptChanged, webpage, &Page::setOnLoadScript);
 
     webpage->move(0, 0);
     webpage->show();
@@ -397,15 +400,23 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         webpage->username = arguments[WebUsername];
         webpage->music = arguments[WebMusic];
         webpage->descriptionAndTags = arguments[WebDescriptionAndTags];
+        webpage->setPageCursor(arguments[WebMouseFX].toInt());
+        webpage->setPageStyle(arguments[WebPageStyle].toInt());
+        webpage->setHomePage(arguments[WebUserHOME].toInt() != 0);
+        webpage->setOnLoadScript(arguments[WebOnLoadScript]);
 
         settings->ui->pageTitleLineEdit->setText(webpage->title);
-        settings->ui->pageOwnerLineEdit->setText(webpage->username);
+        int index = settings->ui->pageOwnerComboBox->findText(webpage->username);
+        if (index == -1) index = 0;
+        settings->ui->pageOwnerComboBox->setCurrentIndex(index);
         settings->ui->pageDescriptionAndTags->setPlainText(webpage->descriptionAndTags);
         settings->setBackgroundColorButton(webpage->backgroundColor);
         settings->setBackground(webpage->background);
         settings->setLineCounts(webpage->linesCount);
         settings->setPageCursor(webpage->cursor);
         settings->setMusic(webpage->music);
+        settings->setOnLoadScript(webpage->onLoadScript);
+        settings->setPageStyle(webpage->pageStyle);
     }
     else if (type == TYPE_TEXT)
     {

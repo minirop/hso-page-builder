@@ -12,6 +12,14 @@ ImageSlider::ImageSlider(QWidget *parent) : QWidget(parent)
     refresh();
 }
 
+void ImageSlider::setImage(QString image)
+{
+    current = backgrounds.indexOf(image);
+    auto name = backgrounds[current];
+    bgPixmap = getPixmap(name);
+    update();
+}
+
 void ImageSlider::setEmptyColor(QColor color)
 {
     emptyColor = color;

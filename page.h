@@ -15,13 +15,6 @@ public:
     Page(QWidget * parent);
     virtual ~Page();
 
-    void setLineCount(int lineCount);
-    void setBackground(QString image);
-    void setBackgroundColor(QColor color);
-    void setHomePage(bool b);
-    void setOnLoadScript(QString scpt);
-    void setPageStyle(int style);
-
     void addElement(QGraphicsItem *element);
     bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -35,6 +28,12 @@ public slots:
     void setDescription(QString description);
     void setMusic(QString newMusic);
     void setPageCursor(int newCursor);
+    void setLineCount(int lineCount);
+    void setBackground(QString image);
+    void setBackgroundColor(QColor color);
+    void setHomePage(bool b);
+    void setOnLoadScript(QString scpt);
+    void setPageStyle(int style);
 
 protected:
     void drawForeground(QPainter * painter, const QRectF & rect) override;
