@@ -6,6 +6,7 @@
 #include "text.h"
 #include "fontdatabase.h"
 #include "globals.h"
+#include "eventslist.h"
 #include <QColorDialog>
 #include <QGraphicsScene>
 #include <algorithm>
@@ -22,6 +23,30 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
     ui->tabWidget->setCurrentIndex(0);
+
+    webpageEventsList = new EventsList(this);
+    ui->webpageEventsList->setModel(webpageEventsList);
+
+    connect(webpageEventsList, &EventsList::dataChanged, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
+        Q_UNUSED(bottomRight)
+
+        if (roles.size() == 1 && roles.first() == Qt::CheckStateRole)
+        {
+            auto name = topLeft.data().toString();
+            auto state = topLeft.data(Qt::CheckStateRole).value<Qt::CheckState>();
+            if (state == Qt::Checked)
+            {
+                ui->webpageEventsList->selectionModel()->select(topLeft, QItemSelectionModel::SelectCurrent);
+            }
+            else
+            {
+                emit eventDeactivated(name);
+            }
+        }
+    });
+    connect(ui->webpageEventsList, &QListView::clicked, [&](const QModelIndex & index) {
+        emit eventActivated(index.data().toString());
+    });
 
     ui->animationComboBox->addItem("None", static_cast<int>(Animation::None));
     ui->animationComboBox->addItem("TypeWriter", static_cast<int>(Animation::TypeWriter));
@@ -570,6 +595,7 @@ PageSettings::PageSettings(QWidget *parent) :
     refreshGifsList();
     refreshMusicList();
     refreshUsers();
+    refreshEvents();
 }
 
 PageSettings::~PageSettings()
@@ -869,6 +895,7 @@ void PageSettings::refresh()
     refreshGifsList();
     refreshMusicList();
     refreshUsers();
+    refreshEvents();
 }
 
 void PageSettings::refreshGifsList()
@@ -1043,4 +1070,25 @@ void PageSettings::refreshUsers()
     auto index = ui->pageOwnerComboBox->findText(currentOwner);
     if (index == -1) index = 0;
     ui->pageOwnerComboBox->setCurrentIndex(index);
+}
+
+void PageSettings::refreshEvents()
+{
+    webpageEventsList->clear();
+    webpageEventsList->addEvent(EVENT_DEFAULT);
+
+    auto eventsFile = AppSettings::GetFilePath("/misc/events.txt");
+    QFile f(eventsFile);
+    if (f.open(QFile::ReadOnly))
+    {
+        auto eventsNames = QString(f.readAll()).split('\n', Qt::SkipEmptyParts);
+        for (auto ev : eventsNames)
+        {
+            webpageEventsList->addEvent(ev.trimmed());
+        }
+        f.close();
+    }
+
+    auto firstIdx = webpageEventsList->index(0);
+    webpageEventsList->setData(firstIdx, Qt::Checked, Qt::CheckStateRole);
 }

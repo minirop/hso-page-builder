@@ -14,7 +14,6 @@ Page::Page(QWidget * parent)
 {
     setFixedWidth(300 * ZOOM);
     scale(ZOOM, ZOOM);
-    setLineCount(10);
     startTimer(60);
 
     setCacheMode(QGraphicsView::CacheBackground);
@@ -57,13 +56,13 @@ void Page::setLineCount(int lineCount)
     setFixedHeight(lineCount * LINE_HEIGHT * ZOOM);
     update();
 
-    linesCount = lineCount;
+    events[currentEvent].linesCount = lineCount;
     AppSettings::SetPageDirty();
 }
 
 void Page::setBackground(QString image)
 {
-    background.clear();
+    events[currentEvent].background.clear();
 
     if (!image.isEmpty())
     {
@@ -73,7 +72,7 @@ void Page::setBackground(QString image)
             auto img = path + "/images/bgs/" + image;
             if (QFile(img).exists())
             {
-                background = image;
+                events[currentEvent].background = image;
                 setBackgroundBrush(QPixmap(img));
                 assert(!QPixmap(img).isNull());
                 break;
@@ -81,9 +80,9 @@ void Page::setBackground(QString image)
         }
     }
 
-    if (background.isEmpty())
+    if (events[currentEvent].background.isEmpty())
     {
-        setBackgroundColor(backgroundColor);
+        setBackgroundColor(events[currentEvent].backgroundColor);
     }
 
     update();
@@ -92,9 +91,9 @@ void Page::setBackground(QString image)
 
 void Page::setBackgroundColor(QColor color)
 {
-    backgroundColor = color;
+    events[currentEvent].backgroundColor = color;
 
-    if (background.isEmpty())
+    if (events[currentEvent].background.isEmpty())
     {
         setBackgroundBrush(color);
     }
@@ -111,14 +110,19 @@ void Page::setHomePage(bool b)
 
 void Page::setOnLoadScript(QString scpt)
 {
-    onLoadScript = scpt;
+    events[currentEvent].onLoadScript = scpt;
     AppSettings::SetPageDirty();
 }
 
 void Page::setPageStyle(int style)
 {
-    pageStyle = style;
+    events[currentEvent].pageStyle = style;
     AppSettings::SetPageDirty();
+}
+
+void Page::clearEvent(QString name)
+{
+    events.remove(name);
 }
 
 void Page::addElement(QGraphicsItem * element)
@@ -138,6 +142,71 @@ bool Page::eventFilter(QObject * watched, QEvent * event)
     return QGraphicsView::eventFilter(watched, event);
 }
 
+QString Page::background()
+{
+    return events[currentEvent].background;
+}
+
+QColor Page::backgroundColor()
+{
+    return events[currentEvent].backgroundColor;
+}
+
+int Page::linesCount()
+{
+    return events[currentEvent].linesCount;
+}
+
+QString Page::title()
+{
+    return events[currentEvent].title;
+}
+
+QString Page::owner()
+{
+    return username;
+}
+
+QString Page::music()
+{
+    return events[currentEvent].music;
+}
+
+QString Page::description()
+{
+    return events[currentEvent].descriptionAndTags;
+}
+
+QString Page::onLoadScript()
+{
+    return events[currentEvent].onLoadScript;
+}
+
+int Page::cursor()
+{
+    return events[currentEvent].cursor;
+}
+
+int Page::pageStyle()
+{
+    return events[currentEvent].pageStyle;
+}
+
+void Page::setEvent(QString name)
+{
+    if (!events.contains(name))
+    {
+        EventData data;
+        if (events.contains(currentEvent))
+        {
+            data = events[currentEvent];
+        }
+        events[name] = data;
+    }
+
+    currentEvent = name;
+}
+
 void Page::setSelectedName(QString name)
 {
     selectedName = name;
@@ -145,7 +214,7 @@ void Page::setSelectedName(QString name)
 
 void Page::setTitle(QString newTitle)
 {
-    title = newTitle;
+    events[currentEvent].title = newTitle;
     AppSettings::SetPageDirty();
 }
 
@@ -157,19 +226,19 @@ void Page::setOwner(QString newOwner)
 
 void Page::setDescription(QString description)
 {
-    descriptionAndTags = description;
+    events[currentEvent].descriptionAndTags = description;
     AppSettings::SetPageDirty();
 }
 
 void Page::setMusic(QString newMusic)
 {
-    music = newMusic;
+    events[currentEvent].music = newMusic;
     AppSettings::SetPageDirty();
 }
 
 void Page::setPageCursor(int newCursor)
 {
-    cursor = newCursor;
+    events[currentEvent].cursor = newCursor;
     AppSettings::SetPageDirty();
 }
 
@@ -217,7 +286,7 @@ void Page::wheelEvent(QWheelEvent * event)
     }
     else if (event->angleDelta().y() < 0)
     {
-        if (topLine < linesCount - 1)
+        if (topLine < events[currentEvent].linesCount - 1)
         {
             topLine++;
             move(0, topLine * -LINE_HEIGHT * ZOOM);
@@ -267,7 +336,7 @@ void Page::mouseMoveEvent(QMouseEvent * event)
         assert(pageElement);
         if (pageElement->elementType() == PageElement::ElementType::Text)
         {
-            auto maxY = (linesCount * LINE_HEIGHT) - (int)selectedItem->boundingRect().height();
+            auto maxY = (events[currentEvent].linesCount * LINE_HEIGHT) - (int)selectedItem->boundingRect().height();
             auto y = std::clamp((int)selectedItem->y(), 0, maxY);
             selectedItem->setY(y);
         }

@@ -14,9 +14,14 @@ ImageSlider::ImageSlider(QWidget *parent) : QWidget(parent)
 
 void ImageSlider::setImage(QString image)
 {
+    auto oldCurrent = current;
     current = backgrounds.indexOf(image);
-    auto name = backgrounds[current];
-    bgPixmap = getPixmap(name);
+    if (current != oldCurrent)
+    {
+        auto name = backgrounds[current];
+        bgPixmap = getPixmap(name);
+        emit backgroundChanged(name);
+    }
     update();
 }
 

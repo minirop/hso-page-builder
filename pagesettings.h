@@ -12,6 +12,7 @@ class QListWidgetItem;
 class Gif;
 class Text;
 class PageElement;
+class EventsList;
 class PageSettings : public QWidget
 {
     Q_OBJECT
@@ -48,6 +49,8 @@ signals:
     void pageStyleChanged(int style);
     void homePageChanged(bool b);
     void onLoadScriptChanged(QString script);
+    void eventActivated(QString name);
+    void eventDeactivated(QString name);
 
 private slots:
     void itemChanged(QListWidgetItem * item, QListWidgetItem * previous);
@@ -65,9 +68,11 @@ private:
     void refreshGifsList();
     void refreshMusicList();
     void refreshUsers();
+    void refreshEvents();
 
     friend class MainWindow;
     Ui::PageSettings *ui;
+    EventsList * webpageEventsList = nullptr;
 
     QColor bgColor;
 };

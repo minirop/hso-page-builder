@@ -40,6 +40,7 @@ private:
     QJsonArray textToJson(Text * text);
     QJsonArray emptyArray();
     QStringList pageElementToStringList(PageElement * pageElement);
+    void updateSettingsFromPage(Page * webpage);
 
     QHash<int, QGraphicsItem*> pageElements;
     Ui::MainWindow * ui;

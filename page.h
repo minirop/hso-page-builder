@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QGraphicsView>
+#include <QMap>
 #include "pageelement.h"
 
 constexpr int ZOOM = 2;
@@ -18,10 +19,22 @@ public:
     void addElement(QGraphicsItem *element);
     bool eventFilter(QObject *watched, QEvent *event) override;
 
+    QString background();
+    QColor backgroundColor();
+    int linesCount();
+    QString title();
+    QString owner();
+    QString music();
+    QString description();
+    QString onLoadScript();
+    int cursor();
+    int pageStyle();
+
 signals:
     void selected(int id);
 
 public slots:
+    void setEvent(QString name);
     void setSelectedName(QString name);
     void setTitle(QString newTitle);
     void setOwner(QString newOwner);
@@ -34,6 +47,7 @@ public slots:
     void setHomePage(bool b);
     void setOnLoadScript(QString scpt);
     void setPageStyle(int style);
+    void clearEvent(QString name);
 
 protected:
     void drawForeground(QPainter * painter, const QRectF & rect) override;
@@ -46,17 +60,24 @@ protected:
 private:
     friend class MainWindow;
 
-    QString background;
-    QColor backgroundColor;
+    struct EventData {
+        QString background {};
+        QColor backgroundColor = Qt::black;
+        int linesCount = 0;
+        QString title {};
+        QString music {};
+        QString descriptionAndTags {};
+        QString onLoadScript {};
+        int cursor = 0;
+        int pageStyle = 0;
+    };
+
+    QMap<QString, EventData> events;
+    QStringList eventsOrder;
+
+    QString currentEvent;
     int topLine = 0;
-    int linesCount = 0;
-    QString title;
     QString username;
-    QString music;
-    QString descriptionAndTags;
-    QString onLoadScript;
-    int cursor = 0;
-    int pageStyle = 0;
     bool isUserHomePage = false;
     QGraphicsScene * scene;
     QGraphicsItem * selectedItem = nullptr;

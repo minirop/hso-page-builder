@@ -190,17 +190,17 @@ void MainWindow::savePage()
 
             auto metadata = emptyArray();
             metadata[WebEvent] = EVENT_DEFAULT;
-            metadata[WebTitle] = webpage->title;
-            metadata[WebUsername] = webpage->username;
-            metadata[WebHeight] = QString::number(webpage->linesCount);
-            metadata[WebMusic] = webpage->music;
-            metadata[WebBGImage] = webpage->background;
-            metadata[WebMouseFX] = QString::number(webpage->cursor);
-            metadata[WebBGColor] = QString::number(colorToInt(webpage->backgroundColor));
-            metadata[WebDescriptionAndTags] = webpage->descriptionAndTags;
-            metadata[WebPageStyle] = QString::number(webpage->pageStyle);
+            metadata[WebTitle] = webpage->title();
+            metadata[WebUsername] = webpage->owner();
+            metadata[WebHeight] = QString::number(webpage->linesCount());
+            metadata[WebMusic] = webpage->music();
+            metadata[WebBGImage] = webpage->background();
+            metadata[WebMouseFX] = QString::number(webpage->cursor());
+            metadata[WebBGColor] = QString::number(colorToInt(webpage->backgroundColor()));
+            metadata[WebDescriptionAndTags] = webpage->description();
+            metadata[WebPageStyle] = QString::number(webpage->pageStyle());
             metadata[WebUserHOME] = webpage->isUserHomePage ? "1" : "0";
-            metadata[WebOnLoadScript] = webpage->onLoadScript;
+            metadata[WebOnLoadScript] = webpage->onLoadScript();
             element.append(metadata);
         }
         else
@@ -346,6 +346,13 @@ void MainWindow::clearEverything()
     connect(settings, &PageSettings::pageStyleChanged, webpage, &Page::setPageStyle);
     connect(settings, &PageSettings::homePageChanged, webpage, &Page::setHomePage);
     connect(settings, &PageSettings::onLoadScriptChanged, webpage, &Page::setOnLoadScript);
+    connect(settings, &PageSettings::eventActivated, [&](QString name) {
+        webpage->setEvent(name);
+        updateSettingsFromPage(webpage);
+    });
+    connect(settings, &PageSettings::eventDeactivated, [&](QString name) {
+        webpage->clearEvent(name);
+    });
 
     webpage->move(0, 0);
     webpage->show();
@@ -360,7 +367,6 @@ void MainWindow::parseJSON(QByteArray data)
     auto doc = QJsonDocument::fromJson(data);
     auto obj = doc.object();
     auto pageData = obj["data"].toArray();
-    webpage->setLineCount(pageData.size());
     webpage->setSceneRect(area->rect());
 
     for (auto line : pageData)
@@ -389,34 +395,24 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
 
     if (type == TYPE_WEBPAGE)
     {
+        webpage->setEvent(arguments[WebEvent]);
         webpage->setBackground(arguments[WebBGImage]);
         webpage->setLineCount(arguments[WebHeight].toInt());
 
         webpage->setBackgroundColor(intToColor(arguments[WebBGColor].toInt()));
 
-        webpage->title = arguments[WebTitle];
-        setWindowTitle(webpage->title);
+        webpage->setTitle(arguments[WebTitle]);
+        setWindowTitle(webpage->title());
 
-        webpage->username = arguments[WebUsername];
-        webpage->music = arguments[WebMusic];
-        webpage->descriptionAndTags = arguments[WebDescriptionAndTags];
+        webpage->setOwner(arguments[WebUsername]);
+        webpage->setMusic(arguments[WebMusic]);
+        webpage->setDescription(arguments[WebDescriptionAndTags]);
         webpage->setPageCursor(arguments[WebMouseFX].toInt());
         webpage->setPageStyle(arguments[WebPageStyle].toInt());
         webpage->setHomePage(arguments[WebUserHOME].toInt() != 0);
         webpage->setOnLoadScript(arguments[WebOnLoadScript]);
 
-        settings->ui->pageTitleLineEdit->setText(webpage->title);
-        int index = settings->ui->pageOwnerComboBox->findText(webpage->username);
-        if (index == -1) index = 0;
-        settings->ui->pageOwnerComboBox->setCurrentIndex(index);
-        settings->ui->pageDescriptionAndTags->setPlainText(webpage->descriptionAndTags);
-        settings->setBackgroundColorButton(webpage->backgroundColor);
-        settings->setBackground(webpage->background);
-        settings->setLineCounts(webpage->linesCount);
-        settings->setPageCursor(webpage->cursor);
-        settings->setMusic(webpage->music);
-        settings->setOnLoadScript(webpage->onLoadScript);
-        settings->setPageStyle(webpage->pageStyle);
+        updateSettingsFromPage(webpage);
     }
     else if (type == TYPE_TEXT)
     {
@@ -640,6 +636,22 @@ QStringList MainWindow::pageElementToStringList(PageElement * pageElement)
         list += value.toString();
     }
     return list;
+}
+
+void MainWindow::updateSettingsFromPage(Page * webpage)
+{
+    settings->ui->pageTitleLineEdit->setText(webpage->title());
+    int index = settings->ui->pageOwnerComboBox->findText(webpage->owner());
+    if (index == -1) index = 0;
+    settings->ui->pageOwnerComboBox->setCurrentIndex(index);
+    settings->ui->pageDescriptionAndTags->setPlainText(webpage->description());
+    settings->setBackgroundColorButton(webpage->backgroundColor());
+    settings->setBackground(webpage->background());
+    settings->setLineCounts(webpage->linesCount());
+    settings->setPageCursor(webpage->cursor());
+    settings->setMusic(webpage->music());
+    settings->setOnLoadScript(webpage->onLoadScript());
+    settings->setPageStyle(webpage->pageStyle());
 }
 
 void MainWindow::updateZOrder()
