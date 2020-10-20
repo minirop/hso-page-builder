@@ -7,6 +7,7 @@
 #include "fontdatabase.h"
 #include "globals.h"
 #include "eventslist.h"
+#include "eventslistfiltermodel.h"
 #include <QColorDialog>
 #include <QGraphicsScene>
 #include <algorithm>
@@ -25,28 +26,13 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->tabWidget->setCurrentIndex(0);
 
     webpageEventsList = new EventsList(this);
-    ui->webpageEventsList->setModel(webpageEventsList);
+    webpageActiveEvents = new EventsListFilterModel(Qt::Checked, this);
+    webpageActiveEvents->setSourceModel(webpageEventsList);
+    ui->webpageEventsList->setModel(webpageActiveEvents);
 
-    connect(webpageEventsList, &EventsList::dataChanged, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
-        Q_UNUSED(bottomRight)
-
-        if (roles.size() == 1 && roles.first() == Qt::CheckStateRole)
-        {
-            auto name = topLeft.data().toString();
-            auto state = topLeft.data(Qt::CheckStateRole).value<Qt::CheckState>();
-            if (state == Qt::Checked)
-            {
-                ui->webpageEventsList->selectionModel()->select(topLeft, QItemSelectionModel::SelectCurrent);
-            }
-            else
-            {
-                emit eventDeactivated(name);
-            }
-        }
-    });
-    connect(ui->webpageEventsList, &QListView::clicked, [&](const QModelIndex & index) {
-        emit eventActivated(index.data().toString());
-    });
+    webpageInactiveEvents = new EventsListFilterModel(Qt::Unchecked, this);
+    webpageInactiveEvents->setSourceModel(webpageEventsList);
+    ui->eventsNamesComboBox->setModel(webpageInactiveEvents);
 
     ui->animationComboBox->addItem("None", static_cast<int>(Animation::None));
     ui->animationComboBox->addItem("TypeWriter", static_cast<int>(Animation::TypeWriter));
@@ -588,6 +574,13 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->textScriptTextEdit, &QPlainTextEdit::textChanged, scriptChanged(ui->textScriptTextEdit));
     connect(ui->gifScriptTextEdit, &QPlainTextEdit::textChanged, scriptChanged(ui->gifScriptTextEdit));
 
+    connect(ui->addEventButton, &QPushButton::clicked, [&]() {
+        webpageEventsList->setEventActive(ui->eventsNamesComboBox->currentText(), true);
+    });
+    connect(ui->webpageEventsList->selectionModel(), &QItemSelectionModel::currentChanged, [&](const QModelIndex & current) {
+        emit eventSelected(current.data().toString());
+    });
+
     // to force the page style image to be displayed.
     setPageStyle(2);
     setPageStyle(1);
@@ -1089,6 +1082,14 @@ void PageSettings::refreshEvents()
         f.close();
     }
 
-    auto firstIdx = webpageEventsList->index(0);
-    webpageEventsList->setData(firstIdx, Qt::Checked, Qt::CheckStateRole);
+    webpageEventsList->setEventActive(EVENT_DEFAULT, true);
+
+    QModelIndex firstIndex = ui->webpageEventsList->model()->index(0, 0);
+    ui->webpageEventsList->selectionModel()->select(firstIndex, QItemSelectionModel::SelectCurrent);
+}
+
+void PageSettings::reset()
+{
+    ui->elementsList->clear();
+    refreshEvents();
 }

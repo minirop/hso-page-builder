@@ -7,6 +7,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     appsettings.cpp \
     eventslist.cpp \
+    eventslistfiltermodel.cpp \
     fontdatabase.cpp \
     gif.cpp \
     gifslider.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 HEADERS += \
     appsettings.h \
     eventslist.h \
+    eventslistfiltermodel.h \
     fontdatabase.h \
     gif.h \
     gifslider.h \

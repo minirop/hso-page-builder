@@ -942,8 +942,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>350</width>
-            <height>582</height>
+            <width>113</width>
+            <height>34</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1396,7 +1396,37 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>
-            <widget class="QListView" name="webpageEventsList"/>
+            <widget class="QListView" name="webpageEventsList">
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_22">
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QComboBox" name="eventsNamesComboBox"/>
+             </item>
+             <item>
+              <widget class="QPushButton" name="addEventButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Add</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>

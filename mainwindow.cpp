@@ -6,6 +6,8 @@
 #include "globals.h"
 #include "gif.h"
 #include "text.h"
+#include "eventslist.h"
+#include "eventslistfiltermodel.h"
 #include <QFileDialog>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -137,6 +139,8 @@ void MainWindow::newPage()
 
     openedFilename.clear();
 
+    settings->reset();
+
     AppSettings::SetPageDirty(false);
 }
 
@@ -188,20 +192,31 @@ void MainWindow::savePage()
             definition[DefType] = TYPE_WEBPAGE;
             element.append(definition);
 
-            auto metadata = emptyArray();
-            metadata[WebEvent] = EVENT_DEFAULT;
-            metadata[WebTitle] = webpage->title();
-            metadata[WebUsername] = webpage->owner();
-            metadata[WebHeight] = QString::number(webpage->linesCount());
-            metadata[WebMusic] = webpage->music();
-            metadata[WebBGImage] = webpage->background();
-            metadata[WebMouseFX] = QString::number(webpage->cursor());
-            metadata[WebBGColor] = QString::number(colorToInt(webpage->backgroundColor()));
-            metadata[WebDescriptionAndTags] = webpage->description();
-            metadata[WebPageStyle] = QString::number(webpage->pageStyle());
-            metadata[WebUserHOME] = webpage->isUserHomePage ? "1" : "0";
-            metadata[WebOnLoadScript] = webpage->onLoadScript();
-            element.append(metadata);
+            auto savedEvent = webpage->currentEvent;
+
+            auto activeEventsModel = settings->webpageActiveEvents;
+            for (int row = 0; row < activeEventsModel->rowCount(); row++)
+            {
+                auto evName = activeEventsModel->data(activeEventsModel->index(row, 0)).toString();
+                webpage->setEvent(evName);
+
+                auto metadata = emptyArray();
+                metadata[WebEvent] = evName;
+                metadata[WebTitle] = webpage->title();
+                metadata[WebUsername] = webpage->owner();
+                metadata[WebHeight] = QString::number(webpage->linesCount());
+                metadata[WebMusic] = webpage->music();
+                metadata[WebBGImage] = webpage->background();
+                metadata[WebMouseFX] = QString::number(webpage->cursor());
+                metadata[WebBGColor] = QString::number(colorToInt(webpage->backgroundColor()));
+                metadata[WebDescriptionAndTags] = webpage->description();
+                metadata[WebPageStyle] = QString::number(webpage->pageStyle());
+                metadata[WebUserHOME] = webpage->isUserHomePage ? "1" : "0";
+                metadata[WebOnLoadScript] = webpage->onLoadScript();
+                element.append(metadata);
+            }
+
+            webpage->setEvent(savedEvent);
         }
         else
         {
@@ -346,7 +361,7 @@ void MainWindow::clearEverything()
     connect(settings, &PageSettings::pageStyleChanged, webpage, &Page::setPageStyle);
     connect(settings, &PageSettings::homePageChanged, webpage, &Page::setHomePage);
     connect(settings, &PageSettings::onLoadScriptChanged, webpage, &Page::setOnLoadScript);
-    connect(settings, &PageSettings::eventActivated, [&](QString name) {
+    connect(settings, &PageSettings::eventSelected, [&](QString name) {
         webpage->setEvent(name);
         updateSettingsFromPage(webpage);
     });
@@ -357,7 +372,7 @@ void MainWindow::clearEverything()
     webpage->move(0, 0);
     webpage->show();
 
-    settings->ui->elementsList->clear();
+    settings->reset();
 }
 
 void MainWindow::parseJSON(QByteArray data)
@@ -374,15 +389,29 @@ void MainWindow::parseJSON(QByteArray data)
         auto eventList = line.toArray();
         auto definition = eventList[0].toArray();
         auto type = definition.first().toString();
-        auto eventData = eventList[1].toVariant().toStringList();
+
+        for (int i = 1; i < eventList.size(); i++)
+        {
+            auto eventData = eventList[i].toVariant().toStringList();
+            if (eventData.first().size() == 0)
+            {
+                break;
+            }
+            if (type == TYPE_WEBPAGE)
+            {
+                addElement(type, eventData);
+            }
+            else
+            {
+                createElement(type, definition, eventData);
+            }
+        }
 
         if (type == TYPE_WEBPAGE)
         {
-            addElement(type, eventData);
-        }
-        else
-        {
-            createElement(type, definition, eventData);
+            auto firstEvent = eventList[1].toVariant().toStringList().first();
+            webpage->setEvent(firstEvent);
+            updateSettingsFromPage(webpage);
         }
     }
 
@@ -395,6 +424,8 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
 
     if (type == TYPE_WEBPAGE)
     {
+        settings->webpageEventsList->setEventActive(arguments[WebEvent], true);
+
         webpage->setEvent(arguments[WebEvent]);
         webpage->setBackground(arguments[WebBGImage]);
         webpage->setLineCount(arguments[WebHeight].toInt());

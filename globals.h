@@ -13,6 +13,7 @@ constexpr const char * TYPE_WEBPAGE = "Webpage";
 constexpr const char * TYPE_GIF = "Gif";
 constexpr const char * TYPE_TEXT = "Text";
 constexpr const char * EVENT_DEFAULT = "DEFAULT";
+constexpr int EVENT_ACTIVE_ROLE = Qt::UserRole + 1;
 
 enum DefinitionData {
     DefType,

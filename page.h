@@ -73,7 +73,6 @@ private:
     };
 
     QMap<QString, EventData> events;
-    QStringList eventsOrder;
 
     QString currentEvent;
     int topLine = 0;
