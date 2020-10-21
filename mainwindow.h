@@ -28,14 +28,14 @@ private slots:
     void savePage();
     void openModsWindow();
     void refresh();
-    void createElement(QString type, QJsonArray definition, QStringList eventData);
+    QGraphicsItem * createElement(QString type, QJsonArray definition, QStringList eventData);
     void updateZOrder();
     void duplicateElement(QString name, PageElement * pageElement);
 
 private:
     void clearEverything();
     void parseJSON(QByteArray data);
-    QGraphicsItem * addElement(QString type, QStringList arguments);
+    QGraphicsItem * addElement(QString type, QStringList arguments, PageElement * pageElement = nullptr);
     QJsonArray gifToJson(Gif * gif);
     QJsonArray textToJson(Text * text);
     QJsonArray emptyArray();

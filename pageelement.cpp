@@ -5,23 +5,43 @@ PageElement::PageElement()
 {
 }
 
+void PageElement::setEvent(QString name)
+{
+    currentEvent = name;
+}
+
 void PageElement::setCaseTag(QString tag)
 {
     if (tag == "0" || tag == "-1") tag.clear();
-    caseTag = tag;
+    pageEvents[currentEvent].caseTag = tag;
     AppSettings::SetPageDirty();
 }
 
 void PageElement::setBrokenLaw(int law)
 {
     if (law == 0) law = -1;
-    brokenLaw = law;
+    pageEvents[currentEvent].brokenLaw = law;
     AppSettings::SetPageDirty();
 }
 
 void PageElement::setScript(QString scpt)
 {
     if (scpt == "0" || scpt == "-1") scpt.clear();
-    script = scpt;
+    pageEvents[currentEvent].script = scpt;
     AppSettings::SetPageDirty();
+}
+
+QString PageElement::caseTag() const
+{
+    return pageEvents[currentEvent].caseTag;
+}
+
+int PageElement::brokenLaw() const
+{
+    return pageEvents[currentEvent].brokenLaw;
+}
+
+QString PageElement::script() const
+{
+    return pageEvents[currentEvent].script;
 }

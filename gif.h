@@ -15,10 +15,14 @@ public:
     ElementType elementType() const override { return ElementType::Gif; }
     void refresh() override;
 
+    void setEvent(QString name) override;
+
     void addFrame(QString filename);
     void setSpeed(int speed);
     void setHSL(int h, int s, int l);
     void setFrameOffset(int f);
+
+    void setNameOf(QString name);
 
     void mirror(bool active);
     void flip(bool active);
@@ -40,6 +44,24 @@ public:
 
     QPixmap unscaledPixmap() const;
 
+    bool mirrored() const;
+    bool flipped() const;
+    int H() const;
+    int S() const;
+    int L() const;
+    QString nameOf() const;
+    int swingOrSpin() const;
+    int swingOrSpinSpeed() const;
+    bool flip3DX() const;
+    int flip3DXSpeed() const;
+    bool flip3DY() const;
+    int flip3DYSpeed() const;
+    bool fade() const;
+    int fadeSpeed() const;
+    bool sync() const;
+    int offsetFrame() const;
+    int gifAnimation() const;
+
 protected:
     void timerEvent(QTimerEvent *event) override;
 
@@ -50,31 +72,37 @@ private:
 
     void resetAllAnimations();
 
+    struct EventData {
+        bool mirrored = false;
+        bool flipped = false;
+        int H = 0, S = 100, L = 100;
+        QString nameOf;
+        int swingOrSpin = 0;
+        int swingOrSpinSpeed = 0;
+        bool flip3DX = false;
+        int flip3DXSpeed = 0;
+        bool flip3DY = false;
+        int flip3DYSpeed = 0;
+        bool fade = false;
+        int fadeSpeed = 0;
+        bool sync = false;
+        int offsetFrame = 0;
+        int gifAnimation = 0;
+        QVector<QPixmap> originalFrames;
+    };
+
+    QMap<QString, EventData> events;
+    QString currentEvent;
+
     QVector<QPixmap> frames;
     int currentFrame = 0;
-    bool mirrored = false;
-    bool flipped = false;
-    int H = 0, S = 100, L = 100;
-    QString nameOf;
-    int swingOrSpin = 0;
-    int swingOrSpinSpeed = 0;
     float swingOrSpinProgress = 0;
-    bool flip3DX = false;
-    int flip3DXSpeed = 0;
     float flip3DXProgress = 0;
-    bool flip3DY = false;
-    int flip3DYSpeed = 0;
     float flip3DYProgress = 0;
-    bool fade = false;
-    int fadeSpeed = 0;
     float fadeProgress = 0;
-    bool sync = false;
-    int gifAnimation = 0;
     float fps = 0;
     float fpsProgress = 0;
-    int offsetFrame = 0;
     int timerId = -1;
-    QVector<QPixmap> originalFrames;
 };
 
 #endif // GIF_H

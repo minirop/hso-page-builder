@@ -29,7 +29,7 @@ Gif::Gif()
 void Gif::addFrame(QString filename)
 {
     QPixmap pix(filename);
-    originalFrames.push_back(pix);
+    events[currentEvent].originalFrames.push_back(pix);
     frames.push_back(pix);
 }
 
@@ -42,12 +42,12 @@ void Gif::setSpeed(int speed)
 
 void Gif::setHSL(int h, int s, int l)
 {
-    H = h;
-    S = s;
-    L = l;
+    events[currentEvent].H = h;
+    events[currentEvent].S = s;
+    events[currentEvent].L = l;
 
     frames.clear();
-    for (auto pix : originalFrames)
+    for (auto pix : events[currentEvent].originalFrames)
     {
         frames.push_back(Utils::ChangeHSL(pix, h / 100.0f, s / 100.0f, l / 100.0f));
     }
@@ -59,8 +59,8 @@ void Gif::setHSL(int h, int s, int l)
 
 void Gif::setFrameOffset(int f)
 {
-    offsetFrame = f;
-    if (originalFrames.size() > 1)
+    events[currentEvent].offsetFrame = f;
+    if (events[currentEvent].originalFrames.size() > 1)
     {
         currentFrame = f;
     }
@@ -68,9 +68,15 @@ void Gif::setFrameOffset(int f)
     AppSettings::SetPageDirty();
 }
 
+void Gif::setNameOf(QString name)
+{
+    events[currentEvent].nameOf = name;
+    AppSettings::SetPageDirty();
+}
+
 void Gif::mirror(bool active)
 {
-    mirrored = active;
+    events[currentEvent].mirrored = active;
 
     if (frames.size() == 1)
         timerEvent(nullptr);
@@ -79,7 +85,7 @@ void Gif::mirror(bool active)
 
 void Gif::flip(bool active)
 {
-    flipped = active;
+    events[currentEvent].flipped = active;
 
     if (frames.size() == 1)
         timerEvent(nullptr);
@@ -88,70 +94,70 @@ void Gif::flip(bool active)
 
 void Gif::setSwingOrSpin(int animation)
 {
-    swingOrSpin = animation;
+    events[currentEvent].swingOrSpin = animation;
     resetAllAnimations();
     AppSettings::SetPageDirty();
 }
 
 void Gif::setSwingOrSpinSpeed(int speed)
 {
-    swingOrSpinSpeed = speed;
+    events[currentEvent].swingOrSpinSpeed = speed;
     resetAllAnimations();
     AppSettings::SetPageDirty();
 }
 
 void Gif::set3DFlipX(bool b)
 {
-    flip3DX = b;
+    events[currentEvent].flip3DX = b;
     resetAllAnimations();
     AppSettings::SetPageDirty();
 }
 
 void Gif::set3DFlipXSpeed(int speed)
 {
-    flip3DXSpeed = speed;
+    events[currentEvent].flip3DXSpeed = speed;
     resetAllAnimations();
     AppSettings::SetPageDirty();
 }
 
 void Gif::set3DFlipY(bool b)
 {
-    flip3DY = b;
+    events[currentEvent].flip3DY = b;
     resetAllAnimations();
     AppSettings::SetPageDirty();
 }
 
 void Gif::set3DFlipYSpeed(int speed)
 {
-    flip3DYSpeed = speed;
+    events[currentEvent].flip3DYSpeed = speed;
     resetAllAnimations();
     AppSettings::SetPageDirty();
 }
 
 void Gif::setFade(bool b)
 {
-    fade = b;
+    events[currentEvent].fade = b;
     resetAllAnimations();
     AppSettings::SetPageDirty();
 }
 
 void Gif::setFadeSpeed(int speed)
 {
-    fadeSpeed = speed;
+    events[currentEvent].fadeSpeed = speed;
     resetAllAnimations();
     AppSettings::SetPageDirty();
 }
 
 void Gif::setSync(bool b)
 {
-    sync = b;
+    events[currentEvent].sync = b;
     resetAllAnimations();
     AppSettings::SetPageDirty();
 }
 
 void Gif::setGifAnimation(int animation)
 {
-    gifAnimation = animation;
+    events[currentEvent].gifAnimation = animation;
     resetAllAnimations();
     AppSettings::SetPageDirty();
 }
@@ -166,12 +172,97 @@ QPixmap Gif::unscaledPixmap() const
     return frames[0];
 }
 
+bool Gif::mirrored() const
+{
+    return events[currentEvent].mirrored;
+}
+
+bool Gif::flipped() const
+{
+    return events[currentEvent].flipped;
+}
+
+int Gif::H() const
+{
+    return events[currentEvent].H;
+}
+
+int Gif::S() const
+{
+    return events[currentEvent].S;
+}
+
+int Gif::L() const
+{
+    return events[currentEvent].L;
+}
+
+QString Gif::nameOf() const
+{
+    return events[currentEvent].nameOf;
+}
+
+int Gif::swingOrSpin() const
+{
+    return events[currentEvent].swingOrSpin;
+}
+
+int Gif::swingOrSpinSpeed() const
+{
+    return events[currentEvent].swingOrSpinSpeed;
+}
+
+bool Gif::flip3DX() const
+{
+    return events[currentEvent].flip3DX;
+}
+
+int Gif::flip3DXSpeed() const
+{
+    return events[currentEvent].flip3DXSpeed;
+}
+
+bool Gif::flip3DY() const
+{
+    return events[currentEvent].flip3DY;
+}
+
+int Gif::flip3DYSpeed() const
+{
+    return events[currentEvent].flip3DYSpeed;
+}
+
+bool Gif::fade() const
+{
+    return events[currentEvent].fade;
+}
+
+int Gif::fadeSpeed() const
+{
+    return events[currentEvent].fadeSpeed;
+}
+
+bool Gif::sync() const
+{
+    return events[currentEvent].sync;
+}
+
+int Gif::offsetFrame() const
+{
+    return events[currentEvent].offsetFrame;
+}
+
+int Gif::gifAnimation() const
+{
+    return events[currentEvent].gifAnimation;
+}
+
 void Gif::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event)
     float dt = 1.f / 60.f;
 
-    if (fps > 0 && (gifAnimation == 0 || (gifAnimation == 1 && isUnderMouse())))
+    if (fps > 0 && (events[currentEvent].gifAnimation == 0 || (events[currentEvent].gifAnimation == 1 && isUnderMouse())))
     {
         fpsProgress += dt;
         if (fpsProgress > fps)
@@ -180,12 +271,12 @@ void Gif::timerEvent(QTimerEvent *event)
             fpsProgress -= fps;
         }
     }
-    else if (gifAnimation == 1 && !isUnderMouse())
+    else if (events[currentEvent].gifAnimation == 1 && !isUnderMouse())
     {
         currentFrame = 0;
         fpsProgress = 0;
     }
-    else if (gifAnimation == 3)
+    else if (events[currentEvent].gifAnimation == 3)
     {
         if (isUnderMouse())
         {
@@ -212,36 +303,36 @@ void Gif::timerEvent(QTimerEvent *event)
     QPixmap frame = frames[currentFrame];
     QTransform transform;
 
-    if (mirrored)
+    if (events[currentEvent].mirrored)
     {
         transform.scale(-1, 1);
     }
 
-    if (flipped)
+    if (events[currentEvent].flipped)
     {
         transform.scale(1, -1);
     }
 
-    if (flip3DX)
+    if (events[currentEvent].flip3DX)
     {
-        flip3DXProgress += flip3DXSpeed * 0.1 * dt;
+        flip3DXProgress += events[currentEvent].flip3DXSpeed * 0.1 * dt;
         transform.scale(std::sin(flip3DXProgress), 1);
     }
 
-    if (flip3DY)
+    if (events[currentEvent].flip3DY)
     {
-        flip3DYProgress += flip3DYSpeed * 0.1 * dt;
+        flip3DYProgress += events[currentEvent].flip3DYSpeed * 0.1 * dt;
         transform.scale(1, std::sin(flip3DYProgress));
     }
 
-    switch (swingOrSpin)
+    switch (events[currentEvent].swingOrSpin)
     {
     case 1:
-        swingOrSpinProgress += swingOrSpinSpeed * 0.25 * dt;
+        swingOrSpinProgress += events[currentEvent].swingOrSpinSpeed * 0.25 * dt;
         transform.rotate(std::sin(swingOrSpinProgress) * 20);
         break;
     case 2:
-        swingOrSpinProgress += swingOrSpinSpeed * 0.1 * dt;
+        swingOrSpinProgress += events[currentEvent].swingOrSpinSpeed * 0.1 * dt;
         transform.rotateRadians(swingOrSpinProgress);
         break;
     }
@@ -263,14 +354,14 @@ void Gif::resetAllAnimations()
 
 void Gif::refresh()
 {
-    originalFrames.clear();
+    events[currentEvent].originalFrames.clear();
     frames.clear();
     setSpeed(0);
 
     auto searchPaths = AppSettings::GetSearchPaths();
     for (auto path : searchPaths)
     {
-        if (QFileInfo fi(path + "/images/gifs/" + nameOf); fi.isDir())
+        if (QFileInfo fi(path + "/images/gifs/" + events[currentEvent].nameOf); fi.isDir())
         {
             QDir dir(fi.absoluteFilePath());
             for (auto entry : dir.entryInfoList(QDir::Files, QDir::Name))
@@ -287,22 +378,22 @@ void Gif::refresh()
             }
             break;
         }
-        else if (QFile(path + "/images/static/" + nameOf + ".png").exists())
+        else if (QFile(path + "/images/static/" + events[currentEvent].nameOf + ".png").exists())
         {
-            addFrame(path + "/images/static/" + nameOf + ".png");
+            addFrame(path + "/images/static/" + events[currentEvent].nameOf + ".png");
             break;
         }
-        else if (QFile(path + "/images/shapes/" + nameOf + ".png").exists())
+        else if (QFile(path + "/images/shapes/" + events[currentEvent].nameOf + ".png").exists())
         {
-            addFrame(path + "/images/shapes/" + nameOf + ".png");
+            addFrame(path + "/images/shapes/" + events[currentEvent].nameOf + ".png");
             break;
         }
-        else if (QFileInfo fi(path + "/images/wordart/" + nameOf.toLower()); fi.isDir())
+        else if (QFileInfo fi(path + "/images/wordart/" + events[currentEvent].nameOf.toLower()); fi.isDir())
         {
             auto letter = "0";
-            if (offsetFrame > 0 && offsetFrame < static_cast<int>(characters.size()))
+            if (events[currentEvent].offsetFrame > 0 && events[currentEvent].offsetFrame < static_cast<int>(characters.size()))
             {
-                letter = characters[offsetFrame];
+                letter = characters[events[currentEvent].offsetFrame];
                 if (!QFile(QString("%1/%2.png").arg(fi.absoluteFilePath()).arg(letter)).exists())
                 {
                     letter = "0";
@@ -313,13 +404,28 @@ void Gif::refresh()
         }
     }
 
-    setHSL(H, S, L);
+    setHSL(events[currentEvent].H, events[currentEvent].S, events[currentEvent].L);
 
     // disable the timer if there is
     // a sole image with a speed set.
-    if (originalFrames.size() == 1)
+    if (events[currentEvent].originalFrames.size() == 1)
     {
         setSpeed(0);
         timerEvent(nullptr);
     }
+}
+
+void Gif::setEvent(QString name)
+{
+    if (!events.contains(name))
+    {
+        EventData data;
+        if (events.contains(currentEvent))
+        {
+            data = events[currentEvent];
+        }
+        events[name] = data;
+    }
+
+    PageElement::setEvent(name);
 }

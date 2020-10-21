@@ -312,7 +312,7 @@ void MainWindow::refresh()
     settings->refresh();
 }
 
-void MainWindow::createElement(QString type, QJsonArray definition, QStringList eventData)
+QGraphicsItem * MainWindow::createElement(QString type, QJsonArray definition, QStringList eventData)
 {
     auto element = addElement(type, eventData);
 
@@ -335,6 +335,8 @@ void MainWindow::createElement(QString type, QJsonArray definition, QStringList 
         item->setData(ROLE_ELEMENT, ptr);
         pageElements[id] = element;
     }
+
+    return element;
 }
 
 void MainWindow::clearEverything()
@@ -390,6 +392,8 @@ void MainWindow::parseJSON(QByteArray data)
         auto definition = eventList[0].toArray();
         auto type = definition.first().toString();
 
+        PageElement * currentPageElement = nullptr;
+
         for (int i = 1; i < eventList.size(); i++)
         {
             auto eventData = eventList[i].toVariant().toStringList();
@@ -403,14 +407,26 @@ void MainWindow::parseJSON(QByteArray data)
             }
             else
             {
-                createElement(type, definition, eventData);
+                if (i == 1)
+                {
+                    auto elem = createElement(type, definition, eventData);
+                    currentPageElement = dynamic_cast<PageElement*>(elem);
+                }
+                else
+                {
+                    addElement(type, eventData, currentPageElement);
+                }
             }
         }
 
         if (type == TYPE_WEBPAGE)
         {
-            auto firstEvent = eventList[1].toVariant().toStringList().first();
-            webpage->setEvent(firstEvent);
+            webpage->setEvent(EVENT_DEFAULT);
+            updateSettingsFromPage(webpage);
+        }
+        else
+        {
+            currentPageElement->setEvent(EVENT_DEFAULT);
             updateSettingsFromPage(webpage);
         }
     }
@@ -418,7 +434,7 @@ void MainWindow::parseJSON(QByteArray data)
     updateZOrder();
 }
 
-QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
+QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments, PageElement * pageElement)
 {
     QGraphicsItem * returnedElement = nullptr;
 
@@ -447,6 +463,8 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
     }
     else if (type == TYPE_TEXT)
     {
+        settings->elementsEventsList->setEventActive(arguments[WebEvent], true);
+
         auto x = arguments[TextX].toInt();
         auto y = arguments[TextY].toInt();
         auto width = arguments[TextWidth].toInt();
@@ -464,7 +482,7 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         auto fadeSpeed = arguments[TextColorFadeSpeed].toInt();
         auto noContent = arguments[TextNoContent].toInt() != 0;
 
-        auto text = new Text;
+        auto text = pageElement ? static_cast<Text*>(pageElement) : new Text;
         text->setAlign(align);
         text->setHSPosition(x, y);
         text->setWidth(width);
@@ -494,7 +512,9 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
     }
     else if (type == TYPE_GIF)
     {
-        auto gif = new Gif;
+        settings->elementsEventsList->setEventActive(arguments[WebEvent], true);
+
+        auto gif = pageElement ? static_cast<Gif*>(pageElement) : new Gif;
 
         auto x = arguments[GifX].toInt();
         auto y = arguments[GifY].toInt();
@@ -516,7 +536,7 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments)
         auto sync = arguments[GifSync].toInt() != 0;
         auto animMouseOver = arguments[GifAnimMouseOver].toInt();
 
-        gif->nameOf = image;
+        gif->setNameOf(image);
         gif->setFrameOffset(offset);
 
         gif->setScale(scale);
@@ -593,24 +613,24 @@ QJsonArray MainWindow::gifToJson(Gif * gif)
     array[GifEvent] = "DEFAULT";
     array[GifX] = QString::number((int)gif->pos().x());
     array[GifY] = QString::number((int)gif->pos().y());
-    array[GifHSL] = QString("%1,%2,%3").arg(gif->H).arg(gif->S).arg(gif->L);
-    array[GifCaseTag] = gif->caseTag;
-    array[GifNameOf] = gif->nameOf;
+    array[GifHSL] = QString("%1,%2,%3").arg(gif->H()).arg(gif->S()).arg(gif->L());
+    array[GifCaseTag] = gif->caseTag();
+    array[GifNameOf] = gif->nameOf();
     array[GifScale] = QString::number(gif->scale(), 'f', 2);
     array[GifRotation] = QString::number((int)gif->rotation());
-    array[GifMirror] = gif->mirrored ? "1" : "0";
-    array[GifFlip] = gif->flipped ? "1" : "0";
-    array[GifLinkOrScript] = gif->script;
-    array[GifLawBroken] = QString::number(gif->brokenLaw);
-    array[GifAnimFlipX] = QString::number(gif->flip3DX ? gif->flip3DXSpeed : -1);
-    array[GifAnimFlipY] = QString::number(gif->flip3DY ? gif->flip3DYSpeed : -1);
-    array[GifAnimFade] = QString::number(gif->fade ? gif->fadeSpeed : -1);
-    array[GifAnimTurn] = QString::number(gif->swingOrSpin);
-    array[GifAnimTurnSpeed] = QString::number(gif->swingOrSpinSpeed);
+    array[GifMirror] = gif->mirrored() ? "1" : "0";
+    array[GifFlip] = gif->flipped() ? "1" : "0";
+    array[GifLinkOrScript] = gif->script();
+    array[GifLawBroken] = QString::number(gif->brokenLaw());
+    array[GifAnimFlipX] = QString::number(gif->flip3DX() ? gif->flip3DXSpeed() : -1);
+    array[GifAnimFlipY] = QString::number(gif->flip3DY() ? gif->flip3DYSpeed() : -1);
+    array[GifAnimFade] = QString::number(gif->fade() ? gif->fadeSpeed() : -1);
+    array[GifAnimTurn] = QString::number(gif->swingOrSpin());
+    array[GifAnimTurnSpeed] = QString::number(gif->swingOrSpinSpeed());
     array[GifFPS] = "0"; // unused
-    array[GifOffset] = QString::number(gif->offsetFrame);
-    array[GifSync] = gif->sync ? "1" : "0";
-    array[GifAnimMouseOver] = QString::number(gif->gifAnimation);
+    array[GifOffset] = QString::number(gif->offsetFrame());
+    array[GifSync] = gif->sync() ? "1" : "0";
+    array[GifAnimMouseOver] = QString::number(gif->gifAnimation());
 
     return array;
 }
@@ -622,20 +642,20 @@ QJsonArray MainWindow::textToJson(Text * text)
     array[TextEvent] = EVENT_DEFAULT;
     array[TextX] = QString::number((((int)text->x() * 100) / PAGE_WIDTH) - 50);
     array[TextY] = QString::number((int)text->y());
-    array[TextWidth] = QString::number(text->width);
-    array[TextCaseTag] = text->caseTag;
-    array[TextString] = text->string;
-    array[TextColor] = QString::number(colorToInt(text->fontColor));
-    array[TextFont] = text->fontName;
-    array[TextStyle] = QString("%1%2").arg(text->fontSize).arg(text->fontBold ? 'b' : 'n');
-    array[TextAlign] = QString::number(text->align);
-    array[TextLinkOrScript] = text->script;
-    array[TextLawBroken] = QString::number(text->brokenLaw);
-    array[TextAnimation] = QString::number(static_cast<int>(text->animation));
-    array[TextAnimSpeed] = QString::number(text->animationSpeed);
-    array[TextColorFadeTo] = QString::number(colorToInt(text->fadeColor));
-    array[TextColorFadeSpeed] = QString::number(text->fadeSpeed);
-    array[TextNoContent] = text->noContent ? "1" : "0";
+    array[TextWidth] = QString::number(text->width());
+    array[TextCaseTag] = text->caseTag();
+    array[TextString] = text->string();
+    array[TextColor] = QString::number(colorToInt(text->fontColor()));
+    array[TextFont] = text->fontName();
+    array[TextStyle] = QString("%1%2").arg(text->fontSize()).arg(text->fontBold() ? 'b' : 'n');
+    array[TextAlign] = QString::number(text->align());
+    array[TextLinkOrScript] = text->script();
+    array[TextLawBroken] = QString::number(text->brokenLaw());
+    array[TextAnimation] = QString::number(static_cast<int>(text->animation()));
+    array[TextAnimSpeed] = QString::number(text->animationSpeed());
+    array[TextColorFadeTo] = QString::number(colorToInt(text->fadeColor()));
+    array[TextColorFadeSpeed] = QString::number(text->fadeSpeed());
+    array[TextNoContent] = text->noContent() ? "1" : "0";
 
     return array;
 }

@@ -2,6 +2,7 @@
 #define PAGEELEMENT_H
 
 #include <QObject>
+#include <QMap>
 
 class PageElement : public QObject
 {
@@ -16,6 +17,7 @@ public:
     PageElement();
     virtual ~PageElement() = default;
 
+    virtual void setEvent(QString name);
     virtual ElementType elementType() const = 0;
     virtual void refresh() = 0;
 
@@ -23,10 +25,21 @@ public:
     void setBrokenLaw(int law);
     void setScript(QString scpt);
 
+    QString caseTag() const;
+    int brokenLaw() const;
+    QString script() const;
+
 protected:
-    QString caseTag;
-    int brokenLaw = -1;
-    QString script;
+    QString currentEvent;
+
+private:
+    struct PageEventData {
+        QString caseTag;
+        int brokenLaw = -1;
+        QString script;
+    };
+
+    QMap<QString, PageEventData> pageEvents;
 };
 
 #endif // PAGEELEMENT_H

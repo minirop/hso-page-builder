@@ -32,7 +32,16 @@ PageSettings::PageSettings(QWidget *parent) :
 
     webpageInactiveEvents = new EventsListFilterModel(false, this);
     webpageInactiveEvents->setSourceModel(webpageEventsList);
-    ui->eventsNamesComboBox->setModel(webpageInactiveEvents);
+    ui->webpageEventsNamesComboBox->setModel(webpageInactiveEvents);
+
+    elementsEventsList = new EventsList(this);
+    elementsActiveEvents = new EventsListFilterModel(true, this);
+    elementsActiveEvents->setSourceModel(elementsEventsList);
+    ui->elementsEventsList->setModel(elementsActiveEvents);
+
+    elementsInactiveEvents = new EventsListFilterModel(false, this);
+    elementsInactiveEvents->setSourceModel(elementsEventsList);
+    ui->elementsEventsNamesComboBox->setModel(elementsInactiveEvents);
 
     ui->animationComboBox->addItem("None", static_cast<int>(Animation::None));
     ui->animationComboBox->addItem("TypeWriter", static_cast<int>(Animation::TypeWriter));
@@ -79,7 +88,7 @@ PageSettings::PageSettings(QWidget *parent) :
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
-        auto c = QColorDialog::getColor(graphics->fontColor, this, "Font color");
+        auto c = QColorDialog::getColor(graphics->fontColor(), this, "Font color");
         if (c.isValid())
         {
             graphics->setFontColor(c);
@@ -117,7 +126,7 @@ PageSettings::PageSettings(QWidget *parent) :
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
-        auto c = QColorDialog::getColor(graphics->fadeColor, this, "Fade color");
+        auto c = QColorDialog::getColor(graphics->fadeColor(), this, "Fade color");
         if (c.isValid())
         {
             graphics->setFade(c, ui->fadeSpeedSpinBox->value());
@@ -130,7 +139,7 @@ PageSettings::PageSettings(QWidget *parent) :
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
-        graphics->setFade(graphics->fadeColor, ui->fadeSpeedSpinBox->value());
+        graphics->setFade(graphics->fadeColor(), ui->fadeSpeedSpinBox->value());
     });
 
     auto setFontCallback = [&]() {
@@ -333,7 +342,7 @@ PageSettings::PageSettings(QWidget *parent) :
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
         assert(graphics);
 
-        auto diff = (100 - graphics->width) / 2;
+        auto diff = (100 - graphics->width()) / 2;
         x = std::clamp(x, -diff, diff-1);
         graphics->setHSPosition(x, graphics->y());
 
@@ -378,7 +387,7 @@ PageSettings::PageSettings(QWidget *parent) :
             auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
             assert(graphics);
 
-            graphics->nameOf = current->text();
+            graphics->setNameOf(current->text());
             graphics->refresh();
 
             ui->gifSlider->setGif(graphics);
@@ -574,8 +583,8 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->textScriptTextEdit, &QPlainTextEdit::textChanged, scriptChanged(ui->textScriptTextEdit));
     connect(ui->gifScriptTextEdit, &QPlainTextEdit::textChanged, scriptChanged(ui->gifScriptTextEdit));
 
-    connect(ui->addEventButton, &QPushButton::clicked, [&]() {
-        webpageEventsList->setEventActive(ui->eventsNamesComboBox->currentText(), true);
+    connect(ui->webpageAddEventButton, &QPushButton::clicked, [&]() {
+        webpageEventsList->setEventActive(ui->webpageEventsNamesComboBox->currentText(), true);
 
         auto model = ui->webpageEventsList->model();
         auto firstIndex = model->index(model->rowCount() - 1, 0);
@@ -594,6 +603,31 @@ PageSettings::PageSettings(QWidget *parent) :
                 {
                     auto name = selectedIndexes.first().data().toString();
                     webpageEventsList->setEventActive(name, false);
+                    emit eventDeactivated(name);
+                }
+            }
+        }
+    });
+    connect(ui->elementsAddEventButton, &QPushButton::clicked, [&]() {
+        elementsEventsList->setEventActive(ui->elementsEventsNamesComboBox->currentText(), true);
+
+        auto model = ui->elementsEventsList->model();
+        auto firstIndex = model->index(model->rowCount() - 1, 0);
+        ui->elementsEventsList->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Current);
+    });
+    connect(ui->elementsEventsList->selectionModel(), &QItemSelectionModel::currentChanged, [&](const QModelIndex & current) {
+        emit eventSelected(current.data().toString());
+    });
+    connect(ui->elementsDeleteEvent, &QPushButton::clicked, [&]() {
+        if (ui->elementsEventsList->model()->rowCount() > 1)
+        {
+            auto selectedIndexes = ui->elementsEventsList->selectionModel()->selectedIndexes();
+            if (selectedIndexes.size())
+            {
+                if (selectedIndexes.first().row() != 0)
+                {
+                    auto name = selectedIndexes.first().data().toString();
+                    elementsEventsList->setEventActive(name, false);
                     emit eventDeactivated(name);
                 }
             }
@@ -713,18 +747,18 @@ void PageSettings::updateGifProperties(Gif * gif)
     QSignalBlocker c0(ui->gifCaseTagLineEdit);
     QSignalBlocker c1(ui->gifScriptTextEdit);
 
-    ui->hueSpinBox->setValue(gif->H);
-    ui->saturationSpinBox->setValue(gif->S);
-    ui->lightnessSpinBox->setValue(gif->L);
+    ui->hueSpinBox->setValue(gif->H());
+    ui->saturationSpinBox->setValue(gif->S());
+    ui->lightnessSpinBox->setValue(gif->L());
 
     ui->scaleSpinBox->setValue(gif->scale());
     ui->rotationSpinBox->setValue(gif->rotation());
-    ui->hFlipButton->setChecked(gif->mirrored);
-    ui->vFlipButton->setChecked(gif->flipped);
+    ui->hFlipButton->setChecked(gif->mirrored());
+    ui->vFlipButton->setChecked(gif->flipped());
 
     ui->gifsListWidget->clearSelection();
     QListWidgetItem * selectedItem = nullptr;
-    auto found = ui->gifsListWidget->findItems(gif->nameOf, Qt::MatchExactly);
+    auto found = ui->gifsListWidget->findItems(gif->nameOf(), Qt::MatchExactly);
     if (found.size())
     {
         selectedItem = found.first();
@@ -739,24 +773,24 @@ void PageSettings::updateGifProperties(Gif * gif)
 
     ui->gifSlider->setGif(gif);
 
-    ui->swingOrSpinComboBox->setCurrentIndex(gif->swingOrSpin);
-    ui->swingOrSpinSpeed->setValue(gif->swingOrSpinSpeed);
-    ui->flip3DXCheckBox->setChecked(gif->flip3DX);
-    ui->flip3DXSpeed->setValue(gif->flip3DXSpeed);
-    ui->flip3DYCheckBox->setChecked(gif->flip3DY);
-    ui->flip3DYSpeed->setValue(gif->flip3DYSpeed);
-    ui->gifFadeCheckBox->setChecked(gif->fade);
-    ui->gifFadeSpeed->setValue(gif->fadeSpeed);
-    ui->syncCheckBox->setChecked(gif->sync);
-    ui->gifAnimationComboBox->setCurrentIndex(gif->gifAnimation);
+    ui->swingOrSpinComboBox->setCurrentIndex(gif->swingOrSpin());
+    ui->swingOrSpinSpeed->setValue(gif->swingOrSpinSpeed());
+    ui->flip3DXCheckBox->setChecked(gif->flip3DX());
+    ui->flip3DXSpeed->setValue(gif->flip3DXSpeed());
+    ui->flip3DYCheckBox->setChecked(gif->flip3DY());
+    ui->flip3DYSpeed->setValue(gif->flip3DYSpeed());
+    ui->gifFadeCheckBox->setChecked(gif->fade());
+    ui->gifFadeSpeed->setValue(gif->fadeSpeed());
+    ui->syncCheckBox->setChecked(gif->sync());
+    ui->gifAnimationComboBox->setCurrentIndex(gif->gifAnimation());
 
-    ui->gifFrameSpinBox->setValue(gif->offsetFrame);
+    ui->gifFrameSpinBox->setValue(gif->offsetFrame());
 
-    int lawIndex = ui->gifLawBrokenComboBox->findData(gif->brokenLaw);
+    int lawIndex = ui->gifLawBrokenComboBox->findData(gif->brokenLaw());
     assert(lawIndex != -1);
     ui->gifLawBrokenComboBox->setCurrentIndex(lawIndex);
-    ui->gifCaseTagLineEdit->setText(gif->caseTag);
-    ui->gifScriptTextEdit->setPlainText(gif->script);
+    ui->gifCaseTagLineEdit->setText(gif->caseTag());
+    ui->gifScriptTextEdit->setPlainText(gif->script());
 }
 
 void PageSettings::updateTextProperties(Text * text)
@@ -789,24 +823,24 @@ void PageSettings::updateTextProperties(Text * text)
         ui->fontsCombo->addItem(name);
     }
 
-    auto index = ui->fontsCombo->findText(text->fontName, Qt::MatchStartsWith);
+    auto index = ui->fontsCombo->findText(text->fontName(), Qt::MatchStartsWith);
     ui->fontsCombo->setCurrentIndex(index);
 
-    ui->textEdit->setText(text->string);
+    ui->textEdit->setText(text->string());
 
-    setFontColorButton(text->fontColor);
+    setFontColorButton(text->fontColor());
 
-    int animIndex = ui->animationComboBox->findData(static_cast<int>(text->animation));
+    int animIndex = ui->animationComboBox->findData(static_cast<int>(text->animation()));
     assert(animIndex != -1);
     ui->animationComboBox->setCurrentIndex(animIndex);
-    ui->speedSpinBox->setValue(text->animationSpeed);
+    ui->speedSpinBox->setValue(text->animationSpeed());
 
-    ui->alignmentComboBox->setCurrentIndex(text->align);
+    ui->alignmentComboBox->setCurrentIndex(text->align());
 
-    setFadeColorButton(text->fadeColor);
-    ui->fadeSpeedSpinBox->setValue(text->fadeSpeed);
+    setFadeColorButton(text->fadeColor());
+    ui->fadeSpeedSpinBox->setValue(text->fadeSpeed());
 
-    switch (text->fontSize)
+    switch (text->fontSize())
     {
     case 0:
         ui->size0Button->click();
@@ -819,17 +853,17 @@ void PageSettings::updateTextProperties(Text * text)
         break;
     }
 
-    int lawIndex = ui->textLawBrokenComboBox->findData(text->brokenLaw);
+    int lawIndex = ui->textLawBrokenComboBox->findData(text->brokenLaw());
     assert(lawIndex != -1);
     ui->textLawBrokenComboBox->setCurrentIndex(lawIndex);
-    ui->textCaseTagLineEdit->setText(text->caseTag);
+    ui->textCaseTagLineEdit->setText(text->caseTag());
 
-    ui->xSpinBox->setValue(text->xoffset);
-    ui->widthSpinBox->setValue(text->width);
+    ui->xSpinBox->setValue(text->xoffset());
+    ui->widthSpinBox->setValue(text->width());
 
-    ui->boldButton->setChecked(text->fontBold);
-    ui->noContentCheckBox->setChecked(text->noContent);
-    ui->textScriptTextEdit->setPlainText(text->script);
+    ui->boldButton->setChecked(text->fontBold());
+    ui->noContentCheckBox->setChecked(text->noContent());
+    ui->textScriptTextEdit->setPlainText(text->script());
 }
 
 void PageSettings::setFontColorButton(QColor color)
@@ -1089,6 +1123,9 @@ void PageSettings::refreshEvents()
     webpageEventsList->clear();
     webpageEventsList->addEvent(EVENT_DEFAULT);
 
+    elementsEventsList->clear();
+    elementsEventsList->addEvent(EVENT_DEFAULT);
+
     auto eventsFile = AppSettings::GetFilePath("/misc/events.txt");
     QFile f(eventsFile);
     if (f.open(QFile::ReadOnly))
@@ -1096,7 +1133,9 @@ void PageSettings::refreshEvents()
         auto eventsNames = QString(f.readAll()).split('\n', Qt::SkipEmptyParts);
         for (auto ev : eventsNames)
         {
-            webpageEventsList->addEvent(ev.trimmed());
+            auto name = ev.trimmed();
+            webpageEventsList->addEvent(name);
+            elementsEventsList->addEvent(name);
         }
         f.close();
     }

@@ -25,38 +25,53 @@ void Text::refresh()
 {
 }
 
+void Text::setEvent(QString name)
+{
+    if (!events.contains(name))
+    {
+        EventData data;
+        if (events.contains(currentEvent))
+        {
+            data = events[currentEvent];
+        }
+        events[name] = data;
+    }
+
+    PageElement::setEvent(name);
+}
+
 void Text::setHSPosition(int x, int y)
 {
-    xoffset = x;
+    events[currentEvent].xoffset = x;
     setPos((x + 50) * (PAGE_WIDTH / 100), y);
     AppSettings::SetPageDirty();
 }
 
 void Text::setWidth(int w)
 {
-    width = w;
-    renderedWidth = w * PAGE_WIDTH / 100;
+    events[currentEvent].width = w;
+    events[currentEvent].renderedWidth = w * PAGE_WIDTH / 100;
     textIsDirty = true;
     AppSettings::SetPageDirty();
 }
 
 void Text::setAnimation(int anim)
 {
-    animation = static_cast<Animation>(anim);
+    events[currentEvent].animation = static_cast<Animation>(anim);
 
-    switch (animation)
+    switch (events[currentEvent].animation)
     {
     case Animation::None:
         break;
     case Animation::TypeWriter:
         typewriterProgress = 0;
-        typewriterDirection = 1;
+        events[currentEvent].typewriterDirection = 1;
         break;
     case Animation::Floating:
-        floating = 0;
+        events[currentEvent].floating = 0;
         break;
     case Animation::Marquee:
-        marquee = 0;
+        events[currentEvent].marquee = 0;
         break;
     }
     textIsDirty = true;
@@ -65,7 +80,7 @@ void Text::setAnimation(int anim)
 
 void Text::setAnimationSpeed(int spd)
 {
-    animationSpeed = spd;
+    events[currentEvent].animationSpeed = spd;
     AppSettings::SetPageDirty();
 }
 
@@ -74,13 +89,13 @@ void Text::setAlign(int halign)
     switch (halign)
     {
     case 0:
-        align = ALIGN_LEFT;
+        events[currentEvent].align = ALIGN_LEFT;
         break;
     case 1:
-        align = ALIGN_CENTRE;
+        events[currentEvent].align = ALIGN_CENTRE;
         break;
     case 2:
-        align = ALIGN_RIGHT;
+        events[currentEvent].align = ALIGN_RIGHT;
         break;
     }
     textIsDirty = true;
@@ -89,41 +104,41 @@ void Text::setAlign(int halign)
 
 void Text::setString(QString str)
 {
-    string = str;
+    events[currentEvent].string = str;
     textIsDirty = true;
 
-    renderText(string);
+    renderText(events[currentEvent].string);
     AppSettings::SetPageDirty();
 }
 
 void Text::setFontSize(int size)
 {
-    fontSize = size;
+    events[currentEvent].fontSize = size;
     fontIsDirty = true;
     AppSettings::SetPageDirty();
 }
 
 void Text::setFontBold(bool bold)
 {
-    fontBold = bold;
+    events[currentEvent].fontBold = bold;
     fontIsDirty = true;
     AppSettings::SetPageDirty();
 }
 
 void Text::setFont(QString name)
 {
-    fontName = name;
+    events[currentEvent].fontName = name;
     fontIsDirty = true;
     AppSettings::SetPageDirty();
 }
 
 void Text::setFontColor(QColor color)
 {
-    fontColor = color;
+    events[currentEvent].fontColor = color;
     setColor(color);
-    if (fadeSpeed > 0)
+    if (events[currentEvent].fadeSpeed > 0)
     {
-        setFade(fadeColor, fadeSpeed);
+        setFade(events[currentEvent].fadeColor, events[currentEvent].fadeSpeed);
     }
     AppSettings::SetPageDirty();
 }
@@ -136,8 +151,8 @@ void Text::setColor(QColor color)
 
 void Text::setFade(QColor color, int speed)
 {
-    fadeColor = color;
-    fadeSpeed = speed;
+    events[currentEvent].fadeColor = color;
+    events[currentEvent].fadeSpeed = speed;
 
     if (group)
     {
@@ -147,14 +162,14 @@ void Text::setFade(QColor color, int speed)
 
     if (speed == 0)
     {
-        setColor(fontColor);
+        setColor(events[currentEvent].fontColor);
         AppSettings::SetPageDirty();
         return;
     }
 
     group = new QSequentialAnimationGroup(this);
     auto fadeIn = new QVariantAnimation;
-    fadeIn->setStartValue(fontColor);
+    fadeIn->setStartValue(events[currentEvent].fontColor);
     fadeIn->setEndValue(color);
     fadeIn->setDuration(1000 * speed / 60.f / 2);
     connect(fadeIn, &QVariantAnimation::valueChanged, [&](const QVariant & value) {
@@ -163,7 +178,7 @@ void Text::setFade(QColor color, int speed)
 
     auto fadeOut = new QVariantAnimation;
     fadeOut->setStartValue(color);
-    fadeOut->setEndValue(fontColor);
+    fadeOut->setEndValue(events[currentEvent].fontColor);
     fadeOut->setDuration(1000 * speed / 60.f / 2);
     connect(fadeOut, &QVariantAnimation::valueChanged, [&](const QVariant & value) {
         setColor(value.value<QColor>());
@@ -179,19 +194,124 @@ void Text::setFade(QColor color, int speed)
 
 void Text::setNoContent(bool b)
 {
-    noContent = b;
+    events[currentEvent].noContent = b;
     AppSettings::SetPageDirty();
+}
+
+QString Text::string() const
+{
+    return events[currentEvent].string;
+}
+
+int Text::width() const
+{
+    return events[currentEvent].width;
+}
+
+int Text::renderedWidth() const
+{
+    return events[currentEvent].renderedWidth;
+}
+
+int Text::xoffset() const
+{
+    return events[currentEvent].xoffset;
+}
+
+int Text::align() const
+{
+    return events[currentEvent].align;
+}
+
+qreal Text::marquee() const
+{
+    return events[currentEvent].marquee;
+}
+
+qreal Text::floating() const
+{
+    return events[currentEvent].floating;
+}
+
+int Text::typewriterDirection() const
+{
+    return events[currentEvent].typewriterDirection;
+}
+
+float Text::typewriterTimer() const
+{
+    return events[currentEvent].typewriterTimer;
+}
+
+QColor Text::fontColor() const
+{
+    return events[currentEvent].fontColor;
+}
+
+Animation Text::animation() const
+{
+    return events[currentEvent].animation;
+}
+
+int Text::animationSpeed() const
+{
+    return events[currentEvent].animationSpeed;
+}
+
+QString Text::fontName() const
+{
+    return events[currentEvent].fontName;
+}
+
+int Text::fontSize() const
+{
+    return events[currentEvent].fontSize;
+}
+
+bool Text::fontBold() const
+{
+    return events[currentEvent].fontBold;
+}
+
+QMap<QChar, QPixmap> Text::fontChars() const
+{
+    return events[currentEvent].fontChars;
+}
+
+int Text::fontWidth() const
+{
+    return events[currentEvent].fontWidth;
+}
+
+int Text::fontHeight() const
+{
+    return events[currentEvent].fontHeight;
+}
+
+QColor Text::fadeColor() const
+{
+    return events[currentEvent].fadeColor;
+}
+
+int Text::fadeSpeed() const
+{
+    return events[currentEvent].fadeSpeed;
+}
+
+bool Text::noContent() const
+{
+    return events[currentEvent].noContent;
 }
 
 QRectF Text::boundingRect() const
 {
     qreal floatingOffset = 0.0;
-    if (animation == Animation::Floating)
+    if (events[currentEvent].animation == Animation::Floating)
     {
         constexpr auto PI_180 = M_PI / 180;
-        floatingOffset = (std::sin(floating * PI_180) * renderedTextes.size() * fontHeight * 0.25);
+        floatingOffset = (std::sin(events[currentEvent].floating * PI_180) * renderedTextes.size() * events[currentEvent].fontHeight * 0.25);
     }
-    return QRectF { -renderedWidth / 2.0, floatingOffset, qreal(renderedWidth), qreal(renderedTextes.size() * fontHeight) };
+    return QRectF { -events[currentEvent].renderedWidth / 2.0, floatingOffset, qreal(events[currentEvent].renderedWidth), qreal(renderedTextes.size() * events[currentEvent].fontHeight) };
 }
 
 void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -201,7 +321,7 @@ void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
     auto rect = option->rect;
 
-    switch (animation)
+    switch (events[currentEvent].animation)
     {
     case Animation::None:
     case Animation::TypeWriter:
@@ -211,7 +331,7 @@ void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         for (auto & renderedText : renderedTextes)
         {
             int x = 0;
-            switch (align)
+            switch (events[currentEvent].align)
             {
             case ALIGN_LEFT:
                 x = rect.left();
@@ -225,12 +345,12 @@ void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
             }
 
             painter->drawPixmap(x, rect.top() + y, renderedText);
-            y += fontHeight;
+            y += events[currentEvent].fontHeight;
         }
         break;
     }
     case Animation::Marquee:
-        painter->drawPixmap(marquee, rect.top(), renderedTextes.first());
+        painter->drawPixmap(events[currentEvent].marquee, rect.top(), renderedTextes.first());
         break;
     }
 }
@@ -239,52 +359,52 @@ void Text::timerEvent(QTimerEvent * event)
 {
     Q_UNUSED(event)
 
-    switch (animation)
+    switch (events[currentEvent].animation)
     {
     case Animation::None:
         break;
     case Animation::TypeWriter:
-        typewriterTimer -= animationSpeed;
+        events[currentEvent].typewriterTimer -= events[currentEvent].animationSpeed;
 
-        if (typewriterTimer < 0)
+        if (events[currentEvent].typewriterTimer < 0)
         {
-            typewriterProgress += typewriterDirection;
+            typewriterProgress += events[currentEvent].typewriterDirection;
 
-            if (typewriterProgress >= string.length() && typewriterDirection > 0)
+            if (typewriterProgress >= events[currentEvent].string.length() && events[currentEvent].typewriterDirection > 0)
             {
-                typewriterTimer = 800;
-                typewriterDirection = -1;
+                events[currentEvent].typewriterTimer = 800;
+                events[currentEvent].typewriterDirection = -1;
             }
-            else if (typewriterProgress < 0 && typewriterDirection < 0)
+            else if (typewriterProgress < 0 && events[currentEvent].typewriterDirection < 0)
             {
-                typewriterTimer = 800;
-                typewriterDirection = 1;
+                events[currentEvent].typewriterTimer = 800;
+                events[currentEvent].typewriterDirection = 1;
             }
             else
             {
-                typewriterTimer = 100;
+                events[currentEvent].typewriterTimer = 100;
             }
         }
 
-        typewriterProgress = std::clamp(typewriterProgress, 0.0f, float(string.length()));
+        typewriterProgress = std::clamp(typewriterProgress, 0.0f, float(events[currentEvent].string.length()));
         textIsDirty = true;
         break;
     case Animation::Floating:
-        floating += animationSpeed * 0.4;
+        events[currentEvent].floating += events[currentEvent].animationSpeed * 0.4;
         break;
     case Animation::Marquee:
     {
-        marquee -= animationSpeed / 10.0;
+        events[currentEvent].marquee -= events[currentEvent].animationSpeed / 10.0;
 
-        if (marquee < -renderedWidth/2 - renderedTextes[0].width())
+        if (events[currentEvent].marquee < -events[currentEvent].renderedWidth/2 - renderedTextes[0].width())
         {
-            marquee = x() + renderedWidth / 2;
+            events[currentEvent].marquee = x() + events[currentEvent].renderedWidth / 2;
         }
         break;
     }
     }
 
-    renderText(string);
+    renderText(events[currentEvent].string);
 
     update();
 }
@@ -294,7 +414,7 @@ QVariant Text::itemChange(QGraphicsItem::GraphicsItemChange change, const QVaria
     if (change == ItemPositionChange && scene())
     {
         QPointF newPos = value.toPointF();
-        newPos.setX((xoffset + 50) * (PAGE_WIDTH / 100));
+        newPos.setX((events[currentEvent].xoffset + 50) * (PAGE_WIDTH / 100));
         return newPos;
     }
     return QGraphicsItem::itemChange(change, value);
@@ -309,21 +429,21 @@ void Text::renderText(QString string)
 
     if (!textIsDirty) return;
 
-    auto & font = FontDatabase::GetFont(QString("%1%2%3").arg(fontName).arg(fontSize).arg(fontBold ? 'b' : 'n'));
+    auto & font = FontDatabase::GetFont(QString("%1%2%3").arg(events[currentEvent].fontName).arg(events[currentEvent].fontSize).arg(events[currentEvent].fontBold ? 'b' : 'n'));
 
     QStringList lines;
 
-    if (animation != Animation::Marquee)
+    if (events[currentEvent].animation != Animation::Marquee)
     {
         auto str = string;
-        if (animation == Animation::TypeWriter)
+        if (events[currentEvent].animation == Animation::TypeWriter)
         {
             str = str.left(typewriterProgress);
         }
-        for (int xx = 0, www = renderedWidth, index = 0; index < str.size(); )
+        for (int xx = 0, www = events[currentEvent].renderedWidth, index = 0; index < str.size(); )
         {
             auto c = str[index];
-            xx += font.getWidth(c.toLatin1(), fontWidth);
+            xx += font.getWidth(c.toLatin1(), events[currentEvent].fontWidth);
             index++;
 
             if (xx >= www)
@@ -353,7 +473,7 @@ void Text::renderText(QString string)
             // so the selected marker doesn't collapse and stays at "1 line minimum".
             line = " ";
         }
-        auto newText = QPixmap(fontWidth * line.length(), fontHeight);
+        auto newText = QPixmap(events[currentEvent].fontWidth * line.length(), events[currentEvent].fontHeight);
         newText.fill(Qt::transparent);
 
         QPainter painter;
@@ -361,11 +481,11 @@ void Text::renderText(QString string)
         int xx = 0;
         for (int yy = 0; auto c : line)
         {
-            painter.drawPixmap(xx, yy, fontChars[c.toLatin1()]);
-            xx += font.getWidth(c.toLatin1(), fontWidth);
+            painter.drawPixmap(xx, yy, events[currentEvent].fontChars[c.toLatin1()]);
+            xx += font.getWidth(c.toLatin1(), events[currentEvent].fontWidth);
         }
         painter.end();
-        renderedTextes.push_back(newText.copy(0, 0, xx, fontHeight));
+        renderedTextes.push_back(newText.copy(0, 0, xx, events[currentEvent].fontHeight));
     }
 
     textIsDirty = false;
@@ -374,14 +494,14 @@ void Text::renderText(QString string)
 void Text::regenerateFont()
 {
     static const QString alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;:?!-_~#\"'&()[]|`\\/@°+=*€$$<> ";
-    QPixmap pix = FontDatabase::GetFontAtlas(QString("%1%2%3").arg(fontName).arg(fontSize).arg(fontBold ? 'b' : 'n'));
+    QPixmap pix = FontDatabase::GetFontAtlas(QString("%1%2%3").arg(events[currentEvent].fontName).arg(events[currentEvent].fontSize).arg(events[currentEvent].fontBold ? 'b' : 'n'));
     assert(!pix.isNull());
-    fontWidth = pix.width() / 8;
-    fontHeight = pix.height() / 12;
+    events[currentEvent].fontWidth = pix.width() / 8;
+    events[currentEvent].fontHeight = pix.height() / 12;
 
     for (int xx = 0, yy = 0; auto c : alphabet)
     {
-        fontChars[c] = pix.copy(xx * fontWidth, yy * fontHeight, fontWidth, fontHeight);
+        events[currentEvent].fontChars[c] = pix.copy(xx * events[currentEvent].fontWidth, yy * events[currentEvent].fontHeight, events[currentEvent].fontWidth, events[currentEvent].fontHeight);
 
         xx++;
         if (xx >= 8)
