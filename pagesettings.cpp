@@ -26,11 +26,11 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->tabWidget->setCurrentIndex(0);
 
     webpageEventsList = new EventsList(this);
-    webpageActiveEvents = new EventsListFilterModel(Qt::Checked, this);
+    webpageActiveEvents = new EventsListFilterModel(true, this);
     webpageActiveEvents->setSourceModel(webpageEventsList);
     ui->webpageEventsList->setModel(webpageActiveEvents);
 
-    webpageInactiveEvents = new EventsListFilterModel(Qt::Unchecked, this);
+    webpageInactiveEvents = new EventsListFilterModel(false, this);
     webpageInactiveEvents->setSourceModel(webpageEventsList);
     ui->eventsNamesComboBox->setModel(webpageInactiveEvents);
 
@@ -576,9 +576,28 @@ PageSettings::PageSettings(QWidget *parent) :
 
     connect(ui->addEventButton, &QPushButton::clicked, [&]() {
         webpageEventsList->setEventActive(ui->eventsNamesComboBox->currentText(), true);
+
+        auto model = ui->webpageEventsList->model();
+        auto firstIndex = model->index(model->rowCount() - 1, 0);
+        ui->webpageEventsList->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Current);
     });
     connect(ui->webpageEventsList->selectionModel(), &QItemSelectionModel::currentChanged, [&](const QModelIndex & current) {
         emit eventSelected(current.data().toString());
+    });
+    connect(ui->webpageDeleteEvent, &QPushButton::clicked, [&]() {
+        if (ui->webpageEventsList->model()->rowCount() > 1)
+        {
+            auto selectedIndexes = ui->webpageEventsList->selectionModel()->selectedIndexes();
+            if (selectedIndexes.size())
+            {
+                if (selectedIndexes.first().row() != 0)
+                {
+                    auto name = selectedIndexes.first().data().toString();
+                    webpageEventsList->setEventActive(name, false);
+                    emit eventDeactivated(name);
+                }
+            }
+        }
     });
 
     // to force the page style image to be displayed.

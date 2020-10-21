@@ -1428,6 +1428,48 @@
              </item>
             </layout>
            </item>
+           <item>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QPushButton" name="webpageDeleteEvent">
+               <property name="text">
+                <string>Delete</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QPushButton" name="webpageMoveToTopEvent">
+               <property name="text">
+                <string>Move to top</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QPushButton" name="webpageMoveUpEvent">
+               <property name="text">
+                <string>Move up</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QPushButton" name="webpageMoveDownEvent">
+               <property name="text">
+                <string>Move down</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QPushButton" name="webpageMoveToBottomEvent">
+               <property name="text">
+                <string>Move to bottom</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
           </layout>
          </widget>
         </widget>
