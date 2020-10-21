@@ -11,6 +11,7 @@ public:
     explicit EventsList(QObject *parent = nullptr);
 
     void clear();
+    void reset();
     void addEvent(QString name);
     void setEventActive(QString name, bool active);
 

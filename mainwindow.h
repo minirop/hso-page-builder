@@ -41,6 +41,7 @@ private:
     QJsonArray emptyArray();
     QStringList pageElementToStringList(PageElement * pageElement);
     void updateSettingsFromPage(Page * webpage);
+    void updateCurrentPageElement(PageElement * pageElement);
 
     QHash<int, QGraphicsItem*> pageElements;
     Ui::MainWindow * ui;

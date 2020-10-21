@@ -21,6 +21,8 @@ public:
     virtual ElementType elementType() const = 0;
     virtual void refresh() = 0;
 
+    virtual QList<QString> activeEvents() const = 0;
+
     void setCaseTag(QString tag);
     void setBrokenLaw(int law);
     void setScript(QString scpt);

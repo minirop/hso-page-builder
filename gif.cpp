@@ -429,3 +429,8 @@ void Gif::setEvent(QString name)
 
     PageElement::setEvent(name);
 }
+
+QList<QString> Gif::activeEvents() const
+{
+    return events.keys();
+}

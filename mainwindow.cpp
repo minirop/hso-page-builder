@@ -363,11 +363,18 @@ void MainWindow::clearEverything()
     connect(settings, &PageSettings::pageStyleChanged, webpage, &Page::setPageStyle);
     connect(settings, &PageSettings::homePageChanged, webpage, &Page::setHomePage);
     connect(settings, &PageSettings::onLoadScriptChanged, webpage, &Page::setOnLoadScript);
-    connect(settings, &PageSettings::eventSelected, [&](QString name) {
+    connect(settings, &PageSettings::webpageEventSelected, [&](QString name) {
         webpage->setEvent(name);
         updateSettingsFromPage(webpage);
     });
-    connect(settings, &PageSettings::eventDeactivated, [&](QString name) {
+    connect(settings, &PageSettings::webpageEventDeactivated, [&](QString name) {
+        webpage->clearEvent(name);
+    });
+    connect(settings, &PageSettings::elementsEventSelected, [&](QString name) {
+        webpage->setEvent(name);
+        updateSettingsFromPage(webpage);
+    });
+    connect(settings, &PageSettings::elementsEventDeactivated, [&](QString name) {
         webpage->clearEvent(name);
     });
 
@@ -427,7 +434,7 @@ void MainWindow::parseJSON(QByteArray data)
         else
         {
             currentPageElement->setEvent(EVENT_DEFAULT);
-            updateSettingsFromPage(webpage);
+            updateCurrentPageElement(currentPageElement);
         }
     }
 
@@ -483,6 +490,7 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments, Page
         auto noContent = arguments[TextNoContent].toInt() != 0;
 
         auto text = pageElement ? static_cast<Text*>(pageElement) : new Text;
+        text->setEvent(arguments[WebEvent]);
         text->setAlign(align);
         text->setHSPosition(x, y);
         text->setWidth(width);
@@ -514,8 +522,6 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments, Page
     {
         settings->elementsEventsList->setEventActive(arguments[WebEvent], true);
 
-        auto gif = pageElement ? static_cast<Gif*>(pageElement) : new Gif;
-
         auto x = arguments[GifX].toInt();
         auto y = arguments[GifY].toInt();
         auto color = arguments[GifHSL].split(',');
@@ -536,9 +542,11 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments, Page
         auto sync = arguments[GifSync].toInt() != 0;
         auto animMouseOver = arguments[GifAnimMouseOver].toInt();
 
+        auto gif = pageElement ? static_cast<Gif*>(pageElement) : new Gif;
+
+        gif->setEvent(arguments[WebEvent]);
         gif->setNameOf(image);
         gif->setFrameOffset(offset);
-
         gif->setScale(scale);
         gif->setRotation(rotation);
         gif->mirror(mirrored);
@@ -703,6 +711,11 @@ void MainWindow::updateSettingsFromPage(Page * webpage)
     settings->setMusic(webpage->music());
     settings->setOnLoadScript(webpage->onLoadScript());
     settings->setPageStyle(webpage->pageStyle());
+}
+
+void MainWindow::updateCurrentPageElement(PageElement * pageElement)
+{
+    settings->updateProperties(pageElement);
 }
 
 void MainWindow::updateZOrder()

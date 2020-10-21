@@ -16,6 +16,7 @@ public:
     void refresh() override;
 
     void setEvent(QString name) override;
+    QList<QString> activeEvents() const override;
 
     void addFrame(QString filename);
     void setSpeed(int speed);
@@ -92,7 +93,6 @@ private:
     };
 
     QMap<QString, EventData> events;
-    QString currentEvent;
 
     QVector<QPixmap> frames;
     int currentFrame = 0;

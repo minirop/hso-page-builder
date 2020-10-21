@@ -40,6 +40,11 @@ void Text::setEvent(QString name)
     PageElement::setEvent(name);
 }
 
+QList<QString> Text::activeEvents() const
+{
+    return events.keys();
+}
+
 void Text::setHSPosition(int x, int y)
 {
     events[currentEvent].xoffset = x;

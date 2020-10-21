@@ -27,6 +27,7 @@ public:
     void refresh() override;
 
     void setEvent(QString name) override;
+    QList<QString> activeEvents() const override;
 
     void setHSPosition(int x, int y);
     void setWidth(int w);
@@ -103,7 +104,6 @@ private:
     };
 
     QMap<QString, EventData> events;
-    QString currentEvent;
 
     QVector<QPixmap> renderedTextes;
     float typewriterProgress = 0;

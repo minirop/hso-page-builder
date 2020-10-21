@@ -15,6 +15,19 @@ void EventsList::clear()
     endResetModel();
 }
 
+void EventsList::reset()
+{
+    beginResetModel();
+
+    for (auto & ev : events)
+    {
+        ev.active = false;
+    }
+    events.first().active = true;
+
+    endResetModel();
+}
+
 void EventsList::addEvent(QString name)
 {
     auto size = events.size();

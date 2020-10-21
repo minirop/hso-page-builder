@@ -50,15 +50,19 @@ signals:
     void pageStyleChanged(int style);
     void homePageChanged(bool b);
     void onLoadScriptChanged(QString script);
-    void eventActivated(QString name);
-    void eventDeactivated(QString name);
-    void eventSelected(QString name);
+    void webpageEventActivated(QString name);
+    void webpageEventDeactivated(QString name);
+    void webpageEventSelected(QString name);
+    void elementsEventActivated(QString name);
+    void elementsEventDeactivated(QString name);
+    void elementsEventSelected(QString name);
 
 private slots:
     void itemChanged(QListWidgetItem * item, QListWidgetItem * previous);
 
 private:
     void updateProperties(QListWidgetItem * item);
+    void updateProperties(PageElement * elem);
     void updateGifProperties(Gif * gif);
     void updateTextProperties(Text * text);
 
