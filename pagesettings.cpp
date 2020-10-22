@@ -24,7 +24,6 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
     ui->tabWidget->setCurrentIndex(0);
-    ui->toolBox->setCurrentIndex(0);
 
     webpageEventsList = new EventsList(this);
     webpageActiveEvents = new EventsListFilterModel(true, this);
@@ -632,6 +631,7 @@ PageSettings::PageSettings(QWidget *parent) :
         auto name = current.data().toString();
         pageElement->setEvent(name);
         pageElement->refresh();
+        updateProperties(pageElement);
     });
     connect(ui->elementsDeleteEvent, &QPushButton::clicked, [&]() {
         if (ui->elementsEventsList->model()->rowCount() > 1)

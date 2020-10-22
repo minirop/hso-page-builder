@@ -846,7 +846,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QToolBox" name="toolBox">
+        <widget class="QWidget" name="widget_2" native="true">
          <property name="minimumSize">
           <size>
            <width>350</width>
@@ -859,183 +859,181 @@
            <height>16777215</height>
           </size>
          </property>
-         <property name="currentIndex">
-          <number>1</number>
-         </property>
-         <widget class="QWidget" name="elements">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>350</width>
-            <height>582</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>Elements</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <widget class="QListWidget" name="elementsList"/>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="elementName"/>
-           </item>
-           <item>
-            <widget class="QWidget" name="widget" native="true">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>100</height>
-              </size>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item>
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>Elements</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QListWidget" name="elementsList"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="elementName"/>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>100</height>
+             </size>
+            </property>
+            <layout class="QGridLayout" name="gridLayout">
+             <property name="leftMargin">
+              <number>0</number>
              </property>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="0" column="0">
-               <widget class="QPushButton" name="duplicateBtn">
-                <property name="text">
-                 <string>Duplicate</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QPushButton" name="moveUp">
-                <property name="text">
-                 <string>Move Up</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QPushButton" name="moveToTop">
-                <property name="text">
-                 <string>Move To Top</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QPushButton" name="deleteBtn">
-                <property name="text">
-                 <string>Delete</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QPushButton" name="moveDown">
-                <property name="text">
-                 <string>Move Down</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QPushButton" name="moveToBottom">
-                <property name="text">
-                 <string>Move To Bottom</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="events">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>350</width>
-            <height>582</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>Events</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
-           <item>
-            <widget class="QListView" name="elementsEventsList">
-             <property name="editTriggers">
-              <set>QAbstractItemView::NoEditTriggers</set>
-             </property>
-             <property name="alternatingRowColors">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_23">
              <property name="topMargin">
               <number>0</number>
              </property>
-             <item>
-              <widget class="QComboBox" name="elementsEventsNamesComboBox"/>
-             </item>
-             <item>
-              <widget class="QPushButton" name="elementsAddEventButton">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QPushButton" name="duplicateBtn">
                <property name="text">
-                <string>Add</string>
+                <string>Duplicate</string>
                </property>
               </widget>
              </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QGridLayout" name="gridLayout_5">
-             <property name="leftMargin">
-              <number>9</number>
-             </property>
-             <property name="topMargin">
-              <number>9</number>
-             </property>
-             <property name="rightMargin">
-              <number>9</number>
-             </property>
-             <property name="bottomMargin">
-              <number>9</number>
-             </property>
-             <item row="0" column="0">
-              <widget class="QPushButton" name="elementsDeleteEvent">
+             <item row="0" column="1">
+              <widget class="QPushButton" name="moveUp">
+               <property name="text">
+                <string>Move Up</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QPushButton" name="moveToTop">
+               <property name="text">
+                <string>Move To Top</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QPushButton" name="deleteBtn">
                <property name="text">
                 <string>Delete</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="2">
-              <widget class="QPushButton" name="elementsMoveToTopEvent">
-               <property name="text">
-                <string>Move to top</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="elementsMoveUpEvent">
-               <property name="text">
-                <string>Move up</string>
-               </property>
-              </widget>
-             </item>
              <item row="1" column="1">
-              <widget class="QPushButton" name="elementsMoveDownEvent">
+              <widget class="QPushButton" name="moveDown">
                <property name="text">
-                <string>Move down</string>
+                <string>Move Down</string>
                </property>
               </widget>
              </item>
              <item row="1" column="2">
-              <widget class="QPushButton" name="elementsMoveToBottomEvent">
+              <widget class="QPushButton" name="moveToBottom">
                <property name="text">
-                <string>Move to bottom</string>
+                <string>Move To Bottom</string>
                </property>
               </widget>
              </item>
             </layout>
-           </item>
-          </layout>
-         </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_37">
+            <property name="text">
+             <string>Events</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QListView" name="elementsEventsList">
+            <property name="editTriggers">
+             <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
+            <property name="alternatingRowColors">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_23">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QComboBox" name="elementsEventsNamesComboBox"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="elementsAddEventButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Add</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <property name="leftMargin">
+             <number>9</number>
+            </property>
+            <property name="topMargin">
+             <number>9</number>
+            </property>
+            <property name="rightMargin">
+             <number>9</number>
+            </property>
+            <property name="bottomMargin">
+             <number>9</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QPushButton" name="elementsDeleteEvent">
+              <property name="text">
+               <string>Delete</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="elementsMoveToTopEvent">
+              <property name="text">
+               <string>Move to top</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="elementsMoveUpEvent">
+              <property name="text">
+               <string>Move up</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="elementsMoveDownEvent">
+              <property name="text">
+               <string>Move down</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QPushButton" name="elementsMoveToBottomEvent">
+              <property name="text">
+               <string>Move to bottom</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
