@@ -31,6 +31,10 @@ public:
     void setHSScale(float scale);
     float HSScale() const;
 
+    void setPosition(int x, int y);
+    int HSX() const;
+    int HSY() const;
+
     void mirror(bool active);
     void flip(bool active);
 
@@ -71,6 +75,7 @@ public:
 
 protected:
     void timerEvent(QTimerEvent *event) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 private:
     friend class MainWindow;
@@ -81,6 +86,8 @@ private:
     void resetProgress();
 
     struct EventData {
+        int x = 0;
+        int y = 0;
         bool mirrored = false;
         bool flipped = false;
         int H = 0, S = 100, L = 100;

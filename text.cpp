@@ -23,6 +23,10 @@ Text::Text()
 
 void Text::refresh()
 {
+    auto & ev = events[currentEvent];
+
+    setHSPosition(ev.xoffset, ev.y);
+    setFade(ev.fadeColor, ev.fadeSpeed);
 }
 
 void Text::setEvent(QString name)
@@ -48,6 +52,7 @@ QList<QString> Text::activeEvents() const
 void Text::setHSPosition(int x, int y)
 {
     events[currentEvent].xoffset = x;
+    events[currentEvent].y = y;
     setPos((x + 50) * (PAGE_WIDTH / 100), y);
     AppSettings::SetPageDirty();
 }
@@ -420,6 +425,8 @@ QVariant Text::itemChange(QGraphicsItem::GraphicsItemChange change, const QVaria
     {
         QPointF newPos = value.toPointF();
         newPos.setX((events[currentEvent].xoffset + 50) * (PAGE_WIDTH / 100));
+        events[currentEvent].y = newPos.y();
+        AppSettings::SetPageDirty();
         return newPos;
     }
     return QGraphicsItem::itemChange(change, value);

@@ -586,7 +586,7 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments, Page
         gif->setSync(sync);
         gif->setGifAnimation(animMouseOver);
 
-        gif->setPos(x, y);
+        gif->setPosition(x, y);
 
         if (color.size() == 3)
         {
@@ -612,8 +612,8 @@ QJsonArray MainWindow::gifToJson(Gif * gif)
     QJsonArray array = emptyArray();
 
     array[GifEvent] = "DEFAULT";
-    array[GifX] = QString::number((int)gif->pos().x());
-    array[GifY] = QString::number((int)gif->pos().y());
+    array[GifX] = QString::number(gif->HSX());
+    array[GifY] = QString::number(gif->HSY());
     array[GifHSL] = QString("%1,%2,%3").arg(gif->H()).arg(gif->S()).arg(gif->L());
     array[GifCaseTag] = gif->caseTag();
     array[GifNameOf] = gif->nameOf();

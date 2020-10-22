@@ -81,6 +81,7 @@ private:
 
     struct EventData {
         QString string;
+        int y = 0;
         int width = 0;
         int renderedWidth = 0;
         int xoffset = 0;

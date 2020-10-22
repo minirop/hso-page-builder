@@ -22,7 +22,7 @@ static const constexpr std::array<const char *, 41> characters = {
 
 Gif::Gif()
 {
-    setFlags(ItemIsMovable | ItemIsSelectable);
+    setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsGeometryChanges);
     timerId = startTimer(1000 / 60);
 }
 
@@ -98,6 +98,26 @@ void Gif::setHSScale(float scale)
 float Gif::HSScale() const
 {
     return events[currentEvent].scale;
+}
+
+void Gif::setPosition(int x, int y)
+{
+    setPos(x, y);
+
+    events[currentEvent].x = x;
+    events[currentEvent].y = y;
+
+    AppSettings::SetPageDirty();
+}
+
+int Gif::HSX() const
+{
+    return events[currentEvent].x;
+}
+
+int Gif::HSY() const
+{
+    return events[currentEvent].y;
 }
 
 void Gif::mirror(bool active)
@@ -370,6 +390,18 @@ void Gif::timerEvent(QTimerEvent *event)
     update();
 }
 
+QVariant Gif::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
+{
+    if (change == ItemPositionChange && scene())
+    {
+        QPointF newPos = value.toPointF();
+        events[currentEvent].x = newPos.x();
+        events[currentEvent].y = newPos.y();
+        AppSettings::SetPageDirty();
+    }
+    return QGraphicsItem::itemChange(change, value);
+}
+
 void Gif::resetAllAnimations()
 {
     swingOrSpinProgress = 0;
@@ -441,6 +473,7 @@ void Gif::refresh()
     setHSL(ev.H, ev.S, ev.L);
     setHSRotation(ev.angle);
     setHSScale(ev.scale);
+    setPosition(ev.x, ev.y);
 
     resetProgress();
 
