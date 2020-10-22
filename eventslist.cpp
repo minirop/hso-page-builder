@@ -42,7 +42,7 @@ void EventsList::setEventActive(QString name, bool active)
 {
     for (int row = 0; auto & ev : events)
     {
-        if (ev.name == name)
+        if (ev.name.compare(name, Qt::CaseInsensitive) == 0)
         {
             ev.active = active;
             auto idx = index(row);

@@ -629,6 +629,10 @@ PageSettings::PageSettings(QWidget *parent) :
         assert(pageElement);
 
         auto name = current.data().toString();
+        if (name != EVENT_DEFAULT)
+        {
+            QString sss;
+        }
         pageElement->setEvent(name);
         pageElement->refresh();
         updateProperties(pageElement);

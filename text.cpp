@@ -31,6 +31,8 @@ void Text::refresh()
 
 void Text::setEvent(QString name)
 {
+    name = name.toUpper();
+
     if (!events.contains(name))
     {
         EventData data;
@@ -211,6 +213,11 @@ void Text::setNoContent(bool b)
 QString Text::string() const
 {
     return events[currentEvent].string;
+}
+
+int Text::HSY() const
+{
+    return events[currentEvent].y;
 }
 
 int Text::width() const

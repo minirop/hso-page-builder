@@ -488,6 +488,8 @@ void Gif::refresh()
 
 void Gif::setEvent(QString name)
 {
+    name = name.toUpper();
+
     if (!events.contains(name))
     {
         EventData data;

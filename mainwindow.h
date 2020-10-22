@@ -36,10 +36,11 @@ private:
     void clearEverything();
     void parseJSON(QByteArray data);
     QGraphicsItem * addElement(QString type, QStringList arguments, PageElement * pageElement = nullptr);
-    QJsonArray gifToJson(Gif * gif);
-    QJsonArray textToJson(Text * text);
+    QJsonArray gifToJson(Gif * gif, QString eventName);
+    QJsonArray textToJson(Text * text, QString eventName);
     QJsonArray emptyArray();
-    QStringList pageElementToStringList(PageElement * pageElement);
+    QJsonArray pageElementToJSON(PageElement * pageElement, QString eventName);
+    QStringList pageElementToStringList(PageElement * pageElement, QString eventName);
     void updateSettingsFromPage(Page * webpage);
     void updateCurrentPageElement(PageElement * pageElement);
 

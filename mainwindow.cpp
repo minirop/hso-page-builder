@@ -161,6 +161,15 @@ void MainWindow::openPage()
 
             parseJSON(contents);
 
+            auto item = settings->ui->elementsList->item(0);
+            if (item)
+            {
+                settings->ui->elementsList->setCurrentItem(item, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
+
+                QModelIndex firstIndex = settings->ui->elementsEventsList->model()->index(0, 0);
+                settings->ui->elementsEventsList->selectionModel()->select(firstIndex, QItemSelectionModel::SelectCurrent);
+            }
+
             AppSettings::SetPageDirty(false);
         }
         else
@@ -230,13 +239,11 @@ void MainWindow::savePage()
             case PageElement::ElementType::Gif:
             {
                 typeName = TYPE_GIF;
-                element.append(gifToJson(dynamic_cast<Gif*>(pageElement)));
                 break;
             }
             case PageElement::ElementType::Text:
             {
                 typeName = TYPE_TEXT;
-                element.append(textToJson(dynamic_cast<Text*>(pageElement)));
                 break;
             }
             default:
@@ -247,7 +254,13 @@ void MainWindow::savePage()
             definition[DefType] = typeName;
             definition[DefId] = id;
             definition[DefName] = item->text();
-            element.prepend(definition);
+            element.append(definition);
+
+            for (auto eventName : pageElement->activeEvents())
+            {
+                auto eventLine = pageElementToJSON(pageElement, eventName);
+                element.append(eventLine);
+            }
         }
 
         while (element.size() < 21)
@@ -427,6 +440,7 @@ void MainWindow::parseJSON(QByteArray data)
         else
         {
             currentPageElement->setEvent(EVENT_DEFAULT);
+            currentPageElement->refresh();
             updateCurrentPageElement(currentPageElement);
         }
     }
@@ -607,11 +621,13 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments, Page
     return returnedElement;
 }
 
-QJsonArray MainWindow::gifToJson(Gif * gif)
+QJsonArray MainWindow::gifToJson(Gif * gif, QString eventName)
 {
+    gif->setEvent(eventName);
+
     QJsonArray array = emptyArray();
 
-    array[GifEvent] = "DEFAULT";
+    array[GifEvent] = eventName;
     array[GifX] = QString::number(gif->HSX());
     array[GifY] = QString::number(gif->HSY());
     array[GifHSL] = QString("%1,%2,%3").arg(gif->H()).arg(gif->S()).arg(gif->L());
@@ -636,13 +652,15 @@ QJsonArray MainWindow::gifToJson(Gif * gif)
     return array;
 }
 
-QJsonArray MainWindow::textToJson(Text * text)
+QJsonArray MainWindow::textToJson(Text * text, QString eventName)
 {
+    text->setEvent(eventName);
+
     QJsonArray array = emptyArray();
 
-    array[TextEvent] = EVENT_DEFAULT;
-    array[TextX] = QString::number((((int)text->x() * 100) / PAGE_WIDTH) - 50);
-    array[TextY] = QString::number((int)text->y());
+    array[TextEvent] = eventName;
+    array[TextX] = QString::number(text->xoffset());
+    array[TextY] = QString::number(text->HSY());
     array[TextWidth] = QString::number(text->width());
     array[TextCaseTag] = text->caseTag();
     array[TextString] = text->string();
@@ -666,21 +684,28 @@ QJsonArray MainWindow::emptyArray()
     return QJsonArray {QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString(), QString()};
 }
 
-QStringList MainWindow::pageElementToStringList(PageElement * pageElement)
+QJsonArray MainWindow::pageElementToJSON(PageElement * pageElement, QString eventName)
 {
     QJsonArray array;
 
     switch (pageElement->elementType())
     {
     case PageElement::ElementType::Gif:
-        array = gifToJson(dynamic_cast<Gif*>(pageElement));
+        array = gifToJson(dynamic_cast<Gif*>(pageElement), eventName);
         break;
     case PageElement::ElementType::Text:
-        array = textToJson(dynamic_cast<Text*>(pageElement));
+        array = textToJson(dynamic_cast<Text*>(pageElement), eventName);
         break;
     default:
         assert(false);
     }
+
+    return array;
+}
+
+QStringList MainWindow::pageElementToStringList(PageElement * pageElement, QString eventName)
+{
+    QJsonArray array = pageElementToJSON(pageElement, eventName);
 
     QStringList list;
     for (auto value : array)
@@ -743,9 +768,22 @@ void MainWindow::duplicateElement(QString name, PageElement * pageElement)
     definition.append(0);
     definition.append(name);
 
-    auto eventData = pageElementToStringList(pageElement);
+    auto activeEvents = pageElement->activeEvents();
 
-    createElement(type, definition, eventData);
+    PageElement * currentPageElement = nullptr;
+    for (int i = 1; auto eventName : activeEvents)
+    {
+        auto eventData = pageElementToStringList(pageElement, eventName);
+        if (i == 1)
+        {
+            auto elem = createElement(type, definition, eventData);
+            currentPageElement = dynamic_cast<PageElement*>(elem);
+        }
+        else
+        {
+            addElement(type, eventData, currentPageElement);
+        }
+    }
 
     updateZOrder();
 }

@@ -44,6 +44,7 @@ public:
     void setNoContent(bool b);
 
     QString string() const;
+    int HSY() const;
     int width() const;
     int renderedWidth() const;
     int xoffset() const;
