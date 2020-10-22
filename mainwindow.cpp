@@ -370,13 +370,6 @@ void MainWindow::clearEverything()
     connect(settings, &PageSettings::webpageEventDeactivated, [&](QString name) {
         webpage->clearEvent(name);
     });
-    connect(settings, &PageSettings::elementsEventSelected, [&](QString name) {
-        webpage->setEvent(name);
-        updateSettingsFromPage(webpage);
-    });
-    connect(settings, &PageSettings::elementsEventDeactivated, [&](QString name) {
-        webpage->clearEvent(name);
-    });
 
     webpage->move(0, 0);
     webpage->show();
