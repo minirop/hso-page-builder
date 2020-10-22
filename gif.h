@@ -25,6 +25,12 @@ public:
 
     void setNameOf(QString name);
 
+    void setHSRotation(int angle);
+    int HSRotation() const;
+
+    void setHSScale(float scale);
+    float HSScale() const;
+
     void mirror(bool active);
     void flip(bool active);
 
@@ -72,12 +78,15 @@ private:
     friend class PageSettings;
 
     void resetAllAnimations();
+    void resetProgress();
 
     struct EventData {
         bool mirrored = false;
         bool flipped = false;
         int H = 0, S = 100, L = 100;
         QString nameOf;
+        int angle = 0;
+        float scale = 1;
         int swingOrSpin = 0;
         int swingOrSpinSpeed = 0;
         bool flip3DX = false;

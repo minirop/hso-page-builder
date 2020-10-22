@@ -74,6 +74,32 @@ void Gif::setNameOf(QString name)
     AppSettings::SetPageDirty();
 }
 
+void Gif::setHSRotation(int angle)
+{
+    setRotation(angle);
+
+    events[currentEvent].angle = angle;
+    AppSettings::SetPageDirty();
+}
+
+int Gif::HSRotation() const
+{
+    return events[currentEvent].angle;
+}
+
+void Gif::setHSScale(float scale)
+{
+    setScale(scale);
+
+    events[currentEvent].scale = scale;
+    AppSettings::SetPageDirty();
+}
+
+float Gif::HSScale() const
+{
+    return events[currentEvent].scale;
+}
+
 void Gif::mirror(bool active)
 {
     events[currentEvent].mirrored = active;
@@ -352,16 +378,24 @@ void Gif::resetAllAnimations()
     fadeProgress = 0;
 }
 
+void Gif::resetProgress()
+{
+    resetAllAnimations();
+    currentFrame = 0;
+    fpsProgress = 0;
+}
+
 void Gif::refresh()
 {
-    events[currentEvent].originalFrames.clear();
+    auto & ev = events[currentEvent];
+    ev.originalFrames.clear();
     frames.clear();
     setSpeed(0);
 
     auto searchPaths = AppSettings::GetSearchPaths();
     for (auto path : searchPaths)
     {
-        if (QFileInfo fi(path + "/images/gifs/" + events[currentEvent].nameOf); fi.isDir())
+        if (QFileInfo fi(path + "/images/gifs/" + ev.nameOf); fi.isDir())
         {
             QDir dir(fi.absoluteFilePath());
             for (auto entry : dir.entryInfoList(QDir::Files, QDir::Name))
@@ -378,22 +412,22 @@ void Gif::refresh()
             }
             break;
         }
-        else if (QFile(path + "/images/static/" + events[currentEvent].nameOf + ".png").exists())
+        else if (QFile(path + "/images/static/" + ev.nameOf + ".png").exists())
         {
-            addFrame(path + "/images/static/" + events[currentEvent].nameOf + ".png");
+            addFrame(path + "/images/static/" + ev.nameOf + ".png");
             break;
         }
-        else if (QFile(path + "/images/shapes/" + events[currentEvent].nameOf + ".png").exists())
+        else if (QFile(path + "/images/shapes/" + ev.nameOf + ".png").exists())
         {
-            addFrame(path + "/images/shapes/" + events[currentEvent].nameOf + ".png");
+            addFrame(path + "/images/shapes/" + ev.nameOf + ".png");
             break;
         }
-        else if (QFileInfo fi(path + "/images/wordart/" + events[currentEvent].nameOf.toLower()); fi.isDir())
+        else if (QFileInfo fi(path + "/images/wordart/" + ev.nameOf.toLower()); fi.isDir())
         {
             auto letter = "0";
-            if (events[currentEvent].offsetFrame > 0 && events[currentEvent].offsetFrame < static_cast<int>(characters.size()))
+            if (ev.offsetFrame > 0 && ev.offsetFrame < static_cast<int>(characters.size()))
             {
-                letter = characters[events[currentEvent].offsetFrame];
+                letter = characters[ev.offsetFrame];
                 if (!QFile(QString("%1/%2.png").arg(fi.absoluteFilePath()).arg(letter)).exists())
                 {
                     letter = "0";
@@ -404,11 +438,15 @@ void Gif::refresh()
         }
     }
 
-    setHSL(events[currentEvent].H, events[currentEvent].S, events[currentEvent].L);
+    setHSL(ev.H, ev.S, ev.L);
+    setHSRotation(ev.angle);
+    setHSScale(ev.scale);
+
+    resetProgress();
 
     // disable the timer if there is
     // a sole image with a speed set.
-    if (events[currentEvent].originalFrames.size() == 1)
+    if (ev.originalFrames.size() == 1)
     {
         setSpeed(0);
         timerEvent(nullptr);

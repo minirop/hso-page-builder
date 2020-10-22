@@ -540,8 +540,8 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments, Page
         gif->setEvent(arguments[WebEvent]);
         gif->setNameOf(image);
         gif->setFrameOffset(offset);
-        gif->setScale(scale);
-        gif->setRotation(rotation);
+        gif->setHSScale(scale);
+        gif->setHSRotation(rotation);
         gif->mirror(mirrored);
         gif->flip(flipped);
         gif->setCaseTag(caseTag);
@@ -617,8 +617,8 @@ QJsonArray MainWindow::gifToJson(Gif * gif)
     array[GifHSL] = QString("%1,%2,%3").arg(gif->H()).arg(gif->S()).arg(gif->L());
     array[GifCaseTag] = gif->caseTag();
     array[GifNameOf] = gif->nameOf();
-    array[GifScale] = QString::number(gif->scale(), 'f', 2);
-    array[GifRotation] = QString::number((int)gif->rotation());
+    array[GifScale] = QString::number(gif->HSScale(), 'f', 2);
+    array[GifRotation] = QString::number(gif->HSRotation());
     array[GifMirror] = gif->mirrored() ? "1" : "0";
     array[GifFlip] = gif->flipped() ? "1" : "0";
     array[GifLinkOrScript] = gif->script();

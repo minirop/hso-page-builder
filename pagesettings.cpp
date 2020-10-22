@@ -428,7 +428,7 @@ PageSettings::PageSettings(QWidget *parent) :
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
         assert(graphics);
 
-        graphics->setScale(value);
+        graphics->setHSScale(value);
     });
     connect(ui->rotationSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), [&](int angle) {
         auto item = ui->elementsList->currentItem();
@@ -436,7 +436,7 @@ PageSettings::PageSettings(QWidget *parent) :
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
         assert(graphics);
 
-        graphics->setRotation(angle);
+        graphics->setHSRotation(angle);
     });
     connect(ui->hFlipButton, &QPushButton::toggled, [&](bool toggled) {
         auto item = ui->elementsList->currentItem();
@@ -791,8 +791,8 @@ void PageSettings::updateGifProperties(Gif * gif)
     ui->saturationSpinBox->setValue(gif->S());
     ui->lightnessSpinBox->setValue(gif->L());
 
-    ui->scaleSpinBox->setValue(gif->scale());
-    ui->rotationSpinBox->setValue(gif->rotation());
+    ui->scaleSpinBox->setValue(gif->HSScale());
+    ui->rotationSpinBox->setValue(gif->HSRotation());
     ui->hFlipButton->setChecked(gif->mirrored());
     ui->vFlipButton->setChecked(gif->flipped());
 
