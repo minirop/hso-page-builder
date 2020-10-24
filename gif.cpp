@@ -36,7 +36,14 @@ void Gif::addFrame(QString filename)
 
 void Gif::setSpeed(int speed)
 {
-    fps = 1.f / speed;
+    if (speed)
+    {
+        fps = 1.f / speed;
+    }
+    else
+    {
+        fps = speed;
+    }
     fpsProgress = 0;
     AppSettings::SetPageDirty();
 }
@@ -64,6 +71,10 @@ void Gif::setFrameOffset(int f)
     if (events[currentEvent].originalFrames.size() > 1)
     {
         currentFrame = f;
+    }
+    else
+    {
+        currentFrame = 0;
     }
     refresh();
     AppSettings::SetPageDirty();
@@ -414,7 +425,8 @@ void Gif::resetAllAnimations()
 void Gif::resetProgress()
 {
     resetAllAnimations();
-    currentFrame = 0;
+    if (fps > 0)
+        currentFrame = 0;
     fpsProgress = 0;
 }
 
