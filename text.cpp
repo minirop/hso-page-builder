@@ -46,6 +46,13 @@ void Text::setEvent(QString name)
     PageElement::setEvent(name);
 }
 
+void Text::clearEvent(QString name)
+{
+    events.remove(name);
+    PageElement::clearEvent(name);
+    setEvent(EVENT_DEFAULT);
+}
+
 QList<QString> Text::activeEvents() const
 {
     return events.keys();

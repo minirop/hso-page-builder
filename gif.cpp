@@ -1,6 +1,7 @@
 #include "gif.h"
 #include "utils.h"
 #include "appsettings.h"
+#include "globals.h"
 #include <QPainter>
 #include <QBitmap>
 #include <QFileInfo>
@@ -501,6 +502,15 @@ void Gif::setEvent(QString name)
     }
 
     PageElement::setEvent(name);
+}
+
+void Gif::clearEvent(QString name)
+{
+    name = name.toUpper();
+
+    events.remove(name);
+    PageElement::clearEvent(name);
+    setEvent(EVENT_DEFAULT);
 }
 
 QList<QString> Gif::activeEvents() const

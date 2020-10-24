@@ -18,6 +18,7 @@ public:
     virtual ~PageElement() = default;
 
     virtual void setEvent(QString name);
+    virtual void clearEvent(QString name);
     virtual ElementType elementType() const = 0;
     virtual void refresh() = 0;
 

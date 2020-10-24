@@ -7,7 +7,22 @@ PageElement::PageElement()
 
 void PageElement::setEvent(QString name)
 {
+    if (!pageEvents.contains(name))
+    {
+        PageEventData data;
+        if (pageEvents.contains(currentEvent))
+        {
+            data = pageEvents[currentEvent];
+        }
+        pageEvents[name] = data;
+    }
+
     currentEvent = name;
+}
+
+void PageElement::clearEvent(QString name)
+{
+    pageEvents.remove(name);
 }
 
 void PageElement::setCaseTag(QString tag)

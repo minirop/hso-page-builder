@@ -629,10 +629,6 @@ PageSettings::PageSettings(QWidget *parent) :
         assert(pageElement);
 
         auto name = current.data().toString();
-        if (name != EVENT_DEFAULT)
-        {
-            QString sss;
-        }
         pageElement->setEvent(name);
         pageElement->refresh();
         updateProperties(pageElement);
@@ -648,6 +644,17 @@ PageSettings::PageSettings(QWidget *parent) :
                     auto name = selectedIndexes.first().data().toString();
                     elementsEventsList->setEventActive(name, false);
                     emit elementsEventDeactivated(name);
+
+                    auto item = ui->elementsList->currentItem();
+                    if (!item) return;
+                    auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+                    assert(pageElement);
+
+                    pageElement->clearEvent(name);
+
+                    auto model = ui->elementsEventsList->model();
+                    auto firstIndex = model->index(0, 0);
+                    ui->elementsEventsList->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Current);
                 }
             }
         }
