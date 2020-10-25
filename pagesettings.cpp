@@ -376,7 +376,7 @@ PageSettings::PageSettings(QWidget *parent) :
         ui->imageSlider->next();
     });
     connect(ui->imageSlider, &ImageSlider::backgroundChanged, this, &PageSettings::backgroundChanged);
-    connect(ui->gifsListWidget, &QListWidget::currentItemChanged, [&](QListWidgetItem * current, QListWidgetItem * previous) {
+    connect(ui->tabbedImages, &TabbedImages::currentItemChanged, [&](QListWidgetItem * current, QListWidgetItem * previous) {
         Q_UNUSED(previous)
 
         if (current)
@@ -392,7 +392,7 @@ PageSettings::PageSettings(QWidget *parent) :
             ui->gifSlider->setGif(graphics);
         }
     });
-    connect(ui->prevGif, &QPushButton::clicked, [&]() {
+    /*connect(ui->prevGif, &QPushButton::clicked, [&]() {
         auto row = ui->gifsListWidget->currentRow();
         if (row > 0)
         {
@@ -405,7 +405,7 @@ PageSettings::PageSettings(QWidget *parent) :
         {
             ui->gifsListWidget->setCurrentRow(row + 1);
         }
-    });
+    });*/
 
     auto changeHSL = [&]() {
         int H = ui->hueSpinBox->value();
@@ -815,21 +815,7 @@ void PageSettings::updateGifProperties(Gif * gif)
     ui->hFlipButton->setChecked(gif->mirrored());
     ui->vFlipButton->setChecked(gif->flipped());
 
-    ui->gifsListWidget->clearSelection();
-    QListWidgetItem * selectedItem = nullptr;
-    auto found = ui->gifsListWidget->findItems(gif->nameOf(), Qt::MatchExactly);
-    if (found.size())
-    {
-        selectedItem = found.first();
-    }
-    else
-    {
-        selectedItem = ui->gifsListWidget->item(0);
-    }
-    ui->gifsListWidget->clearSelection();
-    ui->gifsListWidget->setCurrentItem(selectedItem, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
-    ui->gifsListWidget->scrollToItem(selectedItem);
-
+    ui->tabbedImages->select(gif->nameOf());
     ui->gifSlider->setGif(gif);
 
     ui->swingOrSpinComboBox->setCurrentIndex(gif->swingOrSpin());
@@ -1005,71 +991,41 @@ void PageSettings::refresh()
 
 void PageSettings::refreshGifsList()
 {
-    auto selectedItems = ui->gifsListWidget->selectedItems();
+/*    auto selectedItems = ui->gifsListWidget->selectedItems();
 
     QString saved;
     if (selectedItems.size())
-        saved = selectedItems.first()->text();
+        saved = selectedItems.first()->text();*/
 
-    ui->gifsListWidget->clear();
+    ui->tabbedImages->clear();
 
     auto subFolders = QStringList() << "/images/static/" << "/images/shapes/";
-    QSet<QString> uniqueGifs;
     auto paths = AppSettings::GetSearchPaths();
     for (auto path : paths)
     {
         auto folders = QDir(path + "/images/gifs/").entryList(QDir::Dirs | QDir::NoDotAndDotDot);
         for (auto folder : folders)
         {
-            uniqueGifs.insert(folder);
+            ui->tabbedImages->addImage(TabbedImages::Type::Gif, folder);
         }
 
+        auto type = TabbedImages::Type::Static;
         for (auto subFolder : subFolders)
         {
             auto files = QDir(path + subFolder).entryList(QStringList() << "*.png", QDir::Files);
             for (auto f : files)
             {
-                uniqueGifs.insert(f.chopped(4));
+                ui->tabbedImages->addImage(type, f.chopped(4));
             }
+
+            type = TabbedImages::Type::Shape;
         }
 
         auto fonts = QDir(path + "/images/wordart/").entryList(QDir::Dirs | QDir::NoDotAndDotDot);
         for (auto folder : fonts)
         {
-            uniqueGifs.insert(folder);
+            ui->tabbedImages->addImage(TabbedImages::Type::Wordart, folder);
         }
-    }
-
-    auto foundFiles = uniqueGifs.values();
-    if (foundFiles.size())
-    {
-        foundFiles.sort();
-        for (auto foundFile : foundFiles)
-        {
-            ui->gifsListWidget->addItem(foundFile);
-        }
-
-        ui->gifsListWidget->clearSelection();
-        QListWidgetItem * selectedItem = nullptr;
-        if (saved.size())
-        {
-            auto found = ui->gifsListWidget->findItems(saved, Qt::MatchExactly);
-            if (found.size())
-            {
-                selectedItem = found.first();
-            }
-            else
-            {
-                selectedItem = ui->gifsListWidget->item(0);
-            }
-        }
-        else
-        {
-            selectedItem = ui->gifsListWidget->item(0);
-        }
-        ui->gifsListWidget->clearSelection();
-        ui->gifsListWidget->setCurrentItem(selectedItem, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
-        ui->gifsListWidget->scrollToItem(selectedItem);
     }
 }
 

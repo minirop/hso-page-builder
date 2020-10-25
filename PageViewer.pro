@@ -18,6 +18,7 @@ SOURCES += \
     page.cpp \
     pageelement.cpp \
     pagesettings.cpp \
+    tabbedimages.cpp \
     text.cpp \
     utils.cpp
 
@@ -35,9 +36,11 @@ HEADERS += \
     page.h \
     pageelement.h \
     pagesettings.h \
+    tabbedimages.h \
     text.h \
     utils.h
 
 FORMS += \
     mainwindow.ui \
-    pagesettings.ui
+    pagesettings.ui \
+    tabbedimages.ui

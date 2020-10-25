@@ -62,7 +62,7 @@
          <item>
           <widget class="QStackedWidget" name="stackedWidget">
            <property name="currentIndex">
-            <number>0</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="empty">
             <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -433,29 +433,7 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="QListWidget" name="gifsListWidget">
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>200</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="horizontalScrollBarPolicy">
-                  <enum>Qt::ScrollBarAlwaysOff</enum>
-                 </property>
-                 <property name="defaultDropAction">
-                  <enum>Qt::IgnoreAction</enum>
-                 </property>
-                 <property name="alternatingRowColors">
-                  <bool>true</bool>
-                 </property>
-                </widget>
+                <widget class="TabbedImages" name="tabbedImages" native="true"/>
                </item>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -1572,6 +1550,12 @@
    <class>GifSlider</class>
    <extends>QWidget</extends>
    <header>gifslider.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TabbedImages</class>
+   <extends>QWidget</extends>
+   <header>tabbedimages.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
