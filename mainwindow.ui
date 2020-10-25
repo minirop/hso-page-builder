@@ -30,6 +30,7 @@
     <addaction name="action_New_page"/>
     <addaction name="action_Open_Page"/>
     <addaction name="action_Save_Page"/>
+    <addaction name="action_Save_As"/>
     <addaction name="action_Quit"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
@@ -45,7 +46,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Open_Page">
    <property name="text">
-    <string>&amp;Open Page</string>
+    <string>&amp;Open Page...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -63,20 +64,40 @@
    <property name="text">
     <string>&amp;Save Page</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
   </action>
   <action name="action_Mods">
    <property name="text">
     <string>&amp;Mods</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
    </property>
   </action>
   <action name="action_Refresh">
    <property name="text">
     <string>&amp;Refresh</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
   </action>
   <action name="action_New_page">
    <property name="text">
     <string>&amp;New page</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="action_Save_As">
+   <property name="text">
+    <string>S&amp;ave As...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
  </widget>

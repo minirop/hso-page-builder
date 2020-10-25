@@ -84,6 +84,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->action_New_page, &QAction::triggered, this, &MainWindow::newPage);
     connect(ui->action_Open_Page, &QAction::triggered, this, &MainWindow::openPage);
     connect(ui->action_Save_Page, &QAction::triggered, this, &MainWindow::savePage);
+    connect(ui->action_Save_As, &QAction::triggered, this, &MainWindow::savePageAs);
     connect(ui->action_Quit, &QAction::triggered, this, &MainWindow::close);
     connect(ui->action_Mods, &QAction::triggered, this, &MainWindow::openModsWindow);
     connect(ui->action_Refresh, &QAction::triggered, this, &MainWindow::refresh);
@@ -300,6 +301,18 @@ void MainWindow::savePage()
     else
     {
         QMessageBox::critical(this, "Error whilst saving", QString("Could not write the current page into '%1'.").arg(openedFilename));
+    }
+}
+
+void MainWindow::savePageAs()
+{
+    auto backup = openedFilename;
+    openedFilename.clear();
+    savePage();
+
+    if (openedFilename.isEmpty())
+    {
+        openedFilename = backup;
     }
 }
 

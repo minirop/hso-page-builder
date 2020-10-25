@@ -26,6 +26,7 @@ private slots:
     void newPage();
     void openPage();
     void savePage();
+    void savePageAs();
     void openModsWindow();
     void refresh();
     QGraphicsItem * createElement(QString type, QJsonArray definition, QStringList eventData);
