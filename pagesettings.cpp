@@ -600,9 +600,13 @@ PageSettings::PageSettings(QWidget *parent) :
             {
                 if (selectedIndexes.first().row() != 0)
                 {
+                    auto dirty = AppSettings::IsPageDirty();
+
                     auto name = selectedIndexes.first().data().toString();
                     webpageEventsList->setEventActive(name, false);
                     emit webpageEventDeactivated(name);
+
+                    AppSettings::SetPageDirty(dirty);
                 }
             }
         }
@@ -628,10 +632,14 @@ PageSettings::PageSettings(QWidget *parent) :
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
         assert(pageElement);
 
+        auto dirty = AppSettings::IsPageDirty();
+
         auto name = current.data().toString();
         pageElement->setEvent(name);
         pageElement->refresh();
         updateProperties(pageElement);
+
+        AppSettings::SetPageDirty(dirty);
     });
     connect(ui->elementsDeleteEvent, &QPushButton::clicked, [&]() {
         if (ui->elementsEventsList->model()->rowCount() > 1)
