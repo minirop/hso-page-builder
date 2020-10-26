@@ -50,12 +50,13 @@ void Gif::setSpeed(int speed)
 
 void Gif::setHSL(int h, int s, int l)
 {
-    events[currentEvent].H = h;
-    events[currentEvent].S = s;
-    events[currentEvent].L = l;
+    auto & evData = events[currentEvent];
+    evData.H = h;
+    evData.S = s;
+    evData.L = l;
 
     frames.clear();
-    for (auto pix : events[currentEvent].originalFrames)
+    for (auto pix : evData.originalFrames)
     {
         frames.push_back(Utils::ChangeHSL(pix, h / 100.0f, s / 100.0f, l / 100.0f));
     }
@@ -319,8 +320,9 @@ void Gif::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event)
     float dt = 1.f / 60.f;
+    auto & evData = events[currentEvent];
 
-    if (fps > 0 && (events[currentEvent].gifAnimation == 0 || (events[currentEvent].gifAnimation == 1 && isUnderMouse())))
+    if (fps > 0 && (evData.gifAnimation == 0 || (evData.gifAnimation == 1 && isUnderMouse())))
     {
         fpsProgress += dt;
         if (fpsProgress > fps)
@@ -329,12 +331,12 @@ void Gif::timerEvent(QTimerEvent *event)
             fpsProgress -= fps;
         }
     }
-    else if (events[currentEvent].gifAnimation == 1 && !isUnderMouse())
+    else if (evData.gifAnimation == 1 && !isUnderMouse())
     {
         currentFrame = 0;
         fpsProgress = 0;
     }
-    else if (events[currentEvent].gifAnimation == 3)
+    else if (evData.gifAnimation == 3)
     {
         if (isUnderMouse())
         {
@@ -361,36 +363,36 @@ void Gif::timerEvent(QTimerEvent *event)
     QPixmap frame = frames[currentFrame];
     QTransform transform;
 
-    if (events[currentEvent].mirrored)
+    if (evData.mirrored)
     {
         transform.scale(-1, 1);
     }
 
-    if (events[currentEvent].flipped)
+    if (evData.flipped)
     {
         transform.scale(1, -1);
     }
 
-    if (events[currentEvent].flip3DX)
+    if (evData.flip3DX)
     {
-        flip3DXProgress += events[currentEvent].flip3DXSpeed * 0.1 * dt;
+        flip3DXProgress += evData.flip3DXSpeed * 0.1 * dt;
         transform.scale(std::sin(flip3DXProgress), 1);
     }
 
-    if (events[currentEvent].flip3DY)
+    if (evData.flip3DY)
     {
-        flip3DYProgress += events[currentEvent].flip3DYSpeed * 0.1 * dt;
+        flip3DYProgress += evData.flip3DYSpeed * 0.1 * dt;
         transform.scale(1, std::sin(flip3DYProgress));
     }
 
-    switch (events[currentEvent].swingOrSpin)
+    switch (evData.swingOrSpin)
     {
     case 1:
-        swingOrSpinProgress += events[currentEvent].swingOrSpinSpeed * 0.25 * dt;
+        swingOrSpinProgress += evData.swingOrSpinSpeed * 0.25 * dt;
         transform.rotate(std::sin(swingOrSpinProgress) * 20);
         break;
     case 2:
-        swingOrSpinProgress += events[currentEvent].swingOrSpinSpeed * 0.1 * dt;
+        swingOrSpinProgress += evData.swingOrSpinSpeed * 0.1 * dt;
         transform.rotateRadians(swingOrSpinProgress);
         break;
     }

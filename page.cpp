@@ -62,7 +62,9 @@ void Page::setLineCount(int lineCount)
 
 void Page::setBackground(QString image)
 {
-    events[currentEvent].background.clear();
+    auto & evData = events[currentEvent];
+
+    evData.background.clear();
 
     if (!image.isEmpty())
     {
@@ -72,7 +74,7 @@ void Page::setBackground(QString image)
             auto img = path + "/images/bgs/" + image;
             if (QFile(img).exists())
             {
-                events[currentEvent].background = image;
+                evData.background = image;
                 setBackgroundBrush(QPixmap(img));
                 assert(!QPixmap(img).isNull());
                 break;
@@ -80,9 +82,9 @@ void Page::setBackground(QString image)
         }
     }
 
-    if (events[currentEvent].background.isEmpty())
+    if (evData.background.isEmpty())
     {
-        setBackgroundColor(events[currentEvent].backgroundColor);
+        setBackgroundColor(evData.backgroundColor);
     }
 
     update();
