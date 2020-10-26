@@ -626,7 +626,7 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments, Page
         returnedElement = gif;
     }
 
-    if (returnedElement)
+    if (returnedElement && !pageElement)
     {
         webpage->addElement(returnedElement);
     }
