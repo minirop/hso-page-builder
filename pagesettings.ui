@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="objects">
       <attribute name="title">
@@ -1439,14 +1439,7 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>
-            <widget class="QListView" name="webpageEventsList">
-             <property name="editTriggers">
-              <set>QAbstractItemView::NoEditTriggers</set>
-             </property>
-             <property name="alternatingRowColors">
-              <bool>true</bool>
-             </property>
-            </widget>
+            <widget class="QListWidget" name="webpageEventsList"/>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_22">

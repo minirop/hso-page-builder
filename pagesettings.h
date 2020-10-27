@@ -80,7 +80,6 @@ private:
     friend class MainWindow;
     Ui::PageSettings *ui;
     EventsList * webpageEventsList = nullptr;
-    EventsListFilterModel * webpageActiveEvents = nullptr;
     EventsListFilterModel * webpageInactiveEvents = nullptr;
     EventsList * elementsEventsList = nullptr;
     EventsListFilterModel * elementsInactiveEvents = nullptr;

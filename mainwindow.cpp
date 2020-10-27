@@ -203,10 +203,10 @@ void MainWindow::savePage()
 
             auto savedEvent = webpage->currentEvent;
 
-            auto activeEventsModel = settings->webpageActiveEvents;
-            for (int row = 0; row < activeEventsModel->rowCount(); row++)
+            auto webpageEvents = settings->ui->webpageEventsList;
+            for (int row = 0; row < webpageEvents->count(); row++)
             {
-                auto evName = activeEventsModel->data(activeEventsModel->index(row, 0)).toString();
+                auto evName = webpageEvents->item(row)->text();
                 webpage->setEvent(evName);
 
                 auto metadata = emptyArray();

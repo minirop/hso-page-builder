@@ -26,10 +26,6 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->tabWidget->setCurrentIndex(0);
 
     webpageEventsList = new EventsList(this);
-    webpageActiveEvents = new EventsListFilterModel(true, this);
-    webpageActiveEvents->setSourceModel(webpageEventsList);
-    ui->webpageEventsList->setModel(webpageActiveEvents);
-
     webpageInactiveEvents = new EventsListFilterModel(false, this);
     webpageInactiveEvents->setSourceModel(webpageEventsList);
     ui->webpageEventsNamesComboBox->setModel(webpageInactiveEvents);
@@ -228,12 +224,11 @@ PageSettings::PageSettings(QWidget *parent) :
         }
     });
 
-    auto moveItem = [](Ui::PageSettings * ui, QListWidgetItem * item, int from, int to) {
-        ui->elementsList->takeItem(from);
-        ui->elementsList->insertItem(to, item);
+    auto moveItem = [](QListWidget * listWidget, QListWidgetItem * item, int from, int to) {
+        listWidget->takeItem(from);
+        listWidget->insertItem(to, item);
 
-        ui->elementsList->clearSelection();
-        ui->elementsList->setCurrentItem(item, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
+        listWidget->setCurrentItem(item);
     };
 
     connect(ui->moveUp, &QPushButton::clicked, [&]() {
@@ -244,7 +239,7 @@ PageSettings::PageSettings(QWidget *parent) :
             auto row = ui->elementsList->row(item);
             if (row < 1) return; // already at the top
 
-            moveItem(ui, item, row, row - 1);
+            moveItem(ui->elementsList, item, row, row - 1);
             emit updateZOrder();
         }
     });
@@ -256,7 +251,7 @@ PageSettings::PageSettings(QWidget *parent) :
             auto row = ui->elementsList->row(item);
             if (row == ui->elementsList->count() - 1) return; // already at the bottom
 
-            moveItem(ui, item, row, row + 1);
+            moveItem(ui->elementsList, item, row, row + 1);
             emit updateZOrder();
         }
     });
@@ -268,7 +263,7 @@ PageSettings::PageSettings(QWidget *parent) :
             auto row = ui->elementsList->row(item);
             if (row < 1) return; // already at the top
 
-            moveItem(ui, item, row, 0);
+            moveItem(ui->elementsList, item, row, 0);
             emit updateZOrder();
         }
     });
@@ -281,8 +276,100 @@ PageSettings::PageSettings(QWidget *parent) :
             auto count = ui->elementsList->count();
             if (row == count - 1) return; // already at the bottom
 
-            moveItem(ui, item, row, count - 1);
+            moveItem(ui->elementsList, item, row, count - 1);
             emit updateZOrder();
+        }
+    });
+
+    connect(ui->elementsMoveUpEvent, &QPushButton::clicked, [&]() {
+        auto item = ui->elementsEventsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->elementsEventsList->row(item);
+            if (row < 2) return; // already at the top
+
+            moveItem(ui->elementsEventsList, item, row, row - 1);
+        }
+    });
+    connect(ui->elementsMoveDownEvent, &QPushButton::clicked, [&]() {
+        auto item = ui->elementsEventsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->elementsEventsList->row(item);
+            if (row == ui->elementsEventsList->count() - 1) return; // already at the bottom
+
+            moveItem(ui->elementsEventsList, item, row, row + 1);
+        }
+    });
+    connect(ui->elementsMoveToTopEvent, &QPushButton::clicked, [&]() {
+        auto item = ui->elementsEventsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->elementsEventsList->row(item);
+            if (row < 2) return; // already at the top
+
+            moveItem(ui->elementsEventsList, item, row, 1);
+        }
+    });
+    connect(ui->elementsMoveToBottomEvent, &QPushButton::clicked, [&]() {
+        auto item = ui->elementsEventsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->elementsEventsList->row(item);
+            auto count = ui->elementsEventsList->count();
+            if (row == count - 1) return; // already at the bottom
+
+            moveItem(ui->elementsEventsList, item, row, count - 1);
+        }
+    });
+
+    connect(ui->webpageMoveUpEvent, &QPushButton::clicked, [&]() {
+        auto item = ui->webpageEventsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->webpageEventsList->row(item);
+            if (row < 2) return; // already at the top
+
+            moveItem(ui->webpageEventsList, item, row, row - 1);
+        }
+    });
+    connect(ui->webpageMoveDownEvent, &QPushButton::clicked, [&]() {
+        auto item = ui->webpageEventsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->webpageEventsList->row(item);
+            if (row == ui->webpageEventsList->count() - 1) return; // already at the bottom
+
+            moveItem(ui->webpageEventsList, item, row, row + 1);
+        }
+    });
+    connect(ui->webpageMoveToTopEvent, &QPushButton::clicked, [&]() {
+        auto item = ui->webpageEventsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->webpageEventsList->row(item);
+            if (row < 2) return; // already at the top
+
+            moveItem(ui->webpageEventsList, item, row, 1);
+        }
+    });
+    connect(ui->webpageMoveToBottomEvent, &QPushButton::clicked, [&]() {
+        auto item = ui->webpageEventsList->currentItem();
+
+        if (item)
+        {
+            auto row = ui->webpageEventsList->row(item);
+            auto count = ui->webpageEventsList->count();
+            if (row == count - 1) return; // already at the bottom
+
+            moveItem(ui->webpageEventsList, item, row, count - 1);
         }
     });
 
@@ -579,31 +666,39 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->gifScriptTextEdit, &QPlainTextEdit::textChanged, scriptChanged(ui->gifScriptTextEdit));
 
     connect(ui->webpageAddEventButton, &QPushButton::clicked, [&]() {
-        webpageEventsList->setEventActive(ui->webpageEventsNamesComboBox->currentText(), true);
+        auto name = ui->webpageEventsNamesComboBox->currentText();
+        webpageEventsList->setEventActive(name, true);
 
-        auto model = ui->webpageEventsList->model();
-        auto firstIndex = model->index(model->rowCount() - 1, 0);
-        ui->webpageEventsList->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Current);
+        ui->webpageEventsList->addItem(name);
+        ui->webpageEventsList->setCurrentRow(ui->webpageEventsList->count() - 1);
     });
-    connect(ui->webpageEventsList->selectionModel(), &QItemSelectionModel::currentChanged, [&](const QModelIndex & current) {
-        emit webpageEventSelected(current.data().toString());
+    connect(ui->webpageEventsList, &QListWidget::currentItemChanged, [&](QListWidgetItem * current, QListWidgetItem * previous) {
+        Q_UNUSED(previous)
+
+        if (current)
+            emit webpageEventSelected(current->text());
     });
     connect(ui->webpageDeleteEvent, &QPushButton::clicked, [&]() {
-        if (ui->webpageEventsList->model()->rowCount() > 1)
+        if (ui->webpageEventsList->count() > 1)
         {
-            auto selectedIndexes = ui->webpageEventsList->selectionModel()->selectedIndexes();
-            if (selectedIndexes.size())
+            if (ui->webpageEventsList->currentRow() == 0) return;
+
+            auto item = ui->webpageEventsList->currentItem();
+            if (item)
             {
-                if (selectedIndexes.first().row() != 0)
+                auto dirty = AppSettings::IsPageDirty();
+
+                auto name = item->text();
+                webpageEventsList->setEventActive(name, false);
+                emit webpageEventDeactivated(name);
+
+                auto deletedEvents = ui->webpageEventsList->findItems(name, Qt::MatchExactly);
+                for (auto deletedEvent : deletedEvents)
                 {
-                    auto dirty = AppSettings::IsPageDirty();
-
-                    auto name = selectedIndexes.first().data().toString();
-                    webpageEventsList->setEventActive(name, false);
-                    emit webpageEventDeactivated(name);
-
-                    AppSettings::SetPageDirty(dirty);
+                    delete deletedEvent;
                 }
+
+                AppSettings::SetPageDirty(dirty);
             }
         }
     });
@@ -641,6 +736,8 @@ PageSettings::PageSettings(QWidget *parent) :
     connect(ui->elementsDeleteEvent, &QPushButton::clicked, [&]() {
         if (ui->elementsEventsList->count() > 1)
         {
+            if (ui->elementsEventsList->currentRow() == 0) return;
+
             auto item = ui->elementsEventsList->currentItem();
             if (item)
             {
@@ -1161,8 +1258,10 @@ void PageSettings::refreshEvents()
 
     webpageEventsList->setEventActive(EVENT_DEFAULT, true);
 
-    QModelIndex firstIndex = ui->webpageEventsList->model()->index(0, 0);
-    ui->webpageEventsList->selectionModel()->select(firstIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Current);
+    ui->webpageEventsList->clear();
+    ui->webpageEventsList->addItem(EVENT_DEFAULT);
+
+    ui->webpageEventsList->setCurrentRow(0);
 }
 
 void PageSettings::reset()
