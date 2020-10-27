@@ -31,8 +31,6 @@ void Text::refresh()
 
 void Text::setEvent(QString name)
 {
-    name = name.toUpper();
-
     if (!events.contains(name))
     {
         EventData data;
@@ -51,11 +49,6 @@ void Text::clearEvent(QString name)
     events.remove(name);
     PageElement::clearEvent(name);
     setEvent(EVENT_DEFAULT);
-}
-
-QList<QString> Text::activeEvents() const
-{
-    return events.keys();
 }
 
 void Text::setHSPosition(int x, int y)

@@ -46,7 +46,7 @@ void EventsList::setEventActive(QString name, bool active)
 {
     for (int row = 0; auto & ev : events)
     {
-        if (ev.name.compare(name, Qt::CaseInsensitive) == 0)
+        if (ev.name == name)
         {
             if (ev.active != active)
             {

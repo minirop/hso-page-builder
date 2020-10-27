@@ -503,8 +503,6 @@ void Gif::refresh()
 
 void Gif::setEvent(QString name)
 {
-    name = name.toUpper();
-
     if (!events.contains(name))
     {
         EventData data;
@@ -520,14 +518,7 @@ void Gif::setEvent(QString name)
 
 void Gif::clearEvent(QString name)
 {
-    name = name.toUpper();
-
     events.remove(name);
     PageElement::clearEvent(name);
     setEvent(EVENT_DEFAULT);
-}
-
-QList<QString> Gif::activeEvents() const
-{
-    return events.keys();
 }

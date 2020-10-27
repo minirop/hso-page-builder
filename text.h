@@ -28,7 +28,6 @@ public:
 
     void setEvent(QString name) override;
     void clearEvent(QString name) override;
-    QList<QString> activeEvents() const override;
 
     void setHSPosition(int x, int y);
     void setWidth(int w);

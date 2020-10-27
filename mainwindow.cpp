@@ -210,7 +210,7 @@ void MainWindow::savePage()
                 webpage->setEvent(evName);
 
                 auto metadata = emptyArray();
-                metadata[WebEvent] = evName;
+                metadata[WebEvent] = evName.toUpper();
                 metadata[WebTitle] = webpage->title();
                 metadata[WebUsername] = webpage->owner();
                 metadata[WebHeight] = QString::number(webpage->linesCount());
@@ -422,6 +422,7 @@ void MainWindow::parseJSON(QByteArray data)
         for (int i = 1; i < eventList.size(); i++)
         {
             auto eventData = eventList[i].toVariant().toStringList();
+            eventData[0] = getRealEventName(eventData[0]);
             if (eventData.first().size() == 0)
             {
                 break;
@@ -639,7 +640,7 @@ QJsonArray MainWindow::gifToJson(Gif * gif, QString eventName)
 
     QJsonArray array = emptyArray();
 
-    array[GifEvent] = eventName;
+    array[GifEvent] = eventName.toUpper();
     array[GifX] = QString::number(gif->HSX());
     array[GifY] = QString::number(gif->HSY());
     array[GifHSL] = QString("%1,%2,%3").arg(gif->H()).arg(gif->S()).arg(gif->L());
@@ -670,7 +671,7 @@ QJsonArray MainWindow::textToJson(Text * text, QString eventName)
 
     QJsonArray array = emptyArray();
 
-    array[TextEvent] = eventName;
+    array[TextEvent] = eventName.toUpper();
     array[TextX] = QString::number(text->xoffset());
     array[TextY] = QString::number(text->HSY());
     array[TextWidth] = QString::number(text->width());
@@ -746,6 +747,19 @@ void MainWindow::updateSettingsFromPage(Page * webpage)
 void MainWindow::updateCurrentPageElement(PageElement * pageElement)
 {
     settings->updateProperties(pageElement);
+}
+
+QString MainWindow::getRealEventName(QString name)
+{
+    for (auto event : settings->realEventsNames)
+    {
+        if (event.compare(name, Qt::CaseInsensitive) == 0)
+        {
+            return event;
+        }
+    }
+
+    return name;
 }
 
 void MainWindow::updateZOrder()

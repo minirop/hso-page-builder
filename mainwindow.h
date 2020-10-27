@@ -45,6 +45,8 @@ private:
     void updateSettingsFromPage(Page * webpage);
     void updateCurrentPageElement(PageElement * pageElement);
 
+    QString getRealEventName(QString name);
+
     QHash<int, QGraphicsItem*> pageElements;
     Ui::MainWindow * ui;
     Page * webpage;

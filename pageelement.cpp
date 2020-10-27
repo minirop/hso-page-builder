@@ -15,6 +15,7 @@ void PageElement::setEvent(QString name)
             data = pageEvents[currentEvent];
         }
         pageEvents[name] = data;
+        orderedEvents.append(name);
     }
 
     currentEvent = name;
@@ -23,6 +24,18 @@ void PageElement::setEvent(QString name)
 void PageElement::clearEvent(QString name)
 {
     pageEvents.remove(name);
+}
+
+QStringList PageElement::activeEvents() const
+{
+    return orderedEvents;
+}
+
+void PageElement::moveActiveEvent(int from, int to)
+{
+    auto ev = orderedEvents.at(from);
+    orderedEvents.removeAt(from);
+    orderedEvents.insert(to, ev);
 }
 
 void PageElement::setCaseTag(QString tag)

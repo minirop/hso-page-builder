@@ -282,19 +282,28 @@ PageSettings::PageSettings(QWidget *parent) :
     });
 
     connect(ui->elementsMoveUpEvent, &QPushButton::clicked, [&]() {
-        auto item = ui->elementsEventsList->currentItem();
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+        assert(pageElement);
 
+        item = ui->elementsEventsList->currentItem();
         if (item)
         {
             auto row = ui->elementsEventsList->row(item);
             if (row < 2) return; // already at the top
 
             moveItem(ui->elementsEventsList, item, row, row - 1);
+            pageElement->moveActiveEvent(row, row - 1);
         }
     });
     connect(ui->elementsMoveDownEvent, &QPushButton::clicked, [&]() {
-        auto item = ui->elementsEventsList->currentItem();
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+        assert(pageElement);
 
+        item = ui->elementsEventsList->currentItem();
         if (item)
         {
             auto row = ui->elementsEventsList->row(item);
@@ -302,22 +311,32 @@ PageSettings::PageSettings(QWidget *parent) :
             if (row == ui->elementsEventsList->count() - 1) return; // already at the bottom
 
             moveItem(ui->elementsEventsList, item, row, row + 1);
+            pageElement->moveActiveEvent(row, row + 1);
         }
     });
     connect(ui->elementsMoveToTopEvent, &QPushButton::clicked, [&]() {
-        auto item = ui->elementsEventsList->currentItem();
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+        assert(pageElement);
 
+        item = ui->elementsEventsList->currentItem();
         if (item)
         {
             auto row = ui->elementsEventsList->row(item);
             if (row < 2) return; // already at the top
 
             moveItem(ui->elementsEventsList, item, row, 1);
+            pageElement->moveActiveEvent(row, 1);
         }
     });
     connect(ui->elementsMoveToBottomEvent, &QPushButton::clicked, [&]() {
-        auto item = ui->elementsEventsList->currentItem();
+        auto item = ui->elementsList->currentItem();
+        if (!item) return;
+        auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+        assert(pageElement);
 
+        item = ui->elementsEventsList->currentItem();
         if (item)
         {
             auto row = ui->elementsEventsList->row(item);
@@ -326,6 +345,7 @@ PageSettings::PageSettings(QWidget *parent) :
             if (row == count - 1) return; // already at the bottom
 
             moveItem(ui->elementsEventsList, item, row, count - 1);
+            pageElement->moveActiveEvent(row, count - 1);
         }
     });
 
@@ -1096,12 +1116,6 @@ void PageSettings::refresh()
 
 void PageSettings::refreshGifsList()
 {
-/*    auto selectedItems = ui->gifsListWidget->selectedItems();
-
-    QString saved;
-    if (selectedItems.size())
-        saved = selectedItems.first()->text();*/
-
     ui->tabbedImages->clear();
 
     auto subFolders = QStringList() << "/images/static/" << "/images/shapes/";
@@ -1256,6 +1270,7 @@ void PageSettings::refreshEvents()
             auto name = ev.trimmed();
             webpageEventsList->addEvent(name);
             elementsEventsList->addEvent(name);
+            realEventsNames.append(name);
         }
         f.close();
     }

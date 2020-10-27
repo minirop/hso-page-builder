@@ -17,7 +17,6 @@ public:
 
     void setEvent(QString name) override;
     void clearEvent(QString name) override;
-    QList<QString> activeEvents() const override;
 
     void addFrame(QString filename);
     void setSpeed(int speed);

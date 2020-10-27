@@ -83,6 +83,7 @@ private:
     EventsListFilterModel * webpageInactiveEvents = nullptr;
     EventsList * elementsEventsList = nullptr;
     EventsListFilterModel * elementsInactiveEvents = nullptr;
+    QStringList realEventsNames;
 
     QColor bgColor;
 };

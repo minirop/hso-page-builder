@@ -22,7 +22,8 @@ public:
     virtual ElementType elementType() const = 0;
     virtual void refresh() = 0;
 
-    virtual QList<QString> activeEvents() const = 0;
+    QStringList activeEvents() const;
+    void moveActiveEvent(int from, int to);
 
     void setCaseTag(QString tag);
     void setBrokenLaw(int law);
@@ -43,6 +44,7 @@ private:
     };
 
     QMap<QString, PageEventData> pageEvents;
+    QStringList orderedEvents;
 };
 
 #endif // PAGEELEMENT_H
