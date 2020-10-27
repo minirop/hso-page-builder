@@ -167,8 +167,7 @@ void MainWindow::openPage()
             {
                 settings->ui->elementsList->setCurrentItem(item, QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent);
 
-                QModelIndex firstIndex = settings->ui->elementsEventsList->model()->index(0, 0);
-                settings->ui->elementsEventsList->selectionModel()->select(firstIndex, QItemSelectionModel::SelectCurrent);
+                settings->ui->elementsEventsList->setCurrentRow(0);
             }
 
             AppSettings::SetPageDirty(false);

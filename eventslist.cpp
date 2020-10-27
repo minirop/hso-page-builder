@@ -17,15 +17,19 @@ void EventsList::clear()
 
 void EventsList::reset()
 {
-    beginResetModel();
-
-    for (auto & ev : events)
+    for (int row = 0; auto & ev : events)
     {
-        ev.active = false;
+        if (ev.active)
+        {
+            ev.active = false;
+            auto idx = index(row);
+            emit dataChanged(idx, idx, { EVENT_ACTIVE_ROLE });
+        }
+        row++;
     }
     events.first().active = true;
-
-    endResetModel();
+    auto idx = index(0);
+    emit dataChanged(idx, idx, { EVENT_ACTIVE_ROLE });
 }
 
 void EventsList::addEvent(QString name)
@@ -44,9 +48,12 @@ void EventsList::setEventActive(QString name, bool active)
     {
         if (ev.name.compare(name, Qt::CaseInsensitive) == 0)
         {
-            ev.active = active;
-            auto idx = index(row);
-            emit dataChanged(idx, idx, { EVENT_ACTIVE_ROLE });
+            if (ev.active != active)
+            {
+                ev.active = active;
+                auto idx = index(row);
+                emit dataChanged(idx, idx, { EVENT_ACTIVE_ROLE });
+            }
             break;
         }
 

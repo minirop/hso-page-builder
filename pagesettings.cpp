@@ -35,10 +35,6 @@ PageSettings::PageSettings(QWidget *parent) :
     ui->webpageEventsNamesComboBox->setModel(webpageInactiveEvents);
 
     elementsEventsList = new EventsList(this);
-    elementsActiveEvents = new EventsListFilterModel(true, this);
-    elementsActiveEvents->setSourceModel(elementsEventsList);
-    ui->elementsEventsList->setModel(elementsActiveEvents);
-
     elementsInactiveEvents = new EventsListFilterModel(false, this);
     elementsInactiveEvents->setSourceModel(elementsEventsList);
     ui->elementsEventsNamesComboBox->setModel(elementsInactiveEvents);
@@ -619,14 +615,15 @@ PageSettings::PageSettings(QWidget *parent) :
 
         auto name = ui->elementsEventsNamesComboBox->currentText();
         elementsEventsList->setEventActive(name, true);
+        ui->elementsEventsList->addItem(name);
 
         pageElement->setEvent(name);
 
-        auto model = ui->elementsEventsList->model();
-        auto firstIndex = model->index(model->rowCount() - 1, 0);
-        ui->elementsEventsList->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Current);
+        ui->elementsEventsList->setCurrentRow(0);
     });
-    connect(ui->elementsEventsList->selectionModel(), &QItemSelectionModel::currentChanged, [&](const QModelIndex & current) {
+    connect(ui->elementsEventsList, &QListWidget::currentItemChanged, [&](QListWidgetItem *current) {
+        if (!current) return;
+
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
@@ -634,7 +631,7 @@ PageSettings::PageSettings(QWidget *parent) :
 
         auto dirty = AppSettings::IsPageDirty();
 
-        auto name = current.data().toString();
+        auto name = current->text();
         pageElement->setEvent(name);
         pageElement->refresh();
         updateProperties(pageElement);
@@ -642,28 +639,29 @@ PageSettings::PageSettings(QWidget *parent) :
         AppSettings::SetPageDirty(dirty);
     });
     connect(ui->elementsDeleteEvent, &QPushButton::clicked, [&]() {
-        if (ui->elementsEventsList->model()->rowCount() > 1)
+        if (ui->elementsEventsList->count() > 1)
         {
-            auto selectedIndexes = ui->elementsEventsList->selectionModel()->selectedIndexes();
-            if (selectedIndexes.size())
+            auto item = ui->elementsEventsList->currentItem();
+            if (item)
             {
-                if (selectedIndexes.first().row() != 0)
+                auto name = item->text();
+                elementsEventsList->setEventActive(name, false);
+                emit elementsEventDeactivated(name);
+
+                auto item = ui->elementsList->currentItem();
+                if (!item) return;
+                auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
+                assert(pageElement);
+
+                pageElement->clearEvent(name);
+
+                auto deletedEvents = ui->elementsEventsList->findItems(name, Qt::MatchExactly);
+                for (auto deletedEvent : deletedEvents)
                 {
-                    auto name = selectedIndexes.first().data().toString();
-                    elementsEventsList->setEventActive(name, false);
-                    emit elementsEventDeactivated(name);
-
-                    auto item = ui->elementsList->currentItem();
-                    if (!item) return;
-                    auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-                    assert(pageElement);
-
-                    pageElement->clearEvent(name);
-
-                    auto model = ui->elementsEventsList->model();
-                    auto firstIndex = model->index(0, 0);
-                    ui->elementsEventsList->selectionModel()->setCurrentIndex(firstIndex, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Current);
+                    delete deletedEvent;
                 }
+
+                ui->elementsEventsList->setCurrentRow(0);
             }
         }
     });
@@ -722,8 +720,20 @@ void PageSettings::itemChanged(QListWidgetItem * item, QListWidgetItem * previou
 
         updateProperties(item);
 
-        QModelIndex firstIndex = ui->elementsEventsList->model()->index(0, 0);
-        ui->elementsEventsList->selectionModel()->select(firstIndex, QItemSelectionModel::SelectCurrent);
+        auto elem = item->data(ROLE_ELEMENT).value<PageElement*>();
+        assert(elem);
+
+        elementsEventsList->reset();
+
+        ui->elementsEventsList->clear();
+        for (auto name : elem->activeEvents())
+        {
+            ui->elementsEventsList->addItem(name);
+            elementsEventsList->setEventActive(name, true);
+        }
+        ui->elementsEventsNamesComboBox->setCurrentIndex(0);
+
+        ui->elementsEventsList->setCurrentRow(0);
 
         newSel = item->data(ROLE_ID).toInt();
     }
@@ -771,12 +781,6 @@ void PageSettings::updateProperties(PageElement * elem)
         break;
     default:
         assert(false);
-    }
-
-    elementsEventsList->reset();
-    for (const auto & name : elem->activeEvents())
-    {
-        elementsEventsList->setEventActive(name, true);
     }
 }
 
