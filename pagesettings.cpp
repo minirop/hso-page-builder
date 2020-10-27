@@ -298,6 +298,7 @@ PageSettings::PageSettings(QWidget *parent) :
         if (item)
         {
             auto row = ui->elementsEventsList->row(item);
+            if (row == 0) return; // can't move "default"
             if (row == ui->elementsEventsList->count() - 1) return; // already at the bottom
 
             moveItem(ui->elementsEventsList, item, row, row + 1);
@@ -320,6 +321,7 @@ PageSettings::PageSettings(QWidget *parent) :
         if (item)
         {
             auto row = ui->elementsEventsList->row(item);
+            if (row == 0) return; // can't move "default"
             auto count = ui->elementsEventsList->count();
             if (row == count - 1) return; // already at the bottom
 
@@ -344,6 +346,7 @@ PageSettings::PageSettings(QWidget *parent) :
         if (item)
         {
             auto row = ui->webpageEventsList->row(item);
+            if (row == 0) return; // can't move "default"
             if (row == ui->webpageEventsList->count() - 1) return; // already at the bottom
 
             moveItem(ui->webpageEventsList, item, row, row + 1);
@@ -366,6 +369,7 @@ PageSettings::PageSettings(QWidget *parent) :
         if (item)
         {
             auto row = ui->webpageEventsList->row(item);
+            if (row == 0) return; // can't move "default"
             auto count = ui->webpageEventsList->count();
             if (row == count - 1) return; // already at the bottom
 
