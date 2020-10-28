@@ -683,7 +683,7 @@ QJsonArray MainWindow::textToJson(Text * text, QString eventName)
     array[TextY] = QString::number(text->HSY());
     array[TextWidth] = QString::number(text->width());
     array[TextCaseTag] = text->caseTag();
-    array[TextString] = text->string();
+    array[TextString] = text->string().replace("\n", "/n");
     array[TextColor] = QString::number(colorToInt(text->fontColor()));
     array[TextFont] = text->fontName();
     array[TextStyle] = QString("%1%2").arg(text->fontSize()).arg(text->fontBold() ? 'b' : 'n');

@@ -120,7 +120,7 @@ void Text::setAlign(int halign)
 
 void Text::setString(QString str)
 {
-    events[currentEvent].string = str;
+    events[currentEvent].string = str.replace("/n", "\n");
     textIsDirty = true;
 
     renderText(events[currentEvent].string);
@@ -481,6 +481,15 @@ void Text::renderText(QString string)
         for (int xx = 0, www = evData.renderedWidth, index = 0; index < str.size(); )
         {
             auto c = str[index];
+            if (c == '\n')
+            {
+                lines.push_back(str.left(index));
+                str = str.mid(index).trimmed();
+                xx = 0;
+                index = 0;
+                continue;
+            }
+
             xx += font.getWidth(c.toLatin1(), evData.fontWidth);
             index++;
 
@@ -490,7 +499,7 @@ void Text::renderText(QString string)
                 if (space != -1)
                 {
                     lines.push_back(str.left(space).trimmed());
-                    str = str.mid(space).trimmed();
+                    str = str.mid(space);
                     xx = 0;
                     index = 0;
                 }
