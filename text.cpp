@@ -337,14 +337,15 @@ bool Text::noContent() const
 QRectF Text::boundingRect() const
 {
     auto & evData = events[currentEvent];
+    auto lineHeight = FontDatabase::GetFont(QString("%1%2%3").arg(evData.fontName).arg(evData.fontSize).arg(evData.fontBold ? 'b' : 'n')).lineheight;
 
     qreal floatingOffset = 0.0;
     if (evData.animation == Animation::Floating)
     {
         constexpr auto PI_180 = M_PI / 180;
-        floatingOffset = (std::sin(evData.floating * PI_180) * renderedTextes.size() * evData.fontHeight * 0.25);
+        floatingOffset = (std::sin(evData.floating * PI_180) * renderedTextes.size() * (evData.fontHeight + lineHeight) * 0.25);
     }
-    return QRectF { -evData.renderedWidth / 2.0, floatingOffset, qreal(evData.renderedWidth), qreal(renderedTextes.size() * evData.fontHeight) };
+    return QRectF { -evData.renderedWidth / 2.0, floatingOffset, qreal(evData.renderedWidth), qreal(renderedTextes.size() * (evData.fontHeight + lineHeight)) };
 }
 
 void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -361,6 +362,8 @@ void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     case Animation::TypeWriter:
     case Animation::Floating:
     {
+        auto lineHeight = FontDatabase::GetFont(QString("%1%2%3").arg(evData.fontName).arg(evData.fontSize).arg(evData.fontBold ? 'b' : 'n')).lineheight;
+
         int y = 0;
         for (auto & renderedText : renderedTextes)
         {
@@ -379,7 +382,7 @@ void Text::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
             }
 
             painter->drawPixmap(x, rect.top() + y, renderedText);
-            y += evData.fontHeight;
+            y += evData.fontHeight + lineHeight;
         }
         break;
     }
@@ -484,7 +487,7 @@ void Text::renderText(QString string)
             if (c == '\n')
             {
                 lines.push_back(str.left(index));
-                str = str.mid(index).trimmed();
+                str = str.mid(index + 1);
                 xx = 0;
                 index = 0;
                 continue;
@@ -498,7 +501,7 @@ void Text::renderText(QString string)
                 auto space = str.lastIndexOf(' ', index);
                 if (space != -1)
                 {
-                    lines.push_back(str.left(space).trimmed());
+                    lines.push_back(str.left(space));
                     str = str.mid(space);
                     xx = 0;
                     index = 0;
