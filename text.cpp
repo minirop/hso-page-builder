@@ -180,7 +180,7 @@ void Text::setFade(QColor color, int speed)
         group = nullptr;
     }
 
-    if (speed == 0)
+    if (speed == 0 || !color.isValid())
     {
         setColor(evData.fontColor);
         AppSettings::SetPageDirty();
@@ -209,6 +209,12 @@ void Text::setFade(QColor color, int speed)
     group->setLoopCount(-1);
 
     group->start();
+    AppSettings::SetPageDirty();
+}
+
+void Text::setFadeSpeed(int speed)
+{
+    events[currentEvent].fadeSpeed = speed;
     AppSettings::SetPageDirty();
 }
 

@@ -8,6 +8,7 @@
 #include "globals.h"
 #include "eventslist.h"
 #include "eventslistfiltermodel.h"
+#include "mainwindow.h"
 #include <QColorDialog>
 #include <QGraphicsScene>
 #include <algorithm>
@@ -17,9 +18,10 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-PageSettings::PageSettings(QWidget *parent) :
+PageSettings::PageSettings(MainWindow * parent) :
     QWidget(parent),
-    ui(new Ui::PageSettings)
+    ui(new Ui::PageSettings),
+    mainWindow(parent)
 {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
@@ -237,9 +239,10 @@ PageSettings::PageSettings(QWidget *parent) :
         if (item)
         {
             auto row = ui->elementsList->row(item);
-            if (row < 1) return; // already at the top
+            if (row < 2) return; // already at the top
 
             moveItem(ui->elementsList, item, row, row - 1);
+            mainWindow->webpage->moveActiveEvent(row, row - 1);
             emit updateZOrder();
         }
     });
@@ -249,9 +252,11 @@ PageSettings::PageSettings(QWidget *parent) :
         if (item)
         {
             auto row = ui->elementsList->row(item);
+            if (row == 0) return; // can't move "default"
             if (row == ui->elementsList->count() - 1) return; // already at the bottom
 
             moveItem(ui->elementsList, item, row, row + 1);
+            mainWindow->webpage->moveActiveEvent(row, row + 1);
             emit updateZOrder();
         }
     });
@@ -261,9 +266,10 @@ PageSettings::PageSettings(QWidget *parent) :
         if (item)
         {
             auto row = ui->elementsList->row(item);
-            if (row < 1) return; // already at the top
+            if (row < 2) return; // already at the top
 
             moveItem(ui->elementsList, item, row, 0);
+            mainWindow->webpage->moveActiveEvent(row, 1);
             emit updateZOrder();
         }
     });
@@ -273,10 +279,12 @@ PageSettings::PageSettings(QWidget *parent) :
         if (item)
         {
             auto row = ui->elementsList->row(item);
+            if (row == 0) return; // can't move "default"
             auto count = ui->elementsList->count();
             if (row == count - 1) return; // already at the bottom
 
             moveItem(ui->elementsList, item, row, count - 1);
+            mainWindow->webpage->moveActiveEvent(row, count - 1);
             emit updateZOrder();
         }
     });

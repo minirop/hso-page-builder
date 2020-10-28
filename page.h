@@ -19,6 +19,9 @@ public:
     void addElement(QGraphicsItem *element);
     bool eventFilter(QObject *watched, QEvent *event) override;
 
+    QStringList activeEvents() const;
+    void moveActiveEvent(int from, int to);
+
     QString background();
     QColor backgroundColor();
     int linesCount();
@@ -73,6 +76,7 @@ private:
     };
 
     QMap<QString, EventData> events;
+    QStringList orderedEvents;
 
     QString currentEvent;
     int topLine = 0;

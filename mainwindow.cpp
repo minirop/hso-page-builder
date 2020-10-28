@@ -39,11 +39,18 @@ QList<int> stringsToInts(QStringList strings)
 
 int colorToInt(QColor color)
 {
+    if (!color.isValid())
+    {
+        return -1;
+    }
+
     return color.red() | (color.green() << 8) | (color.blue() << 16);
 }
 
 QColor intToColor(int color)
 {
+    if (color < 0) return QColor(QColor::Invalid);
+
     int r = (color >> 0) & 0xFF;
     int g = (color >> 8) & 0xFF;
     int b = (color >> 16) & 0xFF;
@@ -59,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
     area = new QWidget;
     area->setFixedWidth(PAGE_WIDTH * ZOOM);
 
-    settings = new PageSettings;
+    settings = new PageSettings(this);
     connect(settings, &PageSettings::selectionChanged, [&](int newSel, int oldSel) {
         if (oldSel != -1) pageElements[oldSel]->setSelected(false);
         if (newSel != -1)
@@ -161,6 +168,13 @@ void MainWindow::openPage()
             openedFilename = filename;
 
             parseJSON(contents);
+
+            settings->ui->webpageEventsList->clear();
+            for (auto name : webpage->activeEvents())
+            {
+                settings->ui->webpageEventsList->addItem(name);
+            }
+            settings->ui->webpageEventsList->setCurrentRow(0);
 
             auto item = settings->ui->elementsList->item(0);
             if (item)
@@ -524,15 +538,8 @@ QGraphicsItem * MainWindow::addElement(QString type, QStringList arguments, Page
         text->setNoContent(noContent);
         text->setScript(script);
 
-        if (color >= 0)
-        {
-            text->setFontColor(intToColor(color));
-        }
-
-        if (fadeColor >= 0)
-        {
-            text->setFade(intToColor(fadeColor), fadeSpeed);
-        }
+        text->setFontColor(intToColor(color));
+        text->setFade(intToColor(fadeColor), fadeSpeed);
 
         text->setString(string);
 

@@ -14,12 +14,13 @@ class Text;
 class PageElement;
 class EventsList;
 class EventsListFilterModel;
+class MainWindow;
 class PageSettings : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PageSettings(QWidget *parent = nullptr);
+    explicit PageSettings(MainWindow *parent = nullptr);
     ~PageSettings();
 
     void select(int idSel);
@@ -84,6 +85,7 @@ private:
     EventsList * elementsEventsList = nullptr;
     EventsListFilterModel * elementsInactiveEvents = nullptr;
     QStringList realEventsNames;
+    MainWindow * mainWindow = nullptr;
 
     QColor bgColor;
 };

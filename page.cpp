@@ -144,6 +144,18 @@ bool Page::eventFilter(QObject * watched, QEvent * event)
     return QGraphicsView::eventFilter(watched, event);
 }
 
+QStringList Page::activeEvents() const
+{
+    return orderedEvents;
+}
+
+void Page::moveActiveEvent(int from, int to)
+{
+    auto ev = orderedEvents.at(from);
+    orderedEvents.removeAt(from);
+    orderedEvents.insert(to, ev);
+}
+
 QString Page::background()
 {
     return events[currentEvent].background;
@@ -204,6 +216,7 @@ void Page::setEvent(QString name)
             data = events[currentEvent];
         }
         events[name] = data;
+        orderedEvents.append(name);
     }
 
     currentEvent = name;

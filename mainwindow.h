@@ -47,10 +47,11 @@ private:
 
     QString getRealEventName(QString name);
 
+    friend class PageSettings;
     QHash<int, QGraphicsItem*> pageElements;
-    Ui::MainWindow * ui;
-    Page * webpage;
-    PageSettings * settings;
+    Ui::MainWindow * ui = nullptr;
+    Page * webpage = nullptr;
+    PageSettings * settings = nullptr;
     FontDatabase fontDatabase;
     QWidget * area = nullptr;
     QString openedFilename;

@@ -41,6 +41,7 @@ public:
     void setFontColor(QColor color);
     void setColor(QColor color);
     void setFade(QColor color, int speed);
+    void setFadeSpeed(int speed);
     void setNoContent(bool b);
 
     QString string() const;
