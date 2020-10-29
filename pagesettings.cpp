@@ -1282,7 +1282,13 @@ void PageSettings::refreshEvents()
     QFile f(eventsFile);
     if (f.open(QFile::ReadOnly))
     {
-        auto eventsNames = QString(f.readAll()).split('\n', Qt::SkipEmptyParts);
+        auto eventsNames = QString(f.readAll()).split('\n',
+#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
+                                                      QString::SkipEmptyParts
+#else
+                                                      Qt::SkipEmptyParts
+#endif
+                                                      );
         for (auto ev : eventsNames)
         {
             auto name = ev.trimmed();
