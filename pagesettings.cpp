@@ -42,6 +42,11 @@ PageSettings::PageSettings(MainWindow * parent) :
     ui->animationComboBox->addItem("Floating", static_cast<int>(Animation::Floating));
     ui->animationComboBox->addItem("Marquee", static_cast<int>(Animation::Marquee));
 
+    ui->gifAnimationComboBox->addItem("Always animate", 0);
+    ui->gifAnimationComboBox->addItem("Animate on mouse over", 1);
+    ui->gifAnimationComboBox->addItem("Still image", -1);
+    ui->gifAnimationComboBox->addItem("Simulate a button", -2);
+
     ui->textLawBrokenComboBox->addItem("None", -1);
     ui->textLawBrokenComboBox->addItem("C: Content Infringement", 1);
     ui->textLawBrokenComboBox->addItem("H: Harassment", 2);
@@ -666,12 +671,14 @@ PageSettings::PageSettings(MainWindow * parent) :
         graphics->setSync(c);
     });
     connect(ui->gifAnimationComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int value){
+        Q_UNUSED(value)
+
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
         assert(graphics);
 
-        graphics->setGifAnimation(value);
+        graphics->setGifAnimation(ui->gifAnimationComboBox->currentData().toInt());
     });
     connect(ui->musicComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int value){
         Q_UNUSED(value)
@@ -960,11 +967,14 @@ void PageSettings::updateGifProperties(Gif * gif)
     ui->gifFadeCheckBox->setChecked(gif->fade());
     ui->gifFadeSpeed->setValue(gif->fadeSpeed());
     ui->syncCheckBox->setChecked(gif->sync());
-    ui->gifAnimationComboBox->setCurrentIndex(gif->gifAnimation());
+
+    auto mouseOverIndex = ui->gifAnimationComboBox->findData(gif->gifAnimation());
+    assert(mouseOverIndex != -1);
+    ui->gifAnimationComboBox->setCurrentIndex(mouseOverIndex);
 
     ui->gifFrameSpinBox->setValue(gif->offsetFrame());
 
-    int lawIndex = ui->gifLawBrokenComboBox->findData(gif->brokenLaw());
+    auto lawIndex = ui->gifLawBrokenComboBox->findData(gif->brokenLaw());
     assert(lawIndex != -1);
     ui->gifLawBrokenComboBox->setCurrentIndex(lawIndex);
     ui->gifCaseTagLineEdit->setText(gif->caseTag());

@@ -769,28 +769,7 @@
                 </widget>
                </item>
                <item row="2" column="3">
-                <widget class="QComboBox" name="gifAnimationComboBox">
-                 <item>
-                  <property name="text">
-                   <string>Always animate</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Animate on mouse over</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Still image</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Simulates a button</string>
-                  </property>
-                 </item>
-                </widget>
+                <widget class="QComboBox" name="gifAnimationComboBox"/>
                </item>
                <item row="1" column="3">
                 <widget class="QCheckBox" name="syncCheckBox">

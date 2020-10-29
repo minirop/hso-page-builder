@@ -14,6 +14,10 @@ constexpr const char * TYPE_GIF = "Gif";
 constexpr const char * TYPE_TEXT = "Text";
 constexpr const char * EVENT_DEFAULT = "DEFAULT";
 constexpr int EVENT_ACTIVE_ROLE = Qt::UserRole + 1;
+constexpr int GIF_ANIMATION = 0;
+constexpr int GIF_MOUSE_OVER_ANIMATION = 1;
+constexpr int GIF_STILL_IMAGE = -1;
+constexpr int GIF_SIMULATE_BUTTON = -2;
 
 enum DefinitionData {
     DefType,

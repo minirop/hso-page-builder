@@ -322,7 +322,7 @@ void Gif::timerEvent(QTimerEvent *event)
     float dt = 1.f / 60.f;
     auto & evData = events[currentEvent];
 
-    if (fps > 0 && (evData.gifAnimation == 0 || (evData.gifAnimation == 1 && isUnderMouse())))
+    if (fps > 0 && (evData.gifAnimation == GIF_ANIMATION || (evData.gifAnimation == GIF_MOUSE_OVER_ANIMATION && isUnderMouse())))
     {
         fpsProgress += dt;
         if (fpsProgress > fps)
@@ -331,27 +331,27 @@ void Gif::timerEvent(QTimerEvent *event)
             fpsProgress -= fps;
         }
     }
-    else if (evData.gifAnimation == 1 && !isUnderMouse())
+    else if (evData.gifAnimation == GIF_MOUSE_OVER_ANIMATION && !isUnderMouse())
     {
         currentFrame = 0;
         fpsProgress = 0;
     }
-    else if (evData.gifAnimation == 3)
+    else if (evData.gifAnimation == GIF_SIMULATE_BUTTON)
     {
         if (isUnderMouse())
         {
             if (QApplication::mouseButtons() == Qt::LeftButton)
             {
-                currentFrame = 2;
+                currentFrame = evData.offsetFrame + 2;
             }
             else
             {
-                currentFrame = 1;
+                currentFrame = evData.offsetFrame + 1;
             }
         }
         else
         {
-            currentFrame = 0;
+            currentFrame = evData.offsetFrame;
         }
     }
 
