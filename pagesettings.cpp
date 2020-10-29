@@ -158,7 +158,7 @@ PageSettings::PageSettings(MainWindow * parent) :
     };
 
     connect(ui->fontsCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), setFontCallback);
-    connect(ui->fontSizeGroup, &QButtonGroup::idClicked, setFontCallback);
+    connect(ui->fontSizeGroup, QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked), setFontCallback);
     connect(ui->boldButton, &QPushButton::clicked, setFontCallback);
 
     connect(ui->duplicateBtn, &QPushButton::clicked, [&]() {

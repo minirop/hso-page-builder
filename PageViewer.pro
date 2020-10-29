@@ -1,6 +1,6 @@
 QT += core gui widgets
 
-CONFIG += c++2a
+QMAKE_CXXFLAGS += -std=c++2a
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
