@@ -6,7 +6,7 @@ An attempt to make a page builder for [Hypnospace Outlaw](http://www.hypnospace.
 How to build:
 -------------
 
-You need Qt at least 5.15 and GCC 9 or later.
+You need Qt 5 (minimum version unknown, maybe 5.9 or 5.12) and a C++20 compiler like GCC 9 or later (clang and MSVC have not been tested).
 
     $ qmake
 
