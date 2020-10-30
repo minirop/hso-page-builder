@@ -547,8 +547,9 @@ void Text::regenerateFont()
 
     auto & evData = events[currentEvent];
 
-    QPixmap pix = FontDatabase::GetFontAtlas(QString("%1%2%3").arg(evData.fontName).arg(evData.fontSize).arg(evData.fontBold ? 'b' : 'n'));
-    assert(!pix.isNull());
+    auto fontFullName = QString("%1%2%3").arg(evData.fontName).arg(evData.fontSize).arg(evData.fontBold ? 'b' : 'n');
+    QPixmap pix = FontDatabase::GetFontAtlas(fontFullName);
+    CHECK_DATA(!pix.isNull(), QString("Unable to load font atlas '%1'.").arg(fontFullName))
     evData.fontWidth = pix.width() / 8;
     evData.fontHeight = pix.height() / 12;
 

@@ -84,4 +84,13 @@ enum GifData {
     GifAnimMouseOver
 };
 
+#include <QMessageBox>
+
+#define CHECK_DATA(cond, message) \
+    if (!(cond)) \
+    { \
+        QMessageBox::critical(nullptr, "An error has occured", message); \
+        assert(false); \
+    }
+
 #endif // GLOBALS_H

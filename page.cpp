@@ -74,9 +74,10 @@ void Page::setBackground(QString image)
             auto img = path + "/images/bgs/" + image;
             if (QFile(img).exists())
             {
+                auto pix = QPixmap(img);
+                CHECK_DATA(!pix.isNull(), QString("Unable to load background '%1'.").arg(image))
                 evData.background = image;
-                setBackgroundBrush(QPixmap(img));
-                assert(!QPixmap(img).isNull());
+                setBackgroundBrush(pix);
                 break;
             }
         }
@@ -84,6 +85,11 @@ void Page::setBackground(QString image)
 
     if (evData.background.isEmpty())
     {
+        if (!image.isEmpty())
+        {
+            QMessageBox::information(this, "Missing background", QString("Unable to find background '%1'.").arg(image));
+        }
+
         setBackgroundColor(evData.backgroundColor);
     }
 
@@ -348,7 +354,6 @@ void Page::mouseMoveEvent(QMouseEvent * event)
         selectedItem->moveBy(diff.x(), diff.y());
 
         auto pageElement = dynamic_cast<PageElement*>(selectedItem);
-        assert(pageElement);
         if (pageElement->elementType() == PageElement::ElementType::Text)
         {
             auto maxY = (events[currentEvent].linesCount * LINE_HEIGHT) - (int)selectedItem->boundingRect().height();

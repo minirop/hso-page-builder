@@ -18,6 +18,8 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
+#define CHECK_COMBO_BOX_INDEX(value) if (value == -1) value = 0
+
 PageSettings::PageSettings(MainWindow * parent) :
     QWidget(parent),
     ui(new Ui::PageSettings),
@@ -77,7 +79,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         graphics->setString(ui->textEdit->toPlainText());
     });
@@ -85,7 +86,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         auto c = QColorDialog::getColor(graphics->fontColor(), this, "Font color");
         if (c.isValid())
@@ -98,7 +98,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         graphics->setAnimation(ui->animationComboBox->currentData().toInt());
     });
@@ -106,7 +105,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         graphics->setAnimationSpeed(ui->speedSpinBox->value());
     });
@@ -114,7 +112,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         graphics->setAlign(ui->alignmentComboBox->currentIndex());
     });
@@ -123,7 +120,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         auto c = QColorDialog::getColor(graphics->fadeColor(), this, "Fade color");
         if (c.isValid())
@@ -136,7 +132,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         graphics->setFade(graphics->fadeColor(), ui->fadeSpeedSpinBox->value());
     });
@@ -145,7 +140,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         auto fontSize = ui->fontSizeGroup->checkedButton()->text();
         graphics->setFontSize(fontSize.toInt());
@@ -165,7 +159,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(pageElement);
 
         emit duplicateElement(item->text(), pageElement);
     });
@@ -174,7 +167,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         if (!item) return;
         auto txt = item->data(ROLE_ELEMENT).value<Text*>();
         auto gif = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(txt || gif);
 
         QGraphicsItem * graphics = nullptr;
         if (txt)
@@ -298,7 +290,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(pageElement);
 
         item = ui->elementsEventsList->currentItem();
         if (item)
@@ -314,7 +305,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(pageElement);
 
         item = ui->elementsEventsList->currentItem();
         if (item)
@@ -331,7 +321,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(pageElement);
 
         item = ui->elementsEventsList->currentItem();
         if (item)
@@ -347,7 +336,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(pageElement);
 
         item = ui->elementsEventsList->currentItem();
         if (item)
@@ -431,7 +419,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(pageElement);
 
         pageElement->setBrokenLaw(ui->textLawBrokenComboBox->currentData().toInt());
     });
@@ -439,7 +426,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         graphics->setCaseTag(newText);
     });
@@ -447,7 +433,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         graphics->setWidth(w);
 
@@ -460,7 +445,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         auto diff = (100 - graphics->width()) / 2;
         x = std::clamp(x, -diff, diff-1);
@@ -473,7 +457,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Text*>();
-        assert(graphics);
 
         graphics->setNoContent(c);
     });
@@ -504,7 +487,6 @@ PageSettings::PageSettings(MainWindow * parent) :
             auto item = ui->elementsList->currentItem();
             if (!item) return;
             auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-            assert(graphics);
 
             graphics->setNameOf(current->text());
             graphics->refresh();
@@ -535,7 +517,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->setHSL(H, S, L);
     };
@@ -546,7 +527,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->setHSScale(value);
     });
@@ -554,7 +534,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->setHSRotation(angle);
     });
@@ -562,7 +541,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->mirror(toggled);
     });
@@ -570,7 +548,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->flip(toggled);
     });
@@ -578,7 +555,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->setFrameOffset(offset);
     });
@@ -586,7 +562,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(pageElement);
 
         pageElement->setBrokenLaw(ui->gifLawBrokenComboBox->currentData().toInt());
     });
@@ -594,7 +569,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->setCaseTag(newText);
     });
@@ -602,7 +576,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->setSwingOrSpin(value);
     });
@@ -610,7 +583,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->setSwingOrSpinSpeed(value);
     });
@@ -618,7 +590,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->set3DFlipX(c);
     });
@@ -626,7 +597,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->set3DFlipXSpeed(value);
     });
@@ -634,7 +604,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->set3DFlipY(c);
     });
@@ -642,7 +611,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->set3DFlipYSpeed(value);
     });
@@ -650,7 +618,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->setFade(c);
     });
@@ -658,7 +625,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->setFadeSpeed(value);
     });
@@ -666,7 +632,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->setSync(c);
     });
@@ -676,7 +641,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
-        assert(graphics);
 
         graphics->setGifAnimation(ui->gifAnimationComboBox->currentData().toInt());
     });
@@ -694,7 +658,6 @@ PageSettings::PageSettings(MainWindow * parent) :
             auto item = ths->ui->elementsList->currentItem();
             if (!item) return;
             auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-            assert(pageElement);
 
             pageElement->setScript(textEdit->toPlainText());
         };
@@ -745,7 +708,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(pageElement);
 
         auto name = ui->elementsEventsNamesComboBox->currentText();
         elementsEventsList->setEventActive(name, true);
@@ -761,7 +723,6 @@ PageSettings::PageSettings(MainWindow * parent) :
         auto item = ui->elementsList->currentItem();
         if (!item) return;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(pageElement);
 
         auto dirty = AppSettings::IsPageDirty();
 
@@ -787,7 +748,6 @@ PageSettings::PageSettings(MainWindow * parent) :
                 auto item = ui->elementsList->currentItem();
                 if (!item) return;
                 auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-                assert(pageElement);
 
                 pageElement->clearEvent(name);
 
@@ -857,7 +817,6 @@ void PageSettings::itemChanged(QListWidgetItem * item, QListWidgetItem * previou
         updateProperties(item);
 
         auto elem = item->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(elem);
 
         elementsEventsList->reset();
 
@@ -884,7 +843,6 @@ void PageSettings::itemChanged(QListWidgetItem * item, QListWidgetItem * previou
     if (previous)
     {
         auto pageElement = previous->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(pageElement);
 
         pageElement->setEvent(EVENT_DEFAULT);
         pageElement->refresh();
@@ -969,13 +927,13 @@ void PageSettings::updateGifProperties(Gif * gif)
     ui->syncCheckBox->setChecked(gif->sync());
 
     auto mouseOverIndex = ui->gifAnimationComboBox->findData(gif->gifAnimation());
-    assert(mouseOverIndex != -1);
+    CHECK_COMBO_BOX_INDEX(mouseOverIndex);
     ui->gifAnimationComboBox->setCurrentIndex(mouseOverIndex);
 
     ui->gifFrameSpinBox->setValue(gif->offsetFrame());
 
     auto lawIndex = ui->gifLawBrokenComboBox->findData(gif->brokenLaw());
-    assert(lawIndex != -1);
+    CHECK_COMBO_BOX_INDEX(lawIndex);
     ui->gifLawBrokenComboBox->setCurrentIndex(lawIndex);
     ui->gifCaseTagLineEdit->setText(gif->caseTag());
     ui->gifScriptTextEdit->setPlainText(gif->script());
@@ -1019,7 +977,7 @@ void PageSettings::updateTextProperties(Text * text)
     setFontColorButton(text->fontColor());
 
     int animIndex = ui->animationComboBox->findData(static_cast<int>(text->animation()));
-    assert(animIndex != -1);
+    CHECK_COMBO_BOX_INDEX(animIndex);
     ui->animationComboBox->setCurrentIndex(animIndex);
     ui->speedSpinBox->setValue(text->animationSpeed());
 
@@ -1042,7 +1000,7 @@ void PageSettings::updateTextProperties(Text * text)
     }
 
     int lawIndex = ui->textLawBrokenComboBox->findData(text->brokenLaw());
-    assert(lawIndex != -1);
+    CHECK_COMBO_BOX_INDEX(lawIndex);
     ui->textLawBrokenComboBox->setCurrentIndex(lawIndex);
     ui->textCaseTagLineEdit->setText(text->caseTag());
 
@@ -1111,7 +1069,6 @@ void PageSettings::refresh()
         auto item = ui->elementsList->item(i);
         if (!item) continue;
         auto pageElement = item->data(ROLE_ELEMENT).value<PageElement*>();
-        assert(pageElement);
 
         pageElement->refresh();
     }
