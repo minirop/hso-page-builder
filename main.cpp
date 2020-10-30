@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     if (root.isEmpty() || !dir.exists())
     {
 #if defined(Q_OS_LINUX)
-        auto defaultPath = QDir::homePath() + "/.local/share/Steam/steamapps/common/Hypnospace Outlaw/data";
+        auto defaultPath = QDir::homePath() + "/.steam/steam/steamapps/common/Hypnospace Outlaw/data";
 #elif defined(Q_OS_WIN32)
         auto defaultPath = "C:/Program Files (x86)/Steam/steamapps/common/Hypnospace Outlaw/data";
 #endif
