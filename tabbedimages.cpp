@@ -92,3 +92,8 @@ void TabbedImages::select(QString name)
         i++;
     }
 }
+
+TabbedImages::Type TabbedImages::type() const
+{
+    return static_cast<Type>(ui->stackedWidget->currentIndex());
+}

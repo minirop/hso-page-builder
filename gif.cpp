@@ -336,6 +336,11 @@ void Gif::timerEvent(QTimerEvent *event)
         currentFrame = 0;
         fpsProgress = 0;
     }
+    else if (evData.gifAnimation == GIF_STILL_IMAGE)
+    {
+        currentFrame = evData.offsetFrame;
+        fpsProgress = 0;
+    }
     else if (evData.gifAnimation == GIF_SIMULATE_BUTTON)
     {
         if (isUnderMouse())

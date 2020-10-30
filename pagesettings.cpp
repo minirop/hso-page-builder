@@ -1,5 +1,6 @@
 #include "pagesettings.h"
 #include "ui_pagesettings.h"
+#include "ui_tabbedimages.h"
 #include "appsettings.h"
 #include "pageelement.h"
 #include "gif.h"
@@ -494,20 +495,58 @@ PageSettings::PageSettings(MainWindow * parent) :
             ui->gifSlider->setGif(graphics);
         }
     });
-    /*connect(ui->prevGif, &QPushButton::clicked, [&]() {
-        auto row = ui->gifsListWidget->currentRow();
+    connect(ui->prevGif, &QPushButton::clicked, [&]() {
+        QListWidget * list = nullptr;
+        switch (ui->tabbedImages->type())
+        {
+        case TabbedImages::Type::Gif:
+            list = ui->tabbedImages->ui->gifsListWidget;
+            break;
+        case TabbedImages::Type::Static:
+            list = ui->tabbedImages->ui->staticListWidget;
+            break;
+        case TabbedImages::Type::Shape:
+            list = ui->tabbedImages->ui->shapesListWidget;
+            break;
+        case TabbedImages::Type::Wordart:
+            list = ui->tabbedImages->ui->wordartListWidget;
+            break;
+        default:
+            assert(false);
+        }
+
+        int row = list->currentRow();
         if (row > 0)
         {
-            ui->gifsListWidget->setCurrentRow(row - 1);
+            list->setCurrentRow(row - 1);
         }
     });
     connect(ui->nextGif, &QPushButton::clicked, [&]() {
-        auto row = ui->gifsListWidget->currentRow();
-        if (row < ui->gifsListWidget->count() - 1)
+        QListWidget * list = nullptr;
+        switch (ui->tabbedImages->type())
         {
-            ui->gifsListWidget->setCurrentRow(row + 1);
+        case TabbedImages::Type::Gif:
+            list = ui->tabbedImages->ui->gifsListWidget;
+            break;
+        case TabbedImages::Type::Static:
+            list = ui->tabbedImages->ui->staticListWidget;
+            break;
+        case TabbedImages::Type::Shape:
+            list = ui->tabbedImages->ui->shapesListWidget;
+            break;
+        case TabbedImages::Type::Wordart:
+            list = ui->tabbedImages->ui->wordartListWidget;
+            break;
+        default:
+            assert(false);
         }
-    });*/
+
+        int row = list->currentRow();
+        if (row < list->count() - 1)
+        {
+            list->setCurrentRow(row + 1);
+        }
+    });
 
     auto changeHSL = [&]() {
         int H = ui->hueSpinBox->value();

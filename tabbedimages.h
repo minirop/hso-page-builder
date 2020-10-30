@@ -30,10 +30,13 @@ public:
 
     void select(QString name);
 
+    Type type() const;
+
 signals:
     void currentItemChanged(QListWidgetItem * current, QListWidgetItem * previous);
 
 private:
+    friend class PageSettings;
     Ui::TabbedImages *ui;
     std::array<QListWidget*, 4> lists;
     std::array<QAbstractButton*, 4> buttons;
