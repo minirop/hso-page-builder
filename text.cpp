@@ -518,24 +518,24 @@ void Text::renderText(QString string)
     renderedTextes.clear();
     for (auto line : lines)
     {
-        if (line.length() == 0)
-        {
-            // so the selected marker doesn't collapse and stays at "1 line minimum".
-            line = " ";
-        }
         auto newText = QPixmap(evData.fontWidth * line.length(), evData.fontHeight);
         newText.fill(Qt::transparent);
 
         QPainter painter;
         painter.begin(&newText);
         int xx = 0;
+        int newWidth = 0;
         for (int yy = 0; auto c : line)
         {
             painter.drawPixmap(xx, yy, evData.fontChars[c.toLatin1()]);
+            newWidth = xx + evData.fontWidth;
             xx += font.getWidth(c.toLatin1(), evData.fontWidth);
         }
         painter.end();
-        renderedTextes.push_back(newText.copy(0, 0, xx, evData.fontHeight));
+        if (xx > 0)
+        {
+            renderedTextes.push_back(newText.copy(0, 0, newWidth, evData.fontHeight));
+        }
     }
 
     textIsDirty = false;
