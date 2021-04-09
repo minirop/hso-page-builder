@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
         QApplication::setStyle(style);
 #endif
 
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication a(argc, argv);
 
     AppSettings settings;
