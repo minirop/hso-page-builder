@@ -444,10 +444,12 @@ void Gif::refresh()
     frames.clear();
     setSpeed(0);
 
+    QString nameOf = ev.nameOf.toLower();
+
     auto searchPaths = AppSettings::GetSearchPaths();
     for (auto path : searchPaths)
     {
-        if (QFileInfo fi(path + "/images/gifs/" + ev.nameOf); fi.isDir())
+        if (QFileInfo fi(path + "/images/gifs/" + nameOf); fi.isDir())
         {
             QDir dir(fi.absoluteFilePath());
             for (auto entry : dir.entryInfoList(QDir::Files, QDir::Name))
@@ -464,17 +466,17 @@ void Gif::refresh()
             }
             break;
         }
-        else if (QFile(path + "/images/static/" + ev.nameOf + ".png").exists())
+        else if (QFile(path + "/images/static/" + nameOf + ".png").exists())
         {
-            addFrame(path + "/images/static/" + ev.nameOf + ".png");
+            addFrame(path + "/images/static/" + nameOf + ".png");
             break;
         }
-        else if (QFile(path + "/images/shapes/" + ev.nameOf + ".png").exists())
+        else if (QFile(path + "/images/shapes/" + nameOf + ".png").exists())
         {
-            addFrame(path + "/images/shapes/" + ev.nameOf + ".png");
+            addFrame(path + "/images/shapes/" + nameOf + ".png");
             break;
         }
-        else if (QFileInfo fi(path + "/images/wordart/" + ev.nameOf.toLower()); fi.isDir())
+        else if (QFileInfo fi(path + "/images/wordart/" + nameOf.toLower()); fi.isDir())
         {
             auto letter = "0";
             if (ev.offsetFrame > 0 && ev.offsetFrame < static_cast<int>(characters.size()))

@@ -6,6 +6,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     appsettings.cpp \
+    charactereditor.cpp \
     eventslist.cpp \
     eventslistfiltermodel.cpp \
     fontdatabase.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
 
 HEADERS += \
     appsettings.h \
+    charactereditor.h \
     eventslist.h \
     eventslistfiltermodel.h \
     fontdatabase.h \
@@ -41,6 +43,7 @@ HEADERS += \
     utils.h
 
 FORMS += \
+    charactereditor.ui \
     mainwindow.ui \
     pagesettings.ui \
     tabbedimages.ui

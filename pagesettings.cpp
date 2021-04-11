@@ -488,6 +488,7 @@ PageSettings::PageSettings(MainWindow * parent) :
             auto item = ui->elementsList->currentItem();
             if (!item) return;
             auto graphics = item->data(ROLE_ELEMENT).value<Gif*>();
+            if (!graphics) return;
 
             graphics->setNameOf(current->text());
             graphics->refresh();
@@ -799,6 +800,9 @@ PageSettings::PageSettings(MainWindow * parent) :
                 ui->elementsEventsList->setCurrentRow(0);
             }
         }
+    });
+    connect(ui->editUsersBtn, &QPushButton::clicked, [&]() {
+        refreshUsers();
     });
 
     // to force the page style image to be displayed.
@@ -1225,6 +1229,8 @@ void PageSettings::refreshMusicList()
 
 void PageSettings::refreshUsers()
 {
+    auto oldDirty = AppSettings::IsPageDirty();
+
     auto currentOwner = ui->pageOwnerComboBox->currentText();
     ui->pageOwnerComboBox->clear();
 
@@ -1262,8 +1268,18 @@ void PageSettings::refreshUsers()
     }
 
     auto index = ui->pageOwnerComboBox->findText(currentOwner);
-    if (index == -1) index = 0;
+    if (index == -1)
+    {
+        index = 0;
+        // if the user has been deleted, the page is now dirty.
+        if (currentOwner.size())
+        {
+            oldDirty = true;
+        }
+    }
     ui->pageOwnerComboBox->setCurrentIndex(index);
+
+    AppSettings::SetPageDirty(oldDirty);
 }
 
 void PageSettings::refreshEvents()

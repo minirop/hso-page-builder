@@ -502,7 +502,7 @@ void Text::renderText(QString string)
                 if (space != -1)
                 {
                     lines.push_back(str.left(space));
-                    str = str.mid(space);
+                    str = str.mid(space + 1);
                     xx = 0;
                     index = 0;
                 }
